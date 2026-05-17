@@ -7,12 +7,15 @@ import { searchAmazonProducts } from '../lib/amazon/search-products';
 // This is a Server Component by default.
 
 import { Suspense } from 'react';
+import dynamicNext from 'next/dynamic';
 import AnimatedPageWrapper from '../components/AnimatedPageWrapper';
 import CallToAction from '../components/CallToAction';
 import ProductCard from '../components/ProductCard';         // From nextjs_app_router_presentational_comps_v2
-import PartnerSection from '../components/PartnerSection';
-import PromotionBanner from '../components/PromotionBanner'; // From nextjs_app_router_presentational_comps_v2
-import CategoryHighlight from '../components/CategoryHighlight'; // From nextjs_app_router_presentational_comps_v2
+
+const PartnerSection = dynamicNext(() => import('../components/PartnerSection'));
+const PromotionBanner = dynamicNext(() => import('../components/PromotionBanner')); // From nextjs_app_router_presentational_comps_v2
+const CategoryHighlight = dynamicNext(() => import('../components/CategoryHighlight')); // From nextjs_app_router_presentational_comps_v2
+
 import AffiliateCards from '../components/AffiliateCards';
 import AffiliateCardsSkeleton from '../components/AffiliateCardsSkeleton';
 import CompactSearchBar from '../components/CompactSearchBar';
@@ -166,9 +169,13 @@ export default async function HomePage() {
 
   return (
     <AnimatedPageWrapper>
-      <CompactSearchBar />
+      <Suspense fallback={<div style={{ height: '60px' }}></div>}>
+        <CompactSearchBar />
+      </Suspense>
       
-      <HomeSearchResults />
+      <Suspense fallback={null}>
+        <HomeSearchResults />
+      </Suspense>
       
       {/* Dynamic Affiliate Showcase Hero Slider */}
       <header className={`${styles.heroSection} relative`} data-aos="fade-in" data-aos-duration="800" style={{ backgroundImage: 'none', padding: '0', minHeight: '400px' }}>

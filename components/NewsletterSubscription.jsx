@@ -74,6 +74,9 @@ export default function NewsletterSubscription() {
                 required
                 className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 transition-all font-semibold text-gray-800 placeholder-gray-400"
                 disabled={status === 'loading'}
+                data-gramm="false"
+                data-gramm_editor="false"
+                data-enable-grammarly="false"
               />
             </div>
             <CallToAction 

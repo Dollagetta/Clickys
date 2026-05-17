@@ -100,9 +100,9 @@ export default function RootLayout({ children }) {
         {/* Google Analytics Script */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-ZVHNBRCRHH"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
-        <Script id="google-analytics" strategy="afterInteractive">
+        <Script id="google-analytics" strategy="lazyOnload">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
@@ -112,7 +112,7 @@ export default function RootLayout({ children }) {
         </Script>
         {/* Analytics script */}
        {/* Analytics script */}
-        <Script id="cuelinks" strategy="afterInteractive" type="text/javascript">
+        <Script id="cuelinks" strategy="lazyOnload" type="text/javascript">
           {`
             var cId = '239712';
             (function(d, t) {

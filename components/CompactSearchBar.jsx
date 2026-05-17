@@ -59,6 +59,9 @@ export default function CompactSearchBar() {
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search products..." 
           className={styles.searchInput}
+          data-gramm="false"
+          data-gramm_editor="false"
+          data-enable-grammarly="false"
         />
         <div className={styles.selectWrapper}>
           <select 

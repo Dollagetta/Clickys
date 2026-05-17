@@ -165,7 +165,6 @@ const ProductCard = ({ product }) => {
         variants={cardVariants}
         initial="rest"
         whileHover="hover"
-        layout
       >
         <div className={styles.cardLinkWrapper}>
           <motion.div className={styles.imageWrapper} variants={imageVariants}>
