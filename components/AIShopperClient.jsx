@@ -127,42 +127,28 @@ export default function AIShopperClient() {
     removeImage();
 
     try {
-      const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-      if (!apiKey) {
-        throw new Error('Gemini API Key is missing. Please set NEXT_PUBLIC_GEMINI_API_KEY in your environment variables.');
-      }
-
-      const ai = new GoogleGenAI({ apiKey });
-
-      // Convert messages to the format expected by the API
-      let parts = [];
-      if (userQuery) parts.push({ text: userQuery });
-      if (currentImageBase64) {
-        parts.push({
-          inlineData: {
-            mimeType: currentMimeType,
-            data: currentImageBase64
-          }
-        });
-      }
-      // Provide a fallback text if user submitted image with no text
-      if (parts.length === 1 && currentImageBase64) {
-          parts.unshift({ text: "Find products like this image" });
-      }
-      
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.1-pro-preview',
-        contents: { parts },
-        config: {
-          systemInstruction: systemInstruction,
-          tools: [{ googleSearch: {} }],
-        }
+      const response = await fetch('/api/ai-shopper', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userQuery,
+          imageBase64: currentImageBase64,
+          imageMimeType: currentMimeType,
+        }),
       });
 
-      const jsonText = response.text.replace(/```json/g, '').replace(/```/g, '').trim();
-      const data = JSON.parse(jsonText);
+      if (!response.ok) {
+        throw new Error('Failed to fetch recommendations');
+      }
 
-      setMessages(prev => [...prev, { role: 'model', data: data, type: 'products' }]);
+      const { data } = await response.json();
+      
+      // Ensure data is structured correctly as an array of products
+      const productsArray = Array.isArray(data) ? data : data.products || [];
+
+      setMessages(prev => [...prev, { role: 'model', data: { products: productsArray }, type: 'products' }]);
 
     } catch (error) {
       console.error('Error fetching recommendations:', error);

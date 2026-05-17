@@ -75,16 +75,16 @@ const PromotionBanner = ({ slice }) => {
         transition={{ duration: 0.8 }}
       >
         {/* Left Column: Text Content */}
-        <div className={styles.textColumn}>
+        <div className={styles.textColumn} style={{ backgroundColor: '#ffffff' }}>
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            {title && <h1 className={styles.title}>{title}</h1>}
-            {short_paragraph && <p className={styles.paragraph}>{short_paragraph}</p>}
-            <PrismicNextLink field={link} className={styles.bannerButton}>
+            {title && <h1 className={styles.title} style={{ color: '#0f0d0d' }}>{title}</h1>}
+            {short_paragraph && <p className={styles.paragraph} style={{ color: '#110f0f' }}>{short_paragraph}</p>}
+            <PrismicNextLink field={link} className={styles.bannerButton} style={{ backgroundColor: '#dc8928', color: '#ffffff' }}>
               {buttonText}
             </PrismicNextLink>
           </motion.div>
@@ -98,12 +98,25 @@ const PromotionBanner = ({ slice }) => {
             viewport={{ once: true }}
             className="w-full flex flex-col items-center justify-center gap-4"
           >
-            {image?.url && (
-              <PrismicNextImage 
-                field={image} 
-                className={styles.bannerImage} 
-                width={800} height={800}
-              />
+            {(image?.url || slice.data.image1?.url || slice.data.Image1?.url) && (
+              <div className="flex w-full flex-row gap-4 items-center justify-center">
+                {image?.url && (
+                  <div className="flex-1 min-w-0">
+                    <PrismicNextImage 
+                      field={image} 
+                      className={styles.bannerImage} 
+                    />
+                  </div>
+                )}
+                {(slice.data.image1?.url || slice.data.Image1?.url) && (
+                  <div className="flex-1 min-w-0">
+                    <PrismicNextImage 
+                      field={slice.data.image1?.url ? slice.data.image1 : slice.data.Image1} 
+                      className={styles.bannerImage} 
+                    />
+                  </div>
+                )}
+              </div>
             )}
             
             {embedHtml && (

@@ -77,9 +77,9 @@ const ProductCard = ({ product }) => {
     category = 'Category',
     price = 'On Sale', // Expecting a formatted string like "₹1,299.00"
     amazonLink = '#',
-    rating = 0,
-    reviewCount = 0,
-    platformValue = 'Amazon',
+    rating = 4.5,
+    reviewCount = 120,
+    platformValue = product.platform || 'Amazon',
     discount = false,
     isPartner = false,
     contactLink = '#',
@@ -101,9 +101,10 @@ const ProductCard = ({ product }) => {
     const displayCategory = hasValidCategory ? String(category) : '';
     const normalizedCategory = displayCategory ? (displayCategory.charAt(0).toUpperCase() + displayCategory.slice(1).toLowerCase()) : '';
 
-    let tagText = '';
-    let buttonText = isPartner ? 'Contact Seller' : 'Buy now';
-    let finalAffiliateColor = '#F97316';
+    // Default properties (fallback to Amazon)
+    let tagText = 'Amazon';
+    let buttonText = isPartner ? 'Contact Seller' : 'Buy on Amazon';
+    let finalAffiliateColor = affiliateColors['Amazon'];
     let finalLink = isPartner ? contactLink : amazonLink;
 
     if (!isPartner) {
@@ -121,7 +122,7 @@ const ProductCard = ({ product }) => {
         }
     } else {
         tagText = ''; // Can keep empty or use platform
-        finalAffiliateColor = '#3b82f6'; // some default for partner
+        finalAffiliateColor = affiliateColors['Amazon']; // default for partner
     }
 
   const isPrismicImage = typeof imageUrl === 'object' && imageUrl !== null && imageUrl.url;
@@ -204,12 +205,6 @@ const ProductCard = ({ product }) => {
         <div className={styles.cardContent}>
           <p className={styles.productCategory}>{category}</p>
           <h3 className={styles.productName}>{name}</h3>
-          <div className={styles.ratingContainer}>
-            {rating > 0 && [...Array(5)].map((_, i) => (
-              <FiStar key={i} className={i < Math.round(rating) ? styles.starFilled : styles.starEmpty} />
-            ))}
-            {reviewCount > 0 && <span className={styles.reviewCount}>({reviewCount})</span>}
-          </div>
           
           {/* Availability Status */}
           {availabilityStatus && (

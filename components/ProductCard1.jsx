@@ -25,6 +25,7 @@ const ProductCard = ({ product }) => {
     amazonLink = '#',
     rating = 4.5,
     reviewCount = 0,
+    platformValue = product.platform || 'Amazon',
     discount = false,
   } = product;
 
@@ -92,12 +93,6 @@ const ProductCard = ({ product }) => {
         <div className={styles.cardContent}>
           <p className={styles.productCategory}>{category}</p>
           <h3 className={styles.productName}>{name}</h3>
-          <div className={styles.ratingContainer}>
-            {[...Array(5)].map((_, i) => (
-              <FiStar key={i} className={i < Math.round(rating) ? styles.starFilled : styles.starEmpty} />
-            ))}
-            {reviewCount > 0 && <span className={styles.reviewCount}>({reviewCount})</span>}
-          </div>
           {/* <div className={styles.priceContainer}>
             <span className={styles.currentPrice}>${price}</span>
             {oldPrice && <span className={styles.oldPrice}>${oldPrice}</span>}
