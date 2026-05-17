@@ -1,4 +1,3 @@
-import AnimatedPageWrapper from '../../components/AnimatedPageWrapper';
 import AIShopperClient from '../../components/AIShopperClient';
 import { FiShoppingCart } from 'react-icons/fi';
 
@@ -9,7 +8,7 @@ export const metadata = {
 
 export default function AIShopperPage() {
   return (
-    <AnimatedPageWrapper>
+    <>
       <div className="container mx-auto px-4 py-12 max-w-4xl">
         <div className="text-center mb-10">
           <h1 className="text-4xl font-bold text-gray-900 flex items-center justify-center gap-3">
@@ -19,6 +18,6 @@ export default function AIShopperPage() {
         
         <AIShopperClient />
       </div>
-    </AnimatedPageWrapper>
+    </>
   );
 }

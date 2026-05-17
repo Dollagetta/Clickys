@@ -9,9 +9,7 @@ import * as prismic from '@prismicio/client';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-import AnimatedPageWrapper from '../../components/AnimatedPageWrapper';
 import ProductCard from '../../components/ProductCard';
-import { ProductGridSkeleton } from '../../components/ProductGridSkeleton';
 import CallToAction from '../../components/CallToAction';
 import BrandGrid from '../../components/BrandGrid';
 import styles from '../../styles/DealsPage.module.css';
@@ -226,16 +224,14 @@ function DealsPageContent() {
   }
 
   return (
-    <AnimatedPageWrapper>
+    <>
       <div className={styles.dealsPageContainer}>
         {/* Page Header */}
         <header className={styles.pageHeader} data-aos="fade-in" data-aos-duration="600">
-          <div className="container">
-            <div className="flex justify-start mb-6">
-              <Link href="/" className="inline-flex items-center gap-2 text-white hover:text-white/80 transition-colors font-semibold bg-black/20 hover:bg-black/30 px-4 py-2 rounded-full backdrop-blur-md">
-                <FiArrowLeft /> Back to Home
-              </Link>
-            </div>
+          <div className="container" style={{ position: 'relative' }}>
+            <Link href="/" style={{ position: 'absolute', top: '0', left: '15px', color: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', fontWeight: 600, textDecoration: 'none' }}>
+              <FiArrowLeft /> Back to Home
+            </Link>
             <FiTag className={styles.headerIcon} />
             <h1 className={styles.pageTitle}>Find Your Next Great Deal</h1>
             <p className={styles.pageSubtitle}>
@@ -431,7 +427,10 @@ function DealsPageContent() {
         <section className={styles.dealsGridSection}>
           <div className="container">
             {isLoading ? (
-              <ProductGridSkeleton count={8} />
+              <div className={styles.loadingState}>
+                <FiLoader className={styles.spinningIcon} />
+                <p>Loading Deals...</p>
+              </div>
             ) : error ? (
               <div className={styles.noDealsMessage}>
                 <FiAlertCircle className={styles.noDealsIcon} />
@@ -479,7 +478,7 @@ function DealsPageContent() {
        )}
         
       </div>
-    </AnimatedPageWrapper>
+    </>
   );
 }
 

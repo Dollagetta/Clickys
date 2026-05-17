@@ -3,18 +3,14 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import styles from '../styles/ProductCard.module.css';
-import { FiShoppingCart, FiHeart, FiStar, FiShare2, FiEye } from 'react-icons/fi';
+import { FiShoppingCart, FiHeart, FiStar, FiShare2 } from 'react-icons/fi';
 import { PrismicNextImage } from "@prismicio/next";
 import { useWishlist } from './WishlistContext';
-import QuickViewModal from './QuickViewModal';
-import toast from 'react-hot-toast';
 
 const ProductCard = ({ product }) => {
   const { isInWishlist, toggleWishlist } = useWishlist();
-  const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
    
   const affiliateColors = {
   Amazon: "#FF9900",
@@ -151,129 +147,101 @@ const ProductCard = ({ product }) => {
     } else {
       // Fallback: Copy to clipboard
       navigator.clipboard.writeText(finalLink);
-      toast.success('Link copied to clipboard!');
+      alert('Link copied to clipboard!');
     }
   };
 
   return (
-    <div className={styles.productCardWrapper} style={{ "--affcolor": finalAffiliateColor }}>
-      <motion.div
-        className={styles.card}
-        style={{ 
-          borderColor: finalAffiliateColor 
-        }}
-        variants={cardVariants}
-        initial="rest"
-        whileHover="hover"
-      >
-        <div className={styles.cardLinkWrapper}>
-          <motion.div className={styles.imageWrapper} variants={imageVariants}>
-            {!isPrismicImage && <Image
-              src={imageUrl}
-              alt={name}
-              width={200}
-              height={150}
-              style={{ objectFit: 'contain' }}
-              priority={true}
-              unoptimized={true}
-              className={styles.productImage}
-              onError={(e) => e.currentTarget.src = `https://placehold.co/200x150/CCCCCC/1A1A1A?text=Error&font=Inter`}
-            />}
-            {isPrismicImage && <PrismicNextImage field={imageUrl} priority={true} className={styles.productImage} />}
-            
-            {tagText && <span className={styles.promoTag}>{tagText}</span>}
-            {featuredFind && <span className={styles.featuredBadge}>Featured Find</span>}
-            
-            <div className={styles.quickActions}>
-              { (discount && discount > 0) && <button aria-label="Discount" className={styles.discountBadge}>{discount}% Off</button> }
-              <button 
-                aria-label="Add to wishlist" 
-                title="Add to wishlist"
-                className={`${styles.actionButton} ${isInWishlist(id) ? styles.wishlistActive : ''}`}
-                onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWishlist(product); }}
-              >
-                <FiHeart fill={isInWishlist(id) ? "currentColor" : "none"} />
-              </button>
-              <button 
-                aria-label="Share" 
-                title="Share"
-                className={styles.actionButton}
-                onClick={(e) => { e.preventDefault(); handleShare(e); }}
-              >
-                <FiShare2 />
-              </button>
+    <motion.div
+      className={styles.card}
+      style={{ 
+        "--affcolor": finalAffiliateColor,
+        borderColor: finalAffiliateColor 
+      }}
+      variants={cardVariants}
+      initial="rest"
+      whileHover="hover"
+      layout
+    >
+      <div className={styles.cardLinkWrapper}>
+        <motion.div className={styles.imageWrapper} variants={imageVariants}>
+          {!isPrismicImage && <Image
+            src={imageUrl}
+            alt={name}
+            width={200}
+            height={150}
+            style={{ objectFit: 'contain' }}
+            priority={true}
+            unoptimized={true}
+            className={styles.productImage}
+            onError={(e) => e.currentTarget.src = `https://placehold.co/200x150/CCCCCC/1A1A1A?text=Error&font=Inter`}
+          />}
+          {isPrismicImage && <PrismicNextImage field={imageUrl} priority={true} className={styles.productImage} />}
+          
+          {tagText && <span className={styles.promoTag}>{tagText}</span>}
+          {featuredFind && <span className={styles.featuredBadge}>Featured Find</span>}
+          
+          <div className={styles.quickActions}>
+            { (discount && discount > 0) && <button aria-label="Discount" className={styles.discountBadge}>{discount}% Off</button> }
+            <button 
+              aria-label="Add to wishlist" 
+              title="Add to wishlist"
+              className={`${styles.actionButton} ${isInWishlist(id) ? styles.wishlistActive : ''}`}
+              onClick={(e) => { e.stopPropagation(); toggleWishlist(product); }}
+            >
+              <FiHeart fill={isInWishlist(id) ? "currentColor" : "none"} />
+            </button>
+            <button 
+              aria-label="Share" 
+              title="Share"
+              className={styles.actionButton}
+              onClick={handleShare}
+            >
+              <FiShare2 />
+            </button>
+          </div>
+        </motion.div>
+        <div className={styles.cardContent}>
+          <p className={styles.productCategory}>{category}</p>
+          <h3 className={styles.productName}>{name}</h3>
+          <div className={styles.ratingContainer}>
+            {rating > 0 && [...Array(5)].map((_, i) => (
+              <FiStar key={i} className={i < Math.round(rating) ? styles.starFilled : styles.starEmpty} />
+            ))}
+            {reviewCount > 0 && <span className={styles.reviewCount}>({reviewCount})</span>}
+          </div>
+          
+          {/* Availability Status */}
+          {availabilityStatus && (
+            <div className={styles.statusRow}>
+              <span className={`${styles.statusBadge} ${(String(availabilityStatus).toLowerCase().includes('in stock') || availabilityStatus === true || String(availabilityStatus).toLowerCase() === 'true' || String(availabilityStatus).toLowerCase() === 'available') ? styles.inStock : styles.outOfStock}`}>
+                { (availabilityStatus === true || String(availabilityStatus).toLowerCase() === 'true') ? 'In Stock' : 
+                  (availabilityStatus === false || String(availabilityStatus).toLowerCase() === 'false') ? 'Out of Stock' : String(availabilityStatus) }
+              </span>
             </div>
-          </motion.div>
-          <div className={styles.cardContent}>
-            <p className={styles.productCategory}>{category}</p>
-            <h3 className={styles.productName}>{name}</h3>
-            
-            {(product.shortDescription || (typeof product.description === 'string' ? product.description : typeof product.longDescription === 'string' ? product.longDescription.replace(/<[^>]+>/g, '') : '')) && (
-              <p className="text-xs text-gray-500 mt-1 mb-2 line-clamp-2" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                {product.shortDescription || (typeof product.description === 'string' ? product.description : typeof product.longDescription === 'string' ? product.longDescription.replace(/<[^>]+>/g, '') : '')}
-              </p>
-            )}
+          )}
 
-            <div className={styles.ratingContainer}>
-              {rating > 0 && [...Array(5)].map((_, i) => (
-                <FiStar key={i} className={i < Math.round(rating) ? styles.starFilled : styles.starEmpty} />
-              ))}
-              {reviewCount > 0 && <span className={styles.reviewCount}>({reviewCount})</span>}
+          <div className={styles.priceActionRow}>
+            <div className={styles.priceContainer}>
+              { price != 0 && <span className={styles.currentPrice}>{price}</span> }
+              { (!price || price == 0) && <span className={styles.currentPrice}>On Sale</span> }
             </div>
-            
-            {/* Availability Status */}
-            {availabilityStatus && (
-              <div className={styles.statusRow}>
-                <span className={`${styles.statusBadge} ${(String(availabilityStatus).toLowerCase().includes('in stock') || availabilityStatus === true || String(availabilityStatus).toLowerCase() === 'true' || String(availabilityStatus).toLowerCase() === 'available') ? styles.inStock : styles.outOfStock}`}>
-                  { (availabilityStatus === true || String(availabilityStatus).toLowerCase() === 'true') ? 'In Stock' : 
-                    (availabilityStatus === false || String(availabilityStatus).toLowerCase() === 'false') ? 'Out of Stock' : String(availabilityStatus) }
-                </span>
-              </div>
-            )}
-  
-            <div className={styles.priceActionRow}>
-              <div className={styles.priceContainer}>
-                { price != 0 && <span className={styles.currentPrice}>{price}</span> }
-                { (!price || price == 0) && <span className={styles.currentPrice}>On Sale</span> }
-              </div>
-              <motion.a
-                href={finalLink}
-                target="_blank"
-                rel="noopener noreferrer sponsored"
-                className={`btn btn-primary ${styles.amazonButton}`}
-                title={buttonText}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                style={{ backgroundColor: 'var(--affcolor)', borderColor: 'var(--affcolor)' }}
-              >
-                {buttonText} <FiShoppingCart style={{ marginLeft: '0.2em' }} />
-              </motion.a>
-            </div>
+            <motion.a
+              href={finalLink}
+              target="_blank"
+              rel="noopener noreferrer sponsored"
+              className={`btn btn-primary ${styles.amazonButton}`}
+              title={buttonText}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              style={{ backgroundColor: 'var(--affcolor)', borderColor: 'var(--affcolor)' }}
+            >
+              {buttonText} <FiShoppingCart style={{ marginLeft: '0.2em' }} />
+            </motion.a>
           </div>
         </div>
-      </motion.div>
-      <div className={styles.previewButtonContainer}>
-        <button
-          className={styles.previewButtonExt}
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsQuickViewOpen(true); }}
-        >
-          <FiEye size={14} /> Preview
-        </button>
       </div>
-      
-      {/* Quick View Modal rendered outside typical container flow */}
-      <QuickViewModal 
-        isOpen={isQuickViewOpen}
-        onClose={() => setIsQuickViewOpen(false)}
-        product={product}
-        finalAffiliateColor={finalAffiliateColor}
-        finalLink={finalLink}
-        buttonText={buttonText}
-        isPrismicImage={isPrismicImage}
-        imageUrl={imageUrl}
-        tagText={tagText}
-      />
-    </div>
+    </motion.div>
   );
 };
 

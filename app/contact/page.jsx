@@ -1,5 +1,4 @@
 // app/contact/page.js
-import AnimatedPageWrapper from '../../components/AnimatedPageWrapper';
 import styles from '../../styles/ContactPage.module.css';
 import { FiMessageSquare, FiMapPin, FiPhone, FiMail, FiFacebook, FiTwitter, FiInstagram } from 'react-icons/fi';
 import faqData from '../../components/faq';
@@ -42,7 +41,7 @@ export const metadata = {
 
 export default function ContactPage() {
   return (
-    <AnimatedPageWrapper>
+    <>
       <div className={styles.contactPageContainer}>
         {/* Page Header */}
         <header className={styles.pageHeader} data-aos="fade-in" data-aos-duration="600">
@@ -122,6 +121,6 @@ export default function ContactPage() {
           </div>
         </section>
       </div>
-    </AnimatedPageWrapper>
+    </>
   );
 }

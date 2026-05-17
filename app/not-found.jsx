@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion';
 import { FiAlertTriangle, FiHome, FiShoppingBag } from 'react-icons/fi';
-import AnimatedPageWrapper from '../components/AnimatedPageWrapper';
 import CallToAction from '../components/CallToAction';
 import styles from '../styles/NotFoundPage.module.css';
 
@@ -31,7 +30,7 @@ const NotFound = () => {
   };
 
   return (
-    <AnimatedPageWrapper>
+    <>
       <motion.div
         className={styles.notFoundContainer}
         variants={containerVariants}
@@ -64,7 +63,7 @@ const NotFound = () => {
           />
         </motion.div>
       </motion.div>
-    </AnimatedPageWrapper>
+    </>
   );
 };
 

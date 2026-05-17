@@ -1,10 +1,4 @@
 /* styles/ProductCard.module.css */
-.productCardWrapper {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
 .card {
   background-color: var(--neutral-white);
   border-radius: var(--rounded-lg);
@@ -155,6 +149,7 @@
 
 .actionButton:hover {
   background-color: white;
+  transform: scale(1.1);
 }
 
 .wishlistActive {
@@ -235,39 +230,6 @@
   color: white;
   min-width: max-content;
 }
-.previewButtonContainer {
-  margin-top: 12px;
-  width: 100%;
-}
-
-.previewButtonExt {
-  width: 100%;
-  background-color: var(--affcolor);
-  color: white;
-  border: 1px solid var(--affcolor);
-  border-radius: var(--rounded-md);
-  padding: 10px 0;
-  font-size: 13px;
-  font-weight: 700;
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  outline: none;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-.previewButtonExt:hover {
-  background-color: white;
-  color: var(--affcolor);
-  border-color: var(--affcolor);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-
 .cardSkeleton {
   width: 100%; height: 230px; background-color: var(--light-gray); border-radius: var(--rounded-lg);
   display: flex; align-items: center; justify-content: center; color: var(--dark-gray);

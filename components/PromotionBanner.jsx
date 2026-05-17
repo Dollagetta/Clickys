@@ -6,10 +6,9 @@ import { motion } from 'framer-motion';
 import styles from '../styles/PromotionBanner.module.css';
 
 const PromotionBanner = ({ slice }) => {
-  const { image, title, short_paragraph, link, offer, video, Image: secondImageCap, image1, image2, image_2 } = slice.data;
+  const { image, title, short_paragraph, link, offer, video } = slice.data;
   
-  const secondImage = secondImageCap || image1 || image2 || image_2;
-  const buttonText = link?.text || 'Explore Now';
+  const buttonText = link.text || 'Explore Now';
 
   const getEmbedHtml = (videoData) => {
     const data = Array.isArray(videoData) ? videoData[0] : videoData;
@@ -99,27 +98,13 @@ const PromotionBanner = ({ slice }) => {
             viewport={{ once: true }}
             className="w-full flex flex-col items-center justify-center gap-4"
           >
-            <div className={`w-full flex ${secondImage?.url ? 'flex-row gap-4' : 'flex-col'} items-center justify-center`}>
-              {image?.url && (
-                <div className={secondImage?.url ? "w-1/2 flex justify-center" : "w-full"}>
-                  <PrismicNextImage 
-                    field={image} 
-                    className={`${styles.bannerImage} ${secondImage?.url ? 'max-h-64 object-contain' : ''}`}
-                    width={800} height={800}
-                  />
-                </div>
-              )}
-              
-              {secondImage?.url && (
-                <div className="w-1/2 flex justify-center">
-                  <PrismicNextImage 
-                    field={secondImage} 
-                    className={`${styles.bannerImage} max-h-64 object-contain`}
-                    width={800} height={800}
-                  />
-                </div>
-              )}
-            </div>
+            {image?.url && (
+              <PrismicNextImage 
+                field={image} 
+                className={styles.bannerImage} 
+                width={800} height={800}
+              />
+            )}
             
             {embedHtml && (
               <div className="relative w-full max-w-2xl mx-auto aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/20 group hover:shadow-cyan-500/20 transition-all duration-500">

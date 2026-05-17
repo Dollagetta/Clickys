@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FiSearch, FiFilter, FiHeart, FiShare2 } from 'react-icons/fi';
-import toast from 'react-hot-toast';
 
 export default function WhatsNewGrid({ pages }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -60,7 +59,7 @@ export default function WhatsNewGrid({ pages }) {
       }
     } else {
       navigator.clipboard.writeText(url);
-      toast.success('Link copied to clipboard!');
+      alert('Link copied to clipboard!');
     }
   };
 

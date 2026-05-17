@@ -2,7 +2,6 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import { FiArrowLeft } from 'react-icons/fi';
 import ProductCard from '../../../components/ProductCard';
-import AnimatedPageWrapper from '../../../components/AnimatedPageWrapper';
 import { products } from '../../../components/products';
 import { allGuides } from '../../../components/guides';
 import { createClient } from "../../../prismicio";
@@ -75,7 +74,7 @@ export default async function CategoryPage({ params }) {
   );
 
   return (
-    <AnimatedPageWrapper>
+    <>
       <div className="container mx-auto max-w-7xl px-4 py-8">
         
         {/* Back Button */}
@@ -138,6 +137,6 @@ export default async function CategoryPage({ params }) {
         )}
 
       </div>
-    </AnimatedPageWrapper>
+    </>
   );
 }

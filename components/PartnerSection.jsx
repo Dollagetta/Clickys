@@ -197,7 +197,7 @@ export default function PartnerSection({ partners = [] }) {
             className="flex items-center gap-5 bg-white p-4 pr-8 rounded-[2rem] shadow-2xl shadow-slate-200/60 border border-slate-100 cursor-pointer group transition-all duration-500"
           >
             <div className="flex -space-x-4">
-              {['women/44', 'men/32', 'women/68', 'men/46'].map((path, i) => (
+              {[1, 2, 3, 4].map((i) => (
                 <motion.div 
                   key={i} 
                   whileHover={{ 
@@ -209,7 +209,7 @@ export default function PartnerSection({ partners = [] }) {
                   className="w-11 h-11 rounded-full border-4 border-white overflow-hidden bg-slate-100 ring-1 ring-slate-100 shadow-md relative group/avatar"
                 >
                   <img 
-                    src={`https://randomuser.me/api/portraits/${path}.jpg`} 
+                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i + 22}`} 
                     alt="Shopper" 
                     className="w-full h-full object-cover transition-transform duration-500 group-hover/avatar:scale-110"
                   />

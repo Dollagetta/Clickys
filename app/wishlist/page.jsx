@@ -9,13 +9,12 @@ import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import { FiHeart, FiShoppingBag } from 'react-icons/fi';
 import Link from 'next/link';
-import AnimatedPageWrapper from '../../components/AnimatedPageWrapper';
 
 export default function WishlistPage() {
   const { wishlist } = useWishlist();
 
   return (
-    <AnimatedPageWrapper>
+    <>
       <Navbar />
       <main className={styles.wishlistPage}>
         <div className="container">
@@ -52,6 +51,6 @@ export default function WishlistPage() {
         </div>
       </main>
       <Footer />
-    </AnimatedPageWrapper>
+    </>
   );
 }

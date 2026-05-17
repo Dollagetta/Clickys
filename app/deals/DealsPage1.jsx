@@ -1,7 +1,7 @@
 "use client";
 // This will be a Server Component by default.
 // Client Components (like ProductCard, CallToAction, AnimatedPageWrapper) will be used within it.
-import AnimatedPageWrapper from '../../components/AnimatedPageWrapper'; // Adjust path if your components folder is elsewhere
+ // Adjust path if your components folder is elsewhere
 import ProductCard from '../../components/ProductCard';
 import CallToAction from '../../components/CallToAction';
 import styles from '../../styles/DealsPage.module.css'; // Create this CSS Module
@@ -28,7 +28,7 @@ const currentDeals = useMemo(() => {
 
     
   return (
-    <AnimatedPageWrapper>
+    <>
       <div className={styles.dealsPageContainer}>
         {/* Page Header */}
         <header className={styles.pageHeader} data-aos="fade-in" data-aos-duration="600">
@@ -89,6 +89,6 @@ const currentDeals = useMemo(() => {
         {/* Optional: Call to action for newsletter or other pages */}
 
       </div>
-    </AnimatedPageWrapper>
+    </>
   );
 }

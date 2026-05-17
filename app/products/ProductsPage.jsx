@@ -3,9 +3,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
-import AnimatedPageWrapper from '../../components/AnimatedPageWrapper';
 import ProductCard from '../../components/ProductCard';
-import { ProductGridSkeleton } from '../../components/ProductGridSkeleton';
 import styles from '../../styles/ProductsPage.module.css';
 import { FiBox, FiFilter, FiSearch, FiX, FiLoader, FiArrowLeft } from 'react-icons/fi';
 import { createClient } from '../../prismicio'; 
@@ -222,15 +220,13 @@ export default function ProductsPage({ products: initialProductsList = [] }) {
   const handleDeselectAll = () => setSelectedCategories([]);
 
   return (
-    <AnimatedPageWrapper>
+    <>
       <div className={styles.productsPageContainer}>
         <header className={styles.pageHeader} style={{ backgroundColor: '#c09758', backgroundImage: 'none' }}>
-          <div className="container">
-            <div className="flex justify-start mb-6">
-              <Link href="/" className="inline-flex items-center gap-2 text-white hover:text-white/80 transition-colors font-semibold bg-black/10 hover:bg-black/20 px-4 py-2 rounded-full backdrop-blur-md">
-                <FiArrowLeft /> Back to Home
-              </Link>
-            </div>
+          <div className="container" style={{ position: 'relative' }}>
+            <Link href="/" style={{ position: 'absolute', top: '-1rem', left: '1rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', fontWeight: 600, textDecoration: 'none' }}>
+              <FiArrowLeft /> Back to Home
+            </Link>
             <FiBox className={styles.headerIcon} />
             <h1 className={styles.pageTitle}>Explore All Products</h1>
             <p className={styles.pageSubtitle} style={{ color: '#ffffff', fontWeight: 'bold' }}>The ultimate collection of our best finds and recommendations.</p>
@@ -364,7 +360,10 @@ export default function ProductsPage({ products: initialProductsList = [] }) {
         <section className={styles.productsGridSection}>
           <div className="container" style={{ backgroundColor: '#bd8c5c' }}>
             {isLoading ? (
-              <ProductGridSkeleton count={12} />
+              <div className={styles.loadingState}>
+                <FiLoader className={styles.loaderIcon} />
+                <p>Loading products...</p>
+              </div>
             ) : error ? (
               <div className={styles.noProductsMessage}>
                 <h2>An Error Occurred</h2>
@@ -405,6 +404,6 @@ export default function ProductsPage({ products: initialProductsList = [] }) {
             </div>
         )}
       </div>
-    </AnimatedPageWrapper>
+    </>
   );
 }

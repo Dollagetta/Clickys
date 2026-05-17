@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { FiCopy, FiCheck } from "react-icons/fi";
 import styles from "../styles/GuideDetailPage.module.css";
-import toast from 'react-hot-toast';
 
 export function CodeBlockWithCopy({ code, children }) {
   const [copied, setCopied] = useState(false);
@@ -11,7 +10,6 @@ export function CodeBlockWithCopy({ code, children }) {
   const handleCopy = () => {
     navigator.clipboard.writeText(code);
     setCopied(true);
-    toast.success('Code copied to clipboard!');
     setTimeout(() => setCopied(false), 2000);
   };
 

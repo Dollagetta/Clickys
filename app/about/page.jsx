@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import Image from 'next/image';
 import Link from 'next/link';
-import AnimatedPageWrapper from '../../components/AnimatedPageWrapper'; // Adjust path
+ // Adjust path
 import CallToAction from '../../components/CallToAction'; // Adjust path
 import styles from '../../styles/AboutPage.module.css'; // Create this CSS Module
 import { FiUsers, FiTarget, FiHeart, FiAward, FiMessageCircle, FiEye } from 'react-icons/fi';
@@ -46,7 +46,7 @@ export const metadata = {
 
 export default function AboutPage() {
   return (
-    <AnimatedPageWrapper>
+    <>
       <div className={styles.aboutPageContainer}>
         {/* Page Header */}
         <header className={styles.pageHeader} data-aos="fade-in" data-aos-duration="600">
@@ -157,6 +157,6 @@ export default function AboutPage() {
           </div>
         </section>
       </div>
-    </AnimatedPageWrapper>
+    </>
   );
 };

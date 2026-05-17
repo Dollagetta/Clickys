@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import Image from 'next/image';
 import Link from 'next/link';
-import AnimatedPageWrapper from '../../../components/AnimatedPageWrapper'; // Adjust path
+ // Adjust path
 import CallToAction from '../../../components/CallToAction'; // Adjust path
 import ProductCard from '../../../components/ProductCard'; // For related products, adjust path
 import styles from '../../../styles/ProductDetailPage.module.css'; // Create this CSS Module
@@ -60,13 +60,13 @@ export default async function ProductDetailPage({ params }) {
 
   if (!product) {
     return (
-        <AnimatedPageWrapper>
+        <>
             <div className="container" style={{ textAlign: 'center', padding: '4rem 1rem' }}>
                 <h1>Product Not Found</h1>
                 <p>Sorry, we couldn't find the product you were looking for.</p>
                 <Link href="/products" className="btn btn-primary" style={{marginTop: '1rem'}}>Back to All Products</Link>
             </div>
-        </AnimatedPageWrapper>
+        </>
     );
   }
 
@@ -89,15 +89,9 @@ export default async function ProductDetailPage({ params }) {
   );
 
   return (
-    <AnimatedPageWrapper>
+    <>
       <div className={styles.productDetailPageContainer}>
         <div className={`container ${styles.productDetailLayout}`}>
-          <div className="flex justify-start mb-6 pt-4">
-            <Link href="/products" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors font-semibold bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
-              <FiArrowLeft className="text-lg" /> 
-              <span>Back to Products</span>
-            </Link>
-          </div>
           {/* Breadcrumbs */}
           <nav aria-label="breadcrumb" className={styles.breadcrumbs} data-aos="fade-in">
               <Link href="/">Home</Link> <FiChevronsRight size={12} />
@@ -177,6 +171,6 @@ export default async function ProductDetailPage({ params }) {
 
         </div>
       </div>
-    </AnimatedPageWrapper>
+    </>
   );
 }

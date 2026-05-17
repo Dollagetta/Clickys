@@ -4,7 +4,6 @@ import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { PrismicNextImage } from "@prismicio/next";
-import AnimatedPageWrapper from "../../../components/AnimatedPageWrapper";
 import ProductCard from "../../../components/ProductCard";
 import {
   FiSearch,
@@ -126,7 +125,7 @@ export default function AffiliateProductsPage({ affiliate, products = [] }) {
   );
 
   return (
-    <AnimatedPageWrapper>
+    <>
       <div className="min-h-screen bg-[#f8fafc]">
 
         {/* HERO SECTION */}
@@ -453,6 +452,6 @@ export default function AffiliateProductsPage({ affiliate, products = [] }) {
           </div>
         )}
       </div>
-    </AnimatedPageWrapper>
+    </>
   );
 }

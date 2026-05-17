@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import ProductCard from './ProductCard';
-import { ProductGridSkeleton } from './ProductGridSkeleton';
 import styles from '../styles/DealsPage.module.css'; // Just reuse some styles
 import { FiLoader, FiAlertCircle, FiChevronLeft, FiChevronRight, FiArrowLeft } from 'react-icons/fi';
 import { createClient } from '../prismicio';
@@ -136,7 +135,10 @@ export default function HomeSearchResults() {
           </button>
         </div>
         {isLoading ? (
-          <ProductGridSkeleton count={8} />
+          <div style={{ textAlign: 'center', padding: '2rem' }}>
+            <FiLoader size={30} style={{ margin: '0 auto', animation: 'spin 1s linear infinite' }}/>
+            <p>Loading results...</p>
+          </div>
         ) : error ? (
           <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
             <FiAlertCircle size={40} style={{ margin: '0 auto 1rem', color: '#e99d14' }} />

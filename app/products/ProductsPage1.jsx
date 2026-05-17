@@ -2,12 +2,9 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import Link from 'next/link';
-import AnimatedPageWrapper from '../../components/AnimatedPageWrapper';
 import ProductCard from '../../components/ProductCard';
-import { ProductGridSkeleton } from '../../components/ProductGridSkeleton';
 import styles from '../../styles/ProductsPage.module.css';
-import { FiBox, FiFilter, FiSearch, FiX, FiLoader, FiArrowLeft } from 'react-icons/fi';
+import { FiBox, FiFilter, FiSearch, FiX, FiLoader } from 'react-icons/fi';
 
 export default function ProductsPage() {
   // State for all fetched products and API status
@@ -143,15 +140,10 @@ export default function ProductsPage() {
   }, [filteredProducts, displayPage, itemsPerPage]);
 
   return (
-    <AnimatedPageWrapper>
+    <>
       <div className={styles.productsPageContainer}>
         <header className={styles.pageHeader}>
           <div className="container">
-            <div className="flex justify-start mb-6">
-              <Link href="/" className="inline-flex items-center gap-2 text-white hover:text-white/80 transition-colors font-semibold bg-black/10 hover:bg-black/20 px-4 py-2 rounded-full backdrop-blur-md">
-                <FiArrowLeft /> Back to Home
-              </Link>
-            </div>
             <FiBox className={styles.headerIcon} />
             <h1 className={styles.pageTitle}>Explore All Amazon Products</h1>
             <p className={styles.pageSubtitle}>Curated finds from Amazon.in, just for you.</p>
@@ -215,7 +207,10 @@ export default function ProductsPage() {
         <section className={styles.productsGridSection}>
           <div className="container">
             {isLoading ? (
-              <ProductGridSkeleton count={10} />
+              <div className={styles.loadingState}>
+                <FiLoader className={styles.loaderIcon} />
+                <p>Searching Amazon...</p>
+              </div>
             ) : error ? (
               <div className={styles.noProductsMessage}>
                 <h2>An Error Occurred</h2>
@@ -255,7 +250,7 @@ export default function ProductsPage() {
             </button>
         </div>
       </div>
-    </AnimatedPageWrapper>
+    </>
   );
 }
 

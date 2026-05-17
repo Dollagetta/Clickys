@@ -1,7 +1,6 @@
 import React from "react";
 import { createClient } from "../../../prismicio";
 import { notFound } from "next/navigation";
-import AnimatedPageWrapper from "../../../components/AnimatedPageWrapper";
 import { PrismicNextImage } from "@prismicio/next";
 import Link from "next/link";
 
@@ -66,7 +65,7 @@ export default async function PartnerPage({ params }) {
   const storePromo = promotion_stripe || mappedProducts.find(p => p.promotionalStatus)?.promotionalStatus;
 
   return (
-    <AnimatedPageWrapper>
+    <>
       <div className="bg-gray-50 min-h-screen pb-20">
         <div className="max-w-7xl mx-auto px-4 pt-8">
           
@@ -203,6 +202,6 @@ export default async function PartnerPage({ params }) {
 
         </div>
       </div>
-    </AnimatedPageWrapper>
+    </>
   );
 }
