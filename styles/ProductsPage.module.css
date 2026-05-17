@@ -1,0 +1,401 @@
+/* styles/ProductsPage.module.css */
+/* Ensure this file is in your styles directory and the import path is correct. */
+
+.productsPageContainer {
+  padding-bottom: 3rem;
+}
+
+.pageHeader {
+  background: linear-gradient(135deg, #fffaf5 0%, #fff 100%);
+  color: #1e293b;
+  padding: 2.5rem 1rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #f1f5f9;
+  position: relative;
+  overflow: hidden;
+}
+
+.pageHeader::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(249, 115, 22, 0.08) 0%, rgba(255, 255, 255, 0) 70%);
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.pageHeader::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  right: -5%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.headerIcon {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  color: #f97316;
+  position: relative;
+  z-index: 1;
+}
+
+.pageTitle {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.pageSubtitle {
+  font-size: 1.2rem;
+  color: #64748b;
+  font-weight: 400;
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* --- UPDATED: Control Bar & Search Bar --- */
+.controlsBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: var(--neutral-white);
+    border-radius: var(--rounded-lg);
+    margin-bottom: 2.5rem;
+    border: 1px solid var(--medium-gray);
+}
+.searchAndFilter {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-grow: 1;
+}
+.searchBox {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+}
+.searchInput {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--medium-gray);
+    border-radius: var(--rounded-md) 0 0 var(--rounded-md);
+    font-size: 1rem;
+    background-color: var(--neutral-white);
+    transition: var(--transition-fast);
+    border-right: none;
+}
+.searchInput:focus {
+    outline: none;
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
+    z-index: 2;
+}
+.searchButton {
+    background-color: var(--primary-green);
+    color: var(--neutral-white);
+    border: 1px solid var(--primary-green);
+    padding: 0.8rem 1.2rem;
+    border-radius: 0 var(--rounded-md) var(--rounded-md) 0;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease-in-out;
+}
+.searchButton:hover:not(:disabled) {
+    background-color: var(--secondary-green);
+}
+.searchButton:disabled {
+    background-color: var(--medium-gray);
+    cursor: not-allowed;
+}
+.spinningIcon {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.controlButton {
+    background-color: var(--neutral-white);
+    color: var(--neutral-black);
+    border: 1px solid var(--medium-gray);
+    padding: 0.8rem 1.2rem;
+    border-radius: var(--rounded-md);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    display: flex;
+    align-items: center;
+    box-shadow: var(--shadow-xs);
+    white-space: nowrap;
+}
+.controlButton:hover {
+    border-color: var(--primary-green);
+    color: var(--primary-green);
+}
+.controlButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* --- FIXED: Product Grid Layout --- */
+.productsGridSection {
+  padding: 0 0 2rem;
+}
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+  gap: 6px !important;
+  padding: 8px !important;
+  justify-content: center;
+}
+
+/* --- UPDATED: Redesigned Filter Menu --- */
+.filterOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.filterMenu {
+  background: white;
+  width: 90%;
+  max-width: 380px;
+  border-radius: var(--rounded-lg);
+  box-shadow: var(--shadow-xl);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideIn 0.3s ease-out;
+}
+@keyframes slideIn {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.filterHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background-color: var(--light-gray);
+  border-bottom: 1px solid var(--medium-gray);
+}
+.filterHeader h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.closeFilterButton {
+  background: none; border: none; cursor: pointer;
+  font-size: 1.5rem; color: var(--dark-gray);
+  padding: 0.25rem; border-radius: 50%;
+  transition: var(--transition-fast);
+}
+.closeFilterButton:hover {
+  background-color: var(--medium-gray);
+  color: var(--neutral-black);
+}
+.filterActions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid var(--medium-gray);
+}
+.filterActions button {
+  font-size: 0.8rem; padding: 0.3rem 0.7rem;
+  border-radius: var(--rounded-full); cursor: pointer;
+  border: 1px solid var(--primary-green);
+  background: var(--neutral-white); color: var(--primary-green);
+  transition: var(--transition-fast);
+}
+.filterActions button:hover {
+  background: var(--primary-green); color: var(--neutral-white);
+}
+
+/* Advanced Filter Extensions */
+.filterMenuContent {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 0 1.5rem;
+}
+
+.filterSection {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--medium-gray);
+}
+
+.filterSection:last-child {
+  border-bottom: none;
+}
+
+.filterSectionTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--neutral-black);
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.rangeInputs {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.rangeInput {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid var(--medium-gray);
+  border-radius: var(--rounded-md);
+  font-size: 0.9rem;
+}
+
+.rangeSeparator {
+  color: var(--dark-gray);
+}
+
+.discountOptions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.discountPill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border: 1px solid var(--medium-gray);
+  border-radius: var(--rounded-full);
+  font-size: 0.85rem;
+  cursor: pointer;
+  background-color: var(--light-gray);
+  transition: all 0.2s ease;
+}
+
+.discountPillActive {
+  background-color: #f97316; /* Orange - using as highlight */
+  border-color: #f97316;
+  color: white;
+  font-weight: 700;
+}
+
+.categoryList {
+  list-style: none; padding: 0.5rem 0; margin: 0;
+  overflow-y: auto; max-height: 50vh;
+}
+.categoryLabel {
+  display: flex; align-items: center; cursor: pointer;
+  padding: 0.8rem 1.5rem; transition: background-color 0.2s ease;
+  font-size: 0.95rem;
+}
+.categoryLabel:hover { background-color: #f8f9fa; }
+.categoryCheckbox { display: none; }
+.customCheckbox {
+  width: 18px; height: 18px; border: 2px solid var(--medium-gray);
+  border-radius: var(--rounded-sm); margin-right: 0.8rem;
+  display: inline-block; position: relative; transition: all 0.2s ease;
+}
+.categoryCheckbox:checked + .customCheckbox {
+  background-color: var(--primary-green); border-color: var(--primary-green);
+}
+.customCheckbox::after {
+  content: ''; position: absolute; display: none;
+  left: 5px; top: 1px; width: 5px; height: 10px;
+  border: solid white; border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.categoryCheckbox:checked + .customCheckbox::after { display: block; }
+
+.filterFooter {
+  padding: 1rem 1.5rem; margin-top: auto;
+  border-top: 1px solid var(--medium-gray);
+}
+.showResultsButton {
+  width: 100%; padding: 0.8rem;
+  background: var(--primary-green); color: white;
+  border: none; cursor: pointer; border-radius: var(--rounded-md);
+  font-size: 1rem; font-weight: 600;
+  transition: var(--transition-fast);
+}
+.showResultsButton:hover { background: var(--secondary-green); }
+
+/* Loading / Error / Pagination States */
+.loadingState, .noProductsMessage {
+  text-align: center; padding: 4rem 1rem;
+  background-color: var(--light-gray); border-radius: var(--rounded-lg);
+  margin-top: 2rem;
+}
+.loaderIcon {
+  font-size: 3rem; color: var(--primary-green);
+  margin-bottom: 1rem; animation: spin 1.5s linear infinite;
+}
+.noProductsMessage h2 { font-size: 1.4rem; margin-bottom: 0.5rem; }
+.noProductsMessage p { font-size: 1rem; color: var(--dark-gray); }
+
+.paginationControls {
+    display: flex; justify-content: center; align-items: center;
+    gap: 1rem; margin-top: 3rem; padding: 1rem 0;
+    border-top: 1px solid var(--medium-gray);
+}
+.paginationButton {
+    background-color: var(--neutral-white); color: var(--primary-green);
+    border: 1px solid var(--primary-green); padding: 0.5rem 1rem;
+    border-radius: var(--rounded-md); font-weight: 500;
+    cursor: pointer; transition: var(--transition-fast);
+}
+.paginationButton:hover:not(:disabled) {
+    background-color: var(--primary-green); color: var(--neutral-white);
+}
+.paginationButton:disabled {
+    color: var(--medium-gray); border-color: var(--medium-gray); cursor: not-allowed;
+}
+.pageInfo { font-size: 0.9rem; color: var(--dark-gray); }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .pageHeader { padding: 2.5rem 1rem; }
+  .pageTitle { font-size: 2.2rem; }
+  .controlsBar, .searchAndFilter { flex-direction: column; align-items: stretch; }
+  .productGrid { grid-template-columns: repeat(2, 1fr) !important; gap: 6px !important; }
+}
+
+@media (max-width: 480px) {
+    .productGrid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        max-width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}

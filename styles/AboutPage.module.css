@@ -1,0 +1,261 @@
+/* styles/AboutPage.module.css */
+/* Ensure this file is in your styles directory and the import path is correct. */
+
+.aboutPageContainer {
+  padding-bottom: 3rem;
+}
+
+.pageHeader {
+  /* Using a green gradient for the About Us page header */
+  background: linear-gradient(120deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+  color: var(--neutral-white);
+  padding: 3.5rem 1rem;
+  text-align: center;
+  margin-bottom: 3rem; /* Space before main content */
+  border-bottom: 5px solid var(--primary-yellow); /* Yellow accent */
+}
+.headerIcon {
+  font-size: 3.5rem;
+  margin-bottom: 0.75rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.pageTitle {
+  font-size: 2.8rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.25);
+}
+.pageSubtitle {
+  font-size: 1.15rem;
+  max-width: 750px;
+  margin: 0 auto;
+  opacity: 0.95;
+  line-height: 1.6;
+}
+
+.contentSection {
+  padding: 0 0 2rem; /* No top padding as header provides it */
+}
+
+.sectionHeading {
+  font-size: 2rem; /* Consistent section heading size */
+  font-weight: 700;
+  color: var(--neutral-black);
+  margin-bottom: 2rem;
+  text-align: center;
+  position: relative;
+  padding-bottom: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+.sectionHeading::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 3px;
+  background-color: var(--primary-green); /* Default accent color */
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.sectionHeading svg { /* Icon within heading */
+  color: var(--primary-green);
+  margin-bottom: -2px; /* Align icon better */
+}
+
+/* Our Story Section */
+.storySection {
+  display: grid;
+  grid-template-columns: 1fr; /* Single column by default */
+  gap: 2.5rem;
+  align-items: center;
+  margin-bottom: 3.5rem;
+}
+@media (min-width: 992px) { /* Two columns on larger screens */
+  .storySection {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); /* Image | Text */
+  }
+  .storyImageWrapper { /* Order image first on desktop */
+    order: -1;
+  }
+}
+.storyImageWrapper {
+    border-radius: var(--rounded-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+}
+.storyImage { /* For Next.js Image */
+    width: 100%;
+    height: auto; /* Maintain aspect ratio */
+    max-height: 450px; /* Max height for the image */
+    object-fit: cover;
+}
+.storyTextContent h2 { /* Override centered sectionHeading for this layout */
+  text-align: left;
+  justify-content: flex-start;
+}
+.storyTextContent h2::after {
+  left: 0;
+  transform: translateX(0);
+}
+.storyTextContent p {
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--dark-gray);
+  margin-bottom: 1.2rem;
+}
+
+/* Our Values Section */
+.valuesSection {
+  margin-bottom: 3.5rem;
+  padding: 2.5rem 0;
+  background-color: var(--light-gray); /* Light background for this section */
+  border-radius: var(--rounded-lg);
+}
+.valuesSection .sectionHeading::after {
+    background-color: var(--primary-yellow); /* Yellow accent for values */
+}
+.valuesSection .sectionHeading svg {
+    color: var(--primary-yellow);
+}
+.valuesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.8rem;
+  margin-top: 1rem; /* Space after heading */
+}
+.valueCard {
+  background-color: var(--neutral-white);
+  padding: 1.8rem;
+  border-radius: var(--rounded-lg);
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--medium-gray);
+  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+}
+.valueCard:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+.valueIcon {
+  font-size: 2.5rem;
+  color: var(--primary-green);
+  margin-bottom: 1rem;
+}
+.valueTitle {
+  font-size: 1.25rem;
+  color: var(--neutral-black);
+  margin-bottom: 0.6rem;
+  font-weight: 600;
+}
+.valueCard p {
+  font-size: 0.9rem;
+  color: var(--dark-gray);
+  line-height: 1.6;
+}
+
+/* How We Work Section */
+.howWeWorkSection {
+  margin-bottom: 3.5rem;
+  padding: 2.5rem;
+  background-color: var(--neutral-black);
+  color: var(--neutral-white);
+  border-radius: var(--rounded-xl);
+  box-shadow: var(--shadow-lg);
+}
+.howWeWorkSection .sectionHeading {
+  color: var(--neutral-white);
+}
+.howWeWorkSection .sectionHeading::after {
+  background-color: var(--primary-yellow);
+}
+.howWeWorkSection .sectionHeading svg {
+  color: var(--primary-yellow);
+}
+.howWeWorkContent p {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--light-gray);
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left; /* Or justify for a more formal look */
+}
+.howWeWorkContent p:not(:last-child) {
+    margin-bottom: 1.2rem;
+}
+.howWeWorkContent strong {
+    color: var(--primary-yellow);
+}
+
+
+/* Team Section (Placeholder) */
+.teamSection {
+  margin-bottom: 3.5rem;
+  text-align: center;
+}
+.teamIntro {
+    font-size: 1.05rem;
+    color: var(--dark-gray);
+    max-width: 700px;
+    margin: 0 auto 1.5rem auto;
+}
+
+/* CTA Section */
+.ctaSection {
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  background-color: var(--light-gray);
+  border-radius: var(--rounded-lg);
+  border-top: 3px solid var(--primary-green);
+}
+.ctaTitle {
+  font-size: 1.6rem;
+  color: var(--neutral-black);
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+.ctaSection p {
+  font-size: 1.05rem;
+  color: var(--dark-gray);
+  margin-bottom: 1.8rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .pageHeader { padding: 2.5rem 1rem; }
+  .pageTitle { font-size: 2.2rem; }
+  .pageSubtitle { font-size: 1rem; }
+  .sectionHeading { font-size: 1.8rem; }
+
+  .storySection {
+    grid-template-columns: 1fr; /* Stack story image and text */
+  }
+  .storyImageWrapper {
+    order: 0; /* Image first on mobile */
+    max-height: 300px;
+  }
+  .storyTextContent h2 {
+    text-align: center;
+    justify-content: center;
+  }
+  .storyTextContent h2::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .valuesGrid {
+    grid-template-columns: 1fr; /* Stack value cards */
+  }
+  .howWeWorkSection { padding: 2rem; }
+}
+

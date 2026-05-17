@@ -1,0 +1,32 @@
+{
+  "id": "ai_recommendations",
+  "type": "SharedSlice",
+  "name": "AIRecommendations",
+  "description": "AIRecommendations",
+  "variations": [
+    {
+      "id": "default",
+      "name": "Default",
+      "docURL": "...",
+      "version": "s39ke",
+      "description": "Default",
+      "primary": {
+        "title": {
+          "type": "Title",
+          "config": {
+            "label": "Title",
+            "placeholder": ""
+          }
+        },
+        "description": {
+          "type": "RichText",
+          "config": {
+            "label": "Description",
+            "placeholder": ""
+          }
+        }
+      },
+      "items": {}
+    }
+  ]
+}

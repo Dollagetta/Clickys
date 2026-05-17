@@ -1,0 +1,329 @@
+/* styles/GuidesPage.module.css */
+/* This file contains the necessary styles for the guides page. */
+
+.guidesPageContainer {
+  padding-bottom: 3rem;
+}
+
+.pageHeader {
+  background: linear-gradient(120deg, var(--primary-green, #2ECC71) 0%, var(--secondary-green, #27ae60) 100%);
+  color: var(--primary-yellow); /* Light green for visibility */
+  padding: 3rem 1rem;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.pageHeader h1, .pageHeader p {
+  color: var(--primary-yellow) !important;
+}
+.headerIcon { font-size: 3.2rem; margin-bottom: 0.6rem; }
+.pageTitle { font-size: 2.6rem; font-weight: 700; text-shadow: 1px 1px 3px rgba(0,0,0,0.2); color: var(--primary-yellow) !important; }
+.pageSubtitle { font-size: 1.1rem; max-width: 650px; margin: 0 auto; opacity: 0.9; color: var(--primary-yellow) !important; }
+
+.disclaimer {
+    font-size: 0.75rem;
+    font-style: italic;
+    opacity: 0.7;
+    color: var(--primary-yellow) !important; /* Light green */
+}
+
+.controlsBar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: var(--neutral-white);
+    border-radius: var(--rounded-lg);
+    margin-bottom: 2.5rem;
+    border: 1px solid var(--medium-gray);
+}
+.searchAndFilter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    flex-grow: 1;
+}
+.searchBox {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    min-width: 250px;
+}
+.searchInput {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--medium-gray);
+    border-radius: var(--rounded-md) 0 0 var(--rounded-md);
+    font-size: 1rem;
+    transition: var(--transition-fast);
+    border-right: none;
+}
+.searchInput:focus {
+    outline: none;
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
+    z-index: 2;
+}
+.searchButton {
+    background-color: var(--primary-green);
+    color: var(--neutral-white);
+    border: 1px solid var(--primary-green);
+    padding: 0.8rem 1.2rem;
+    border-radius: 0 var(--rounded-md) var(--rounded-md) 0;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease-in-out;
+}
+.searchButton:hover {
+    background-color: var(--secondary-green);
+}
+.controlButton {
+    background-color: var(--neutral-white);
+    border: 1px solid var(--medium-gray);
+    padding: 0.8rem 1.2rem;
+    border-radius: var(--rounded-md);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    display: flex;
+    align-items: center;
+    box-shadow: var(--shadow-sm);
+    white-space: nowrap;
+}
+.controlButton:hover {
+    border-color: var(--primary-green);
+    color: var(--primary-green);
+}
+.sortAndView { display: flex; align-items: center; }
+.sortDropdown {
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--medium-gray);
+    border-radius: var(--rounded-md);
+    font-size: 0.9rem;
+    min-width: 180px;
+    cursor: pointer;
+    background-color: white;
+}
+
+/* --- Guides Grid Layout --- */
+.guidesGridSection {
+  padding: 0 0 2rem;
+}
+.guidesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+/* --- Card Styles --- */
+.guideCard {
+  background-color: #fff;
+  border-radius: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+.guideCard:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+  border-color: rgba(46, 204, 113, 0.4);
+}
+.guideLink { text-decoration: none; color: inherit; display: flex; flex-direction: column; height: 100%; }
+.guideImageWrapper {
+  aspect-ratio: 16 / 9; position: relative;
+  overflow: hidden; background-color: #f1f5f9;
+}
+.guideImage { 
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); 
+}
+.guideCard:hover .guideImage { transform: scale(1.1); }
+.tagWrapper {
+  position: absolute; 
+  top: 15px; 
+  left: 15px;
+  right: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+.guideCategoryTag {
+    background-color: #ff9800;
+    color: #fff; 
+    padding: 0.4rem 0.9rem;
+    border-radius: 10px; 
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: 0 10px 15px -3px rgba(255, 152, 0, 0.4);
+}
+.readingTimeTag {
+  background-color: #f44336;
+  backdrop-filter: blur(10px) saturate(200%);
+  color: #fff;
+  padding: 0.4rem 0.9rem;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 15px -3px rgba(244, 67, 54, 0.4);
+}
+.guideContent { padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column; }
+.guideTitle {
+  font-size: 1.3rem; font-weight: 600;
+  color: var(--neutral-black);
+  margin-bottom: 0.75rem; line-height: 1.4;
+  display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+  min-height: calc(1.4em * 2);
+}
+.guideMeta {
+    display: flex; flex-wrap: wrap; gap: 0.5rem 1.2rem;
+    font-size: 0.8rem; color: var(--dark-gray);
+    margin-bottom: 1rem;
+}
+.guideMeta span { display: inline-flex; align-items: center; }
+.metaIcon { margin-right: 0.4em; }
+.guideExcerpt {
+  font-size: 0.95rem; color: var(--dark-gray);
+  margin-bottom: 1rem; line-height: 1.6;
+  flex-grow: 1; display: -webkit-box;
+  -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.guideReadMore {
+  font-size: 0.9rem; font-weight: 600; color: var(--primary-green);
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  margin-top: auto; transition: color 0.2s ease;
+}
+.guideReadMore:hover { color: var(--secondary-green); text-decoration: underline; }
+.readMoreIcon { transition: transform 0.2s ease; }
+.guideReadMore:hover .readMoreIcon { transform: translateX(3px); }
+
+
+/* --- Filter Menu --- */
+.filterOverlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+  display: flex; justify-content: center; align-items: center; z-index: 1000;
+}
+.filterMenu {
+  background: white; width: 90%; max-width: 380px;
+  border-radius: var(--rounded-lg); box-shadow: var(--shadow-lg);
+  display: flex; flex-direction: column; overflow: hidden;
+  animation: slideIn 0.3s ease-out;
+}
+@keyframes slideIn {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.filterHeader {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1rem 1.5rem; background-color: var(--light-gray);
+  border-bottom: 1px solid var(--medium-gray);
+}
+.filterHeader h2 {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 1.1rem; font-weight: 600;
+}
+.closeFilterButton {
+  background: none; border: none; cursor: pointer;
+  font-size: 1.5rem; color: var(--dark-gray);
+  padding: 0.25rem; border-radius: 50%;
+  transition: var(--transition-fast);
+}
+.closeFilterButton:hover { background-color: var(--medium-gray); color: var(--neutral-black); }
+.filterActions {
+  display: flex; gap: 0.5rem; padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid var(--medium-gray);
+}
+.filterActions button {
+  font-size: 0.8rem; padding: 0.3rem 0.7rem; border-radius: var(--rounded-full);
+  cursor: pointer; border: 1px solid var(--primary-green);
+  background: var(--neutral-white); color: var(--primary-green);
+  transition: var(--transition-fast);
+}
+.filterActions button:hover { background: var(--primary-green); color: var(--neutral-white); }
+.categoryList { list-style: none; padding: 0.5rem 0; margin: 0; overflow-y: auto; max-height: 50vh; }
+.categoryLabel {
+  display: flex; align-items: center; cursor: pointer;
+  padding: 0.8rem 1.5rem; transition: background-color 0.2s ease;
+  font-size: 0.95rem;
+}
+.categoryLabel:hover { background-color: #f8f9fa; }
+.categoryCheckbox { 
+  display: none;
+}
+.customCheckbox {
+  width: 18px; height: 18px; border: 2px solid var(--medium-gray);
+  border-radius: var(--rounded-md); margin-right: 0.8rem;
+  display: inline-block; position: relative; transition: all 0.2s ease;
+}
+.categoryCheckbox:checked + .customCheckbox { 
+  background-color: var(--primary-green); 
+  border-color: var(--primary-green); 
+}
+.customCheckbox::after {
+  content: ''; position: absolute; display: none;
+  left: 5px; top: 1px; width: 5px; height: 10px; 
+  border: solid white; border-width: 0 2px 2px 0; 
+  transform: rotate(45deg);
+}
+.categoryCheckbox:checked + .customCheckbox::after { 
+  display: block; 
+}
+
+.filterFooter { 
+  padding: 1rem 1.5rem; margin-top: auto; 
+  border-top: 1px solid var(--medium-gray); 
+}
+.showResultsButton {
+  width: 100%; padding: 0.8rem; background: var(--primary-green);
+  color: white; border: none; cursor: pointer;
+  border-radius: var(--rounded-md); font-size: 1rem;
+  font-weight: 600; transition: var(--transition-fast);
+}
+.showResultsButton:hover { background: var(--secondary-green); }
+
+
+.noGuidesMessage {
+  text-align: center; padding: 3rem 1rem;
+  background-color: var(--light-gray);
+  border-radius: var(--rounded-lg); margin-top: 2rem;
+}
+.noGuidesMessage h2 { font-size: 1.4rem; margin-bottom: 0.75rem; color: var(--neutral-black);}
+.noGuidesMessage p { font-size: 1rem; color: var(--dark-gray); }
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .controlsBar { flex-direction: column; align-items: stretch; }
+    .searchAndFilter, .sortAndView { width: 100%; justify-content: space-between; }
+    .searchBox { flex-grow: 1; }
+}
+@media (max-width: 768px) {
+  .pageHeader { padding: 2.5rem 1rem; }
+  .pageTitle { font-size: 2.2rem; }
+  .guidesGrid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+  .searchAndFilter { flex-direction: column; gap: 0.8rem; }
+  .sortAndView { align-items: stretch; }
+  .searchInput, .sortDropdown, .controlButton { width: 100%; }
+}
+@media (max-width: 480px) {
+    .guidesGrid { grid-template-columns: 1fr; }
+}
+
+

@@ -1,0 +1,249 @@
+/* styles/DealsPage.module.css */
+/* Ensure this file is in your styles directory and the import path in app/deals/page.js is correct. */
+
+.dealsPageContainer {
+  /* Overall container for the deals page content */
+  padding-bottom: 3rem; /* Add some space at the very bottom */
+}
+
+.pageHeader {
+  background: linear-gradient(120deg, var(--primary-yellow) 0%, var(--secondary-yellow) 100%);
+  color: var(--neutral-black); /* Black text on yellow background */
+  padding: 3.5rem 1rem; /* Generous padding */
+  text-align: center;
+  margin-bottom: 0; /* Remove bottom margin as filter section might have its own top margin */
+  /* border-bottom: 5px solid var(--neutral-black); /* Strong separator */
+}
+.headerIcon {
+  font-size: 3.5rem; /* Larger icon */
+  margin-bottom: 0.75rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  color: var(--neutral-black); /* Icon color matches text */
+}
+.pageTitle {
+  font-size: 2.8rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  text-shadow: 1px 1px 2px rgba(255,255,255,0.1); /* Subtle light shadow */
+}
+.pageSubtitle {
+  font-size: 1.15rem;
+  max-width: 700px;
+  margin: 0 auto;
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+.filtersSection {
+  padding: 1.5rem 0;
+  background-color: var(--light-gray); /* Light background for filter area */
+  margin-bottom: 3rem; /* Space before deals grid */
+  border-bottom: 1px solid var(--medium-gray);
+  /* border-radius: 0 0 var(--rounded-lg) var(--rounded-lg); /* Optional: round bottom corners if header is sharp */
+}
+.filterControls {
+  display: flex;
+  flex-direction: column; /* Stack title and buttons */
+  align-items: center; /* Center content */
+  gap: 1rem; /* Space between title and button group */
+}
+.filterTitle {
+  font-size: 1.2rem; /* Slightly smaller filter title */
+  font-weight: 600;
+  color: var(--neutral-black);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.filterButtons {
+  display: flex;
+  flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+  gap: 0.6rem; /* Space between filter buttons */
+  justify-content: center; /* Center buttons */
+}
+.filterButton {
+  background-color: var(--neutral-white);
+  color: var(--neutral-black);
+  border: 1px solid var(--medium-gray);
+  padding: 0.5rem 1.1rem; /* Adjusted padding */
+  border-radius: var(--rounded-full);
+  font-size: 0.85rem; /* Slightly smaller button text */
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  box-shadow: var(--shadow-xs);
+}
+.filterButton:hover {
+  background-color: var(--primary-green);
+  color: var(--neutral-white);
+  border-color: var(--primary-green);
+  box-shadow: var(--shadow-sm);
+}
+.filterButton.active {
+  background-color: var(--primary-green);
+  color: var(--neutral-white);
+  border-color: var(--primary-green);
+  font-weight: 600;
+  box-shadow: var(--shadow-md);
+}
+
+.dealsGridSection {
+  padding: 0 0 3rem; /* Reduced top padding as filters section provides separation */
+}
+
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+  gap: 4px !important;
+  padding: 4px !important;
+  justify-content: center;
+}
+
+
+/* --- NEW PAGINATION STYLES --- */
+.paginationSection {
+  padding: 2rem 1rem 0; /* Space above pagination */
+}
+.paginationControls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.pageButton {
+  background-color: var(--neutral-white);
+  color: var(--neutral-black);
+  border: 1px solid var(--medium-gray);
+  padding: 0.6rem 1rem;
+  min-width: 45px; /* Ensure consistent button size */
+  text-align: center;
+  border-radius: var(--rounded-md);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+}
+.pageButton:hover {
+  background-color: var(--light-gray);
+  border-color: var(--dark-gray);
+  box-shadow: var(--shadow-sm);
+}
+.pageButton.active {
+  background-color: var(--primary-green);
+  color: var(--neutral-white);
+  border-color: var(--primary-green);
+  font-weight: 700;
+  box-shadow: var(--shadow-md);
+}
+.pageButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: var(--light-gray);
+}
+.pageButton:disabled:hover {
+  box-shadow: var(--shadow-xs);
+  border-color: var(--medium-gray);
+}
+/* --- END PAGINATION STYLES --- */
+
+
+.noDealsMessage {
+  text-align: center;
+  padding: 3.5rem 1rem;
+  background-color: var(--light-gray);
+  border-radius: var(--rounded-lg);
+  margin-top: 2rem;
+  border: 1px dashed var(--medium-gray);
+}
+.noDealsIcon {
+    font-size: 3rem;
+    color: var(--secondary-yellow);
+    margin-bottom: 1rem;
+}
+.noDealsMessage h2 {
+    font-size: 1.5rem;
+    color: var(--neutral-black);
+    margin-bottom: 0.75rem;
+}
+.noDealsMessage p {
+  font-size: 1.05rem;
+  color: var(--dark-gray);
+  margin-bottom: 1.5rem;
+  max-width: 550px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ctaBannerSection {
+    background-color: var(--neutral-black);
+    color: var(--neutral-white);
+    padding: 3rem 1rem;
+    text-align: center;
+    margin-top: 3rem;
+    border-radius: var(--rounded-lg);
+}
+.ctaBannerContent h3 {
+    font-size: 1.8rem;
+    color: var(--primary-yellow);
+    margin-bottom: 0.5rem;
+}
+.ctaBannerContent p {
+    font-size: 1.1rem;
+    color: var(--light-gray);
+    margin-bottom: 1.5rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .pageHeader { padding: 2.5rem 1rem; }
+  .pageTitle { font-size: 2.2rem; }
+  .pageSubtitle { font-size: 1rem; }
+
+  .filterControls { align-items: stretch; text-align: center; }
+  .filterButtons { justify-content: center; }
+  .filterButton { font-size: 0.8rem; padding: 0.4rem 0.9rem; }
+
+  .productGrid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 6px !important;
+  }
+  .noDealsMessage { padding: 2.5rem 1rem; }
+  .noDealsMessage h2 { font-size: 1.3rem; }
+  .noDealsMessage p { font-size: 0.95rem; }
+
+  .ctaBannerContent h3 { font-size: 1.5rem; }
+  .ctaBannerContent p { font-size: 1rem; }
+
+  .pageButton {
+    min-width: 40px;
+    padding: 0.5rem 0.8rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+    .productGrid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 6px !important;
+        max-width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* On very small screens, maybe only show prev/next and current page number */
+    .pageButton {
+      gap: 0.2rem;
+    }
+}

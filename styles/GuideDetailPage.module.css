@@ -1,0 +1,401 @@
+/* --- BASE & CONTAINER --- */
+.guideDetailPageContainer {
+  padding-bottom: 4rem;
+  background-color: var(--neutral-white);
+}
+
+/* --- HEADER IMAGE & CAPTION --- */
+.guideHeaderImageWrapper {
+  position: relative;
+  width: 100%;
+  height: clamp(300px, 50vh, 500px);
+  background-color: var(--light-gray);
+  margin-bottom: 2rem;
+}
+.guideHeaderImage {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+.headerImageCaption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+  color: var(--neutral-white);
+  font-size: 0.85rem;
+  text-align: center;
+  font-style: italic;
+  z-index: 1;
+}
+
+/* --- BREADCRUMBS --- */
+.breadcrumbs {
+  font-size: 0.9rem;
+  color: var(--dark-gray);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.breadcrumbs a {
+  color: var(--primary-green);
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+.breadcrumbs a:hover {
+  color: var(--secondary-green);
+  text-decoration: underline;
+}
+.breadcrumbs span {
+  font-weight: 500;
+  color: var(--neutral-black);
+}
+
+/* --- GUIDE HEADER (TITLE, META) --- */
+.guideHeader {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--medium-gray);
+}
+.guideTitle {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  color: var(--neutral-black);
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+.guideMeta {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--dark-gray);
+}
+.guideMeta span {
+  display: inline-flex;
+  align-items: center;
+}
+.metaIcon {
+  margin-right: 0.5rem;
+  font-size: 1.1em;
+  color: var(--primary-green);
+}
+
+/* --- ARTICLE BODY & RICH TEXT COMPONENTS --- */
+.articleBody {
+  line-height: 1.8;
+  font-size: 1.1rem;
+  color: var(--dark-gray);
+  max-width: 75ch; /* Optimal reading width */
+  margin-left: auto;
+  margin-right: auto;
+}
+.articleBody .paragraph {
+  margin-bottom: 1.5rem;
+}
+.articleBody h1, .articleBody h2, .articleBody h3, .articleBody h4, .articleBody h5, .articleBody h6 {
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+  color: var(--neutral-black);
+}
+.articleBody h2 { font-size: 2rem; border-bottom: 2px solid var(--primary-green); padding-bottom: 0.5rem; }
+.articleBody h3 { font-size: 1.6rem; }
+.articleBody h4 { font-size: 1.3rem; }
+.articleBody .list, .articleBody .oList {
+  margin-bottom: 1.5rem;
+  padding-left: 1.8rem;
+}
+.articleBody .list li, .articleBody .oList li {
+  margin-bottom: 0.75rem;
+}
+.articleBody a {
+  color: var(--primary-green);
+  text-decoration: underline;
+  font-weight: 500;
+  transition: var(--transition-fast);
+}
+.articleBody a:hover {
+  color: var(--secondary-green);
+}
+.articleBody blockquote {
+  border-left: 4px solid var(--primary-yellow);
+  padding: 1rem 1.5rem;
+  margin: 2rem 0;
+  background-color: var(--light-gray);
+  border-radius: 0 var(--rounded-md) var(--rounded-md) 0;
+  font-style: italic;
+  color: var(--dark-gray);
+}
+.embedWrapper {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  overflow: hidden;
+  max-width: 100%;
+  margin: 2rem 0;
+  border-radius: var(--rounded-lg);
+}
+.embedWrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.richImageWrapper {
+  margin: 2.5rem 0;
+  text-align: center;
+}
+.richImage {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--rounded-lg);
+  box-shadow: var(--shadow-md);
+}
+.richImageCaption {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--dark-gray);
+  font-style: italic;
+}
+
+/* --- SECTION TITLE --- */
+.sectionTitle {
+    text-align: center;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    color: var(--neutral-black);
+}
+
+/* --- COMPARISONS SECTION --- */
+.comparisonsSection {
+  margin: 4rem 0;
+  padding: 3rem 0;
+  background-color: var(--light-gray);
+  border-top: 1px solid var(--medium-gray);
+  border-bottom: 1px solid var(--medium-gray);
+}
+.comparisonBlock {
+  display: grid;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  max-width: var(--max-width-content);
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 1rem;
+}
+.comparisonBlock.twoCard {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+.comparisonBlock.threeCard {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+.comparisonCard {
+  background-color: var(--neutral-white);
+  border: 1px solid var(--medium-gray);
+  border-radius: var(--rounded-lg);
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+.comparisonCard:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+.rankBadge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background-color: var(--primary-yellow);
+    color: var(--neutral-black);
+    padding: 0.3rem 0.8rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-radius: var(--rounded-md);
+    z-index: 2;
+}
+.cardImageWrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    background-color: #fff;
+    padding: 1rem;
+}
+.cardImage {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.cardContent {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+.cardTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--dark-gray);
+  margin-bottom: 0.5rem;
+}
+.productNameLink {
+    text-decoration: none;
+}
+.productNameLink h4 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--neutral-black);
+    margin-bottom: 1rem;
+    transition: var(--transition-fast);
+}
+.productNameLink:hover h4 {
+    color: var(--primary-green);
+}
+.cardParagraph {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--dark-gray);
+    flex-grow: 1;
+    margin-bottom: 1.5rem;
+}
+.cardLinks {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.comparisonButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: var(--primary-yellow);
+  color: black;
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--rounded-md);
+  font-weight: 600;
+  text-decoration: none;
+  transition: var(--transition-fast);
+  text-align: center;
+}
+.comparisonButton:hover {
+  background-color: var(--secondary-green);
+}
+
+/* --- FINAL LINKS SECTION --- */
+.finalLinksSection {
+    margin: 3rem auto;
+    max-width: 75ch;
+}
+.finalLinksGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+.finalLinkButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background-color: var(--primary-yellow);
+  border: 1px solid var(--medium-gray);
+  border-radius: var(--rounded-md);
+  color: black;
+  text-decoration: none;
+  font-weight: 600;
+  transition: var(--transition-fast);
+}
+.finalLinkButton:hover {
+  background-color: var(--primary-green);
+  color: var(--neutral-white);
+  border-color: var(--primary-green);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* --- TAGS SECTION --- */
+.tagsSection {
+  margin: 3rem auto;
+  padding-top: 2rem;
+  border-top: 1px solid var(--medium-gray);
+  max-width: 75ch;
+}
+.tagsTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--neutral-black);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.tagsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.tagLink {
+  background-color: var(--light-gray);
+  color: var(--dark-gray);
+  padding: 0.4rem 1rem;
+  border-radius: var(--rounded-full);
+  font-size: 0.85rem;
+  text-decoration: none;
+  border: 1px solid var(--medium-gray);
+  transition: var(--transition-fast);
+}
+.tagLink:hover {
+  background-color: var(--primary-green);
+  color: var(--neutral-white);
+  border-color: var(--primary-green);
+}
+
+
+/* guides.module.css (or whatever your module file is named) */
+
+.list {
+  list-style-type: disc;   /* black dots */
+  padding-left: 1.5rem;    /* indent so dots don’t overlap text */
+  margin: 1rem 0;          /* vertical spacing around the list */
+}
+
+.list li {
+  margin-bottom: 0.5rem;   /* space between list items */
+}
+
+.oList {
+  list-style-type: decimal; /* numbers */
+  padding-left: 1.5rem;
+  margin: 1rem 0;
+}
+
+.oList li {
+  margin-bottom: 0.5rem;
+}
+
+
+/* --- RESPONSIVE ADJUSTMENTS --- */
+@media (max-width: 768px) {
+    .guideTitle {
+        font-size: 2.5rem;
+    }
+    .articleBody {
+        font-size: 1rem;
+    }
+    .comparisonBlock.twoCard, .comparisonBlock.threeCard {
+        grid-template-columns: 1fr;
+    }
+}
+
+

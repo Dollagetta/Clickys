@@ -1,0 +1,381 @@
+/* styles/GuidesPage.module.css */
+/* Ensure this file is in your styles directory and the import path is correct. */
+
+.guidesPageContainer {
+  padding-bottom: 3rem;
+}
+
+.pageHeader {
+  /* Using a different gradient for guides page for visual distinction */
+  background: linear-gradient(120deg, var(--primary-blue, #3498DB) 0%, var(--secondary-blue, #2980B9) 100%);
+  /* Define --primary-blue & --secondary-blue in globals.css if you use them, or use existing colors */
+  /* Fallback to a green variant if blue is not defined */
+  /* background: linear-gradient(120deg, var(--secondary-green) 0%, var(--primary-green) 100%); */
+  color: var(--neutral-white);
+  padding: 3rem 1rem;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.headerIcon {
+  font-size: 3.2rem;
+  margin-bottom: 0.6rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.pageTitle {
+  font-size: 2.6rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+}
+.pageSubtitle {
+  font-size: 1.1rem;
+  max-width: 650px;
+  margin: 0 auto;
+  opacity: 0.9;
+  line-height: 1.5;
+}
+
+/* Controls Bar: Search, Filter Categories, Sort */
+.controlsBar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    background-color: var(--light-gray);
+    border-radius: var(--rounded-lg);
+    margin-bottom: 2.5rem;
+    box-shadow: var(--shadow-sm);
+}
+.searchAndFilter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    flex-grow: 1;
+}
+.searchBox {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    min-width: 200px;
+}
+.searchIcon {
+    position: absolute;
+    left: 12px;
+    color: var(--dark-gray);
+    font-size: 1.1rem;
+}
+.searchInput {
+    width: 100%;
+    padding: 0.7rem 0.7rem 0.7rem 2.5rem;
+    border: 1px solid var(--medium-gray);
+    border-radius: var(--rounded-md);
+    font-size: 0.9rem;
+    background-color: var(--neutral-white);
+}
+.searchInput:focus {
+    outline: none;
+    border-color: var(--primary-green); /* Or your theme's primary interactive color */
+    box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.2);
+}
+.controlButton { /* For Filter Categories button */
+    background-color: var(--neutral-white);
+    color: var(--neutral-black);
+    border: 1px solid var(--medium-gray);
+    padding: 0.7rem 1.2rem;
+    border-radius: var(--rounded-md);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    display: flex;
+    align-items: center;
+    box-shadow: var(--shadow-xs);
+}
+.controlButton:hover {
+    background-color: var(--primary-green); /* Or your theme's primary interactive color */
+    color: var(--neutral-white);
+    border-color: var(--primary-green);
+}
+.sortAndView { /* For sort dropdown */
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+.sortDropdown {
+    padding: 0.7rem 1rem;
+    border: 1px solid var(--medium-gray);
+    border-radius: var(--rounded-md);
+    font-size: 0.9rem;
+    background-color: var(--neutral-white);
+    min-width: 180px;
+    cursor: pointer;
+}
+
+.guidesGridSection {
+  padding: 0 0 2rem;
+}
+
+.guidesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Adjust minmax for guide card size */
+  gap: 2rem; /* Increased gap for better separation */
+}
+
+.guideCard {
+  background-color: var(--neutral-white);
+  border-radius: var(--rounded-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+  border: 1px solid var(--medium-gray);
+}
+.guideCard:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-green); /* Or your theme's interactive color */
+}
+
+.guideLink { /* Applied to Link component */
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Make the entire card clickable and content fill */
+}
+
+.guideImageWrapper {
+  aspect-ratio: 16 / 9; /* Standard aspect ratio for guide images */
+  position: relative;
+  overflow: hidden;
+  background-color: var(--light-gray); /* Placeholder if image is missing */
+}
+.guideImageWrapper img { /* For Next.js Image */
+  transition: transform 0.4s ease-out;
+  /* border-radius: var(--rounded-md) var(--rounded-md) 0 0; /* Handled by Image component style prop */
+}
+.guideCard:hover .guideImageWrapper img {
+  transform: scale(1.05);
+}
+.guideCategoryTag {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: var(--primary-green); /* Or a specific color for categories */
+    color: var(--neutral-white);
+    padding: 0.25rem 0.6rem;
+    border-radius: var(--rounded-md);
+    font-size: 0.7rem;
+    font-weight: 500;
+    z-index: 1;
+    text-transform: uppercase;
+}
+
+
+.guideContent {
+  padding: 1.25rem; /* Padding inside the card content */
+  flex-grow: 1; /* Allows content to fill available space */
+  display: flex;
+  flex-direction: column; /* Stack title, excerpt, read more */
+}
+
+.guideTitle {
+  font-size: 1.25rem; /* Prominent title for guide */
+  font-weight: 600;
+  color: var(--neutral-black);
+  margin-bottom: 0.5rem;
+  line-height: 1.35;
+  /* Ellipsis for long titles */
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Max 2 lines for title */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: calc(1.35em * 2); /* Ensure space for two lines */
+}
+.guideMeta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 1rem; /* Row and column gap */
+    font-size: 0.75rem;
+    color: var(--dark-gray);
+    margin-bottom: 0.6rem;
+    opacity: 0.8;
+}
+.guideMeta span {
+    display: inline-flex;
+    align-items: center;
+}
+.metaIcon {
+    margin-right: 0.3em;
+    font-size: 0.9em;
+}
+
+.guideExcerpt {
+  font-size: 0.9rem;
+  color: var(--dark-gray);
+  margin-bottom: 1rem;
+  line-height: 1.6;
+  flex-grow: 1; /* Pushes "Read More" to the bottom */
+  /* Ellipsis for excerpt */
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Max 3 lines for excerpt */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.guideReadMore {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary-green); /* Or your theme's interactive color */
+  display: inline-flex; /* For icon alignment */
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: auto; /* Pushes to bottom if content above is short */
+  transition: color 0.2s ease;
+}
+.guideReadMore:hover {
+  color: var(--secondary-green); /* Darker shade on hover */
+  text-decoration: underline;
+}
+.readMoreIcon { /* For the FiArrowRight icon */
+    transition: transform 0.2s ease;
+}
+.guideReadMore:hover .readMoreIcon {
+    transform: translateX(3px); /* Slight move on hover */
+}
+
+.noGuidesMessage {
+  text-align: center;
+  padding: 3rem 1rem;
+  background-color: var(--light-gray);
+  border-radius: var(--rounded-lg);
+  margin-top: 2rem;
+}
+.noGuidesMessage h2 {
+    font-size: 1.4rem;
+    color: var(--neutral-black);
+    margin-bottom: 0.75rem;
+}
+.noGuidesMessage p {
+  font-size: 1rem;
+  color: var(--dark-gray);
+  margin-bottom: 1.5rem;
+}
+
+/* Pagination (same as ProductsPage.module.css, can be globalized) */
+.paginationControls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 3rem;
+    padding: 1rem 0;
+    border-top: 1px solid var(--medium-gray);
+}
+.paginationButton {
+    background-color: var(--neutral-white);
+    color: var(--primary-green);
+    border: 1px solid var(--primary-green);
+    padding: 0.5rem 1rem;
+    border-radius: var(--rounded-md);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+.paginationButton:hover:not(:disabled) {
+    background-color: var(--primary-green);
+    color: var(--neutral-white);
+}
+.paginationButton:disabled {
+    color: var(--medium-gray);
+    border-color: var(--medium-gray);
+    cursor: not-allowed;
+}
+.pageInfo {
+    font-size: 0.9rem;
+    color: var(--dark-gray);
+}
+
+/* ProductsPage.module.css */
+
+.filterOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure it overlays above other content */
+}
+
+.filterMenu {
+  background: white;
+  width: 300px;
+  padding: 1rem;
+  display: flex;
+  height: fit-content;
+  flex-direction: column;
+  border-radius: 10px;
+}
+
+.filterHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.categoryList {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.applyFiltersButton {
+  align-self: stretch;
+  padding: 0.75rem;
+  background: #333;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .controlsBar { flex-direction: column; align-items: stretch; }
+    .searchAndFilter, .sortAndView { width: 100%; justify-content: space-between; }
+    .searchBox { flex-grow: 1; }
+}
+@media (max-width: 768px) {
+  .pageHeader { padding: 2.5rem 1rem; }
+  .pageTitle { font-size: 2.2rem; }
+  .pageSubtitle { font-size: 1rem; }
+
+  .guidesGrid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Ensure cards are not too small */
+    gap: 1.5rem;
+  }
+  .searchAndFilter, .sortAndView { flex-direction: column; gap: 0.8rem; }
+  .searchInput, .sortDropdown, .controlButton { width: 100%; }
+}
+
+@media (max-width: 480px) {
+    .guidesGrid {
+        grid-template-columns: 1fr; /* Single column on very small screens */
+    }
+}
