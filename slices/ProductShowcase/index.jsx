@@ -59,7 +59,7 @@ const ProductShowcase = ({ slice }) => {
                 
                 <div className="flex items-center gap-3 mb-6">
                   <span className="text-xl font-extrabold text-slate-900">
-                    {typeof item.price === 'string' || typeof item.price === 'number' ? String(item.price) : (item.price ? <PrismicText field={item.price} /> : '$0.00')}
+                    {typeof item.price === 'string' || typeof item.price === 'number' ? String(item.price) : (item.price ? <PrismicText field={item.price} /> : '₹0.00')}
                   </span>
                   {item.original_price && (
                     <span className="text-sm text-slate-400 line-through font-medium">

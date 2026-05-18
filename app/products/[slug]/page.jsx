@@ -127,8 +127,8 @@ export default async function ProductDetailPage({ params }) {
 
               {/*
               <div className={styles.priceSection}>
-                <span className={styles.currentPrice}>${product.price}</span>
-                {product.oldPrice && <span className={styles.oldPrice}>${product.oldPrice}</span>}
+                <span className={styles.currentPrice}>₹{product.price}</span>
+                {product.oldPrice && <span className={styles.oldPrice}>₹{product.oldPrice}</span>}
                 {product.onPromotion && <span className={styles.savingsBadge}>Save {Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}%</span>}
               </div>
               */}

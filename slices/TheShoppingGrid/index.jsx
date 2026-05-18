@@ -84,7 +84,7 @@ const TheShoppingGrid = ({ slice }) => {
                   <div className="mt-auto pt-2 flex flex-col gap-4 mx-auto items-center w-full">
                     <div className="flex items-center gap-2">
                       <span className="text-2xl font-black text-orange-600">
-                        {typeof item.price === 'string' || typeof item.price === 'number' ? String(item.price) : (item.price ? <PrismicText field={item.price} /> : '$0.00')}
+                        {typeof item.price === 'string' || typeof item.price === 'number' ? String(item.price) : (item.price ? <PrismicText field={item.price} /> : '₹0.00')}
                       </span>
                     </div>
                     

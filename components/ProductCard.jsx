@@ -75,7 +75,7 @@ const ProductCard = ({ product }) => {
     id = 'default-id',
     name = 'Product Name Placeholder',
     category = 'Category',
-    price = 'On Sale', // Expecting a formatted string like "₹1,299.00"
+    price: rawPrice = 'On Sale', // Expecting a formatted string like "₹1,299.00"
     amazonLink = '#',
     rating = 4.5,
     reviewCount = 120,
@@ -87,6 +87,25 @@ const ProductCard = ({ product }) => {
     promotionalStatus = '',
     availabilityStatus = '',
   } = product;
+
+  const formatPrice = (p) => {
+    if (!p || p == 0 || p === '0' || String(p).trim() === '' || String(p).toLowerCase() === 'on sale') {
+      return "On Sale";
+    }
+    let strClean = String(p).trim();
+    if (strClean.includes('₹')) return strClean;
+    if (strClean.toLowerCase().includes('rs') || strClean.toLowerCase().includes('rs.')) {
+      return strClean.replace(/rs\.?\s*/i, '₹');
+    }
+    // Check if it already has other currency symbols to avoid double adding
+    // If it starts with a number, slap a ₹ in front of it.
+    if (/^[0-9]/.test(strClean)) {
+        return `₹${strClean}`;
+    }
+    return strClean;
+  };
+
+  const formattedPrice = formatPrice(rawPrice);
 
   const imageUrl = product.imageUrl || `https://placehold.co/600x400/2ECC71/1A1A1A?text=${encodeURIComponent(name)}&font=Inter`;
 
@@ -218,8 +237,7 @@ const ProductCard = ({ product }) => {
 
           <div className={styles.priceActionRow}>
             <div className={styles.priceContainer}>
-              { price != 0 && <span className={styles.currentPrice}>{price}</span> }
-              { (!price || price == 0) && <span className={styles.currentPrice}>On Sale</span> }
+              <span className={styles.currentPrice}>{formattedPrice}</span>
             </div>
             <motion.a
               href={finalLink}
