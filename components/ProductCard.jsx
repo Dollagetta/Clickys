@@ -225,6 +225,7 @@ const ProductCard = ({ product }) => {
               href={finalLink}
               target="_blank"
               rel="noopener noreferrer sponsored"
+              onClick={(e) => e.stopPropagation()}
               className={`btn btn-primary ${styles.amazonButton}`}
               title={buttonText}
               whileHover={{ scale: 1.05 }}

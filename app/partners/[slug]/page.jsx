@@ -55,8 +55,8 @@ export default async function PartnerPage({ params }) {
     promotionalStatus: p.promotional_status || "",
     availabilityStatus: p.availability_status || "",
     contactLink:
-      p.contact_link?.url ||
-      `https://wa.me/${String(whatsapp_number).replace(/[\s-+]/g, "")}`,
+      (p.contact_link && p.contact_link.url) ? p.contact_link.url :
+      (whatsapp_number ? `https://wa.me/${String(whatsapp_number).replace(/[\s-+]/g, "")}?text=${encodeURIComponent("Hi, I'm interested in: " + p.product_title)}` : "#"),
     description:
       typeof p.product_description === "string"
         ? p.product_description
