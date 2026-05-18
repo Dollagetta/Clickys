@@ -114,7 +114,7 @@ const PartnerCard = ({ partner, index }) => {
 
           {whatsapp && (
             <a
-              href={`https://wa.me/${String(whatsapp).replace(/[\s-+]/g, "")}`}
+              href={`https://api.whatsapp.com/send/?phone=${String(whatsapp).replace(/[\s-+]/g, "")}&text&type=phone_number&app_absent=0`}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center justify-center w-8 h-8 shrink-0 rounded-md bg-[#25D366] text-white hover:bg-[#22c35e] active:scale-95 transition-all shadow-sm"

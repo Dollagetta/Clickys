@@ -56,7 +56,7 @@ export default async function PartnerPage({ params }) {
     availabilityStatus: p.availability_status || "",
     contactLink:
       (p.contact_link && p.contact_link.url) ? p.contact_link.url :
-      (whatsapp_number ? `https://wa.me/${String(whatsapp_number).replace(/[\s-+]/g, "")}?text=${encodeURIComponent("Hi, I'm interested in: " + p.product_title)}` : "#"),
+      (whatsapp_number ? `https://api.whatsapp.com/send/?phone=${String(whatsapp_number).replace(/[\s-+]/g, "")}&text=${encodeURIComponent("Hi, I'm interested in: " + p.product_title)}&type=phone_number&app_absent=0` : "#"),
     description:
       typeof p.product_description === "string"
         ? p.product_description
@@ -140,7 +140,7 @@ export default async function PartnerPage({ params }) {
               <div className="flex flex-wrap gap-4 mt-auto">
                 {whatsapp_number && (
                   <a
-                    href={`https://wa.me/${String(whatsapp_number).replace(/[\s-+]/g, "")}`}
+                    href={`https://api.whatsapp.com/send/?phone=${String(whatsapp_number).replace(/[\s-+]/g, "")}&text&type=phone_number&app_absent=0`}
                     target="_blank"
                     rel="noreferrer"
                     className="flex-1 sm:flex-none inline-flex items-center justify-center px-7 py-4 bg-green-500 hover:bg-green-600 text-white rounded-2xl font-semibold transition-all active:scale-95"
