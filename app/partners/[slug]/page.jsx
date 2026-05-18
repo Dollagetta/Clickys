@@ -50,6 +50,8 @@ export default async function PartnerPage({ params }) {
     category: p.product_badge,
     discount: p.product_discount,
     featuredFind: p.featured_find === true || String(p.featured_find).toLowerCase() === 'true',
+    partnerName: partner_name,
+    isPartner: true,
     promotionalStatus: p.promotional_status || "",
     availabilityStatus: p.availability_status || "",
     contactLink:

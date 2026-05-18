@@ -1,10 +1,10 @@
-# 📦 Clickys Website Documentation.
+# 📦 Clickys Website Documentation
 
 Welcome to the documentation for **Clickys Website**! This comprehensive guide walks you through maintaining the app, updating static/dynamic content, managing APIs, handling newsletter subscriptions, and deploying a live instance to Vercel with your custom domain.
 
 ---
 
-## 🏗️ 1. Managing Static & Hardcoded Content.
+## 🏗️ 1. Managing Static & Hardcoded Content
 
 Some parts of the application are hardcoded into the React components to act as fallback or fast-rendering sections. Here is how you can update them.
 

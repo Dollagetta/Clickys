@@ -103,7 +103,7 @@ const ProductCard = ({ product }) => {
 
     // Default properties (fallback to Amazon)
     let tagText = 'Amazon';
-    let buttonText = isPartner ? 'Contact Seller' : 'Buy on Amazon';
+    let buttonText = isPartner ? (product.partnerName ? `Buy on ${product.partnerName}` : 'Contact Seller') : 'Buy on Amazon';
     let finalAffiliateColor = affiliateColors['Amazon'];
     let finalLink = isPartner ? contactLink : amazonLink;
 
@@ -121,7 +121,7 @@ const ProductCard = ({ product }) => {
             buttonText = `Buy on ${displayPlatform}`;
         }
     } else {
-        tagText = ''; // Can keep empty or use platform
+        tagText = product.partnerName || ''; // Use partner name if available
         finalAffiliateColor = affiliateColors['Amazon']; // default for partner
     }
 
@@ -165,19 +165,19 @@ const ProductCard = ({ product }) => {
       layout
     >
       <div className={styles.cardLinkWrapper}>
-        <motion.div className={styles.imageWrapper} variants={imageVariants}>
+        <motion.div className={isPartner ? `${styles.imageWrapper} ${styles.partnerImageWrapper}` : styles.imageWrapper} variants={imageVariants}>
           {!isPrismicImage && <Image
             src={imageUrl}
             alt={name}
-            width={200}
-            height={150}
-            style={{ objectFit: 'contain' }}
+            width={isPartner ? 400 : 200}
+            height={isPartner ? 300 : 150}
+            style={{ objectFit: isPartner ? 'cover' : 'contain' }}
             priority={true}
             unoptimized={true}
             className={styles.productImage}
             onError={(e) => e.currentTarget.src = `https://placehold.co/200x150/CCCCCC/1A1A1A?text=Error&font=Inter`}
           />}
-          {isPrismicImage && <PrismicNextImage field={imageUrl} priority={true} className={styles.productImage} />}
+          {isPrismicImage && <PrismicNextImage field={imageUrl} priority={true} className={styles.productImage} style={{ objectFit: isPartner ? 'cover' : 'contain' }} />}
           
           {tagText && <span className={styles.promoTag}>{tagText}</span>}
           {featuredFind && <span className={styles.featuredBadge}>Featured Find</span>}
