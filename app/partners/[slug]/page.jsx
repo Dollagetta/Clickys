@@ -54,9 +54,12 @@ export default async function PartnerPage({ params }) {
     isPartner: true,
     promotionalStatus: p.promotional_status || "",
     availabilityStatus: p.availability_status || "",
-    contactLink:
-      (p.contact_link && p.contact_link.url) ? p.contact_link.url :
-      (whatsapp_number ? `https://api.whatsapp.com/send/?phone=${String(whatsapp_number).replace(/[\s-+]/g, "")}&text=${encodeURIComponent("Hi, I'm interested in: " + p.product_title)}&type=phone_number&app_absent=0` : "#"),
+    contactLink: (() => {
+      const dbUrl = p.contact_link?.url;
+      if (dbUrl && dbUrl.startsWith('http')) return dbUrl;
+      const phone = dbUrl || whatsapp_number;
+      return phone ? `https://api.whatsapp.com/send/?phone=${String(phone).replace(/[\s-+]/g, "")}&text=${encodeURIComponent("Hi, I'm interested in: " + (p.product_title || "your product"))}&type=phone_number&app_absent=0` : "#";
+    })(),
     description:
       typeof p.product_description === "string"
         ? p.product_description
