@@ -1,4 +1,4 @@
-# 📦 Clickys Website Documentation
+# 📦 Clickys Website Documentation.
 
 Welcome to the documentation for **Clickys Website**! This comprehensive guide walks you through maintaining the app, updating static/dynamic content, managing APIs, handling newsletter subscriptions, and deploying a live instance to Vercel with your custom domain.
 
