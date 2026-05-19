@@ -18,8 +18,10 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Missing email' }, { status: 400 });
     }
 
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'Clickys <updates@clickys.in>';
+
     const { data, error } = await resend.emails.send({
-      from: 'Clickys <onboarding@resend.dev>', // Update with your domain when configured
+      from: fromEmail,
       to: [email],
       subject: 'Welcome to Clickys!',
       html: `

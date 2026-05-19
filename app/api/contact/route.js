@@ -22,8 +22,10 @@ export async function POST(req) {
       );
     }
 
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'Clickys Contact <updates@clickys.in>';
+
     const { data, error } = await resend.emails.send({
-      from: 'Contact Form <onboarding@resend.dev>', // Use resend's test domain as default, you can change it to your domain later
+      from: fromEmail,
       to: ['teamclickys@gmail.com'], // Sent to your team email
       reply_to: email,
       subject: `New Contact Request: ${subject || 'No Subject'}`,
