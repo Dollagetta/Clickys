@@ -14,7 +14,6 @@ const inter = Inter({
   variable: '--font-sans', // CSS variable for the font
 });
 
-/*
 const siteName = "Clickys";
 const siteUrl = "https://www.clickys.in"; // Replace with your actual domain
 
@@ -42,8 +41,8 @@ export const metadata = {
   
   // Icons
   icons: {
-    icon: '/click.svg',
-    apple: '/click.svg',
+    icon: '/icon.svg',
+    apple: '/icon.svg',
   },
   
   // Open Graph metadata
@@ -91,7 +90,6 @@ export const metadata = {
     },
   },
 };
-*/
 
 export default function RootLayout({ children }) {
   return (
