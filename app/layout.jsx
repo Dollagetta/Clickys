@@ -41,8 +41,8 @@ export const metadata = {
   
   // Icons
   icons: {
-    icon: '/icon.svg',
-    apple: '/icon.svg',
+    icon: '/clickysbg.png',
+    apple: '/clickysbg.png',
   },
   
   // Open Graph metadata
@@ -99,8 +99,8 @@ export default function RootLayout({ children }) {
        {/* Analytics script */}
       </head>
       <body suppressHydrationWarning>
-        <Script id="cuelinks" strategy="afterInteractive" dangerouslySetInnerHTML={{
-          __html: `
+        <Script id="cuelinks" strategy="afterInteractive">
+          {`
             var cId = '239712';
             (function(d, t) {
               var s = document.createElement('script');
@@ -112,8 +112,8 @@ export default function RootLayout({ children }) {
                   : 'http://cdn0.cuelinks.com/js/') + 'cuelinksv2.js';
               document.getElementsByTagName('body')[0].appendChild(s);
             })();
-          `
-        }} />
+          `}
+        </Script>
         <ReadingProgressBar />
         <AppProviders> {/* Handles AnimatePresence and AOS initialization */}
           <Navbar key="navbar" />

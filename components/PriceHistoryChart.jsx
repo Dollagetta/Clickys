@@ -76,7 +76,7 @@ export default function PriceHistoryChart({ currentPrice }) {
       
       <div className="h-64 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+          <AreaChart data={data} margin={{ top: 15, right: 15, left: 25, bottom: 5 }}>
             <defs>
               <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3}/>
@@ -86,10 +86,12 @@ export default function PriceHistoryChart({ currentPrice }) {
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
             <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B7280' }} dy={10} />
             <YAxis 
+              width={80}
               axisLine={false} 
               tickLine={false} 
               tick={{ fontSize: 12, fill: '#6B7280' }} 
               tickFormatter={(value) => `₹${value}`}
+              domain={['dataMin', 'dataMax']}
             />
             <Tooltip 
               contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}

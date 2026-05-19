@@ -45,7 +45,8 @@ export async function POST(req) {
 
     const latestProduct = productsRes.results[0];
     const productName = latestProduct.data.title || 'New Product';
-    const productUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.clickys.in'}/products/${latestProduct.uid}`;
+    // Hardcode the site URL to avoid environment variable issues in standard node (like punycode errors)
+    const productUrl = `https://www.clickys.in/products/${latestProduct.uid}`;
     const productExcerpt = latestProduct.data.description?.[0]?.text || 'Check out our latest update!';
     const productImage = latestProduct.data.image?.url;
 
@@ -81,7 +82,7 @@ export async function POST(req) {
     }
 
     const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'Clickys Updates <updates@clickys.in>', // Using verified domain
+      from: process.env.RESEND_FROM_EMAIL || 'Clickys <noreply@clickys.in>', // Using verified domain
       to: emails,
       subject: `New Arrival on Clickys: ${productName}`,
       html: `
@@ -91,7 +92,7 @@ export async function POST(req) {
           </div>
           <div style="padding: 30px;">
             <h2 style="color: #333;">${productName}</h2>
-            ${productImage ? `<img src="${productImage}" alt="${productName}" style="width: 100%; border-radius: 8px; margin-bottom: 20px;" />` : ''}
+            ${productImage ? `<img src="${productImage}" alt="${productName}" style="display: block; max-width: 80%; max-height: 250px; margin: 0 auto 20px auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(249, 115, 22, 0.25); border: 2px solid #f97316; object-fit: contain;" />` : ''}
             <p style="color: #666; font-size: 16px; line-height: 1.6;">${productExcerpt}</p>
             <div style="text-align: center; margin-top: 30px;">
               <a href="${productUrl}" style="background-color: #f97316; color: white; padding: 12px 25px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block;">
