@@ -5,6 +5,9 @@ import React, { useEffect } from 'react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { WishlistProvider } from './WishlistContext';
+import { CompareProvider } from './CompareContext';
+import CompareDrawer from './CompareDrawer';
+import LiveActivityToast from './LiveActivityToast';
 
 export default function AppProviders({ children }) {
   useEffect(() => {
@@ -19,7 +22,11 @@ export default function AppProviders({ children }) {
 
   return (
     <WishlistProvider>
-      {children}
+      <CompareProvider>
+        {children}
+        <CompareDrawer />
+        <LiveActivityToast />
+      </CompareProvider>
     </WishlistProvider>
   );
 }

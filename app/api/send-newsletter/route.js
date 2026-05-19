@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
-import { db } from '../../../../lib/firebase';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { adminDb } from '../../../lib/firebase-admin';
 import { Resend } from 'resend';
-import { createClient } from '../../../../prismicio';
+import { createClient } from '../../../prismicio';
 
 export async function POST(req) {
   try {
@@ -10,15 +9,21 @@ export async function POST(req) {
     const body = await req.json();
     console.log('Prismic Webhook received:', body);
 
+    // Verify Prismic Webhook Secret
+    const PRISMIC_SECRET = 'Dollagetta#2003';
+    if (body.secret !== PRISMIC_SECRET) {
+      console.warn('Unauthorized webhook attempt');
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+
     // Prismic webhooks send a list of document IDs that were changed
-    // We care about "api:publish" and "test-trigger"
+    // We care about "api-update" (which is publish) and "test-trigger"
     if (body.type !== 'api-update' && body.type !== 'test-trigger') {
       return NextResponse.json({ message: 'Ignored event type' }, { status: 200 });
     }
 
     // Step 1: Identify if any "product" was published
-    // The payload format varies, but usually contains masterRef or documents
-    // For now, let's just fetch the latest product from Prismic to see if it's new
+    // For now, fetch the latest product from Prismic to see if it's new
     const client = createClient();
     const productsRes = await client.getByType('product', {
       orderings: {
@@ -29,19 +34,23 @@ export async function POST(req) {
     });
 
     if (productsRes.results.length === 0) {
+      if (body.type === 'test-trigger') {
+          return NextResponse.json({ message: 'Test successful, no products found to send.' }, { status: 200});
+      }
       return NextResponse.json({ message: 'No products found' }, { status: 200 });
     }
 
     const latestProduct = productsRes.results[0];
     const productName = latestProduct.data.title || 'New Product';
-    const productUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://clickys.in'}/products/${latestProduct.uid}`;
+    const productUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.clickys.in'}/products/${latestProduct.uid}`;
     const productExcerpt = latestProduct.data.description?.[0]?.text || 'Check out our latest update!';
     const productImage = latestProduct.data.image?.url;
 
-    // Step 2: Fetch all active subscribers from Firestore
-    const subscribersSnap = await getDocs(
-      query(collection(db, 'subscribers'), where('isActive', '==', true))
-    );
+    // Step 2: Fetch all active subscribers from Firestore using Admin SDK to bypass security rules
+    const subscribersSnap = await adminDb
+      .collection('subscribers')
+      .where('isActive', '==', true)
+      .get();
 
     const emails = subscribersSnap.docs.map(doc => doc.data().email);
 
@@ -50,18 +59,13 @@ export async function POST(req) {
     }
 
     // Step 3: Send emails via Resend
-    if (!process.env.RESEND_API_KEY) {
+    if (!resend) {
       console.warn('RESEND_API_KEY is missing. Skipping email sending.');
       return NextResponse.json({ message: 'Webhook processed, but emails not sent (no API key)' }, { status: 200 });
     }
 
-    // Resend batch sending (limit 100 per call for free tier often)
-    // We'll send them one by one or in small batches for better delivery
-    // For this applet, we'll try a single call if possible or loop
-    // Resend supports a list of emails in 'to'
-    
     const { data, error } = await resend.emails.send({
-      from: 'Clickys Updates <onboarding@resend.dev>', // You should use your verified domain later
+      from: process.env.RESEND_FROM_EMAIL || 'Clickys Updates <updates@clickys.in>', // Using verified domain
       to: emails,
       subject: `New Arrival on Clickys: ${productName}`,
       html: `

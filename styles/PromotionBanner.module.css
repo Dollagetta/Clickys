@@ -11,7 +11,7 @@
   position: absolute; /* Positioned relative to bannerWrapper */
   top: 0;
   left: 0;
-  width: 100vw; /* Spans the entire width of bannerWrapper */
+  width: 100%; /* Spans the entire width of bannerWrapper cleanly */
   background-color: #ffd700; /* A vibrant offer color */
   color: #111;
   padding: 0.5rem 0;

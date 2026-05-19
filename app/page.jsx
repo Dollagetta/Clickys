@@ -165,9 +165,10 @@ export default async function HomePage() {
 
   return (
     <>
-      <CompactSearchBar />
-      
-      <HomeSearchResults />
+      <Suspense fallback={<div>Loading search...</div>}>
+        <CompactSearchBar />
+        <HomeSearchResults />
+      </Suspense>
       
       {/* Dynamic Affiliate Showcase Hero Slider */}
       <header className={`${styles.heroSection} relative`} data-aos="fade-in" data-aos-duration="800" style={{ backgroundImage: 'none', padding: '0', minHeight: '400px' }}>
@@ -213,7 +214,9 @@ export default async function HomePage() {
       
       <PartnerSection partners={partners} />
 
-      <PromotionBanner slice={bannerData[0]} />
+      {bannerData && bannerData.length > 0 && bannerData[0] ? (
+        <PromotionBanner slice={bannerData[0]} />
+      ) : null}
       {/* Promotion Banner Section 
       <div className="container" data-aos="zoom-in-up" data-aos-duration="600">
         <PromotionBanner

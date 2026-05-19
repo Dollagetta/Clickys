@@ -43,11 +43,8 @@ const Navbar = () => {
   ];
 
   return (
-    <motion.nav
+    <nav
       className={`${styles.navbar} ${hasScrolled ? styles.scrolled : ''}`}
-      initial={{ y: -80 }}
-      animate={{ y: 0 }}
-      transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0.1 }}
     >
       <div className={`container ${styles.navContainer}`}>
         {/* Logo */}
@@ -105,7 +102,7 @@ const Navbar = () => {
             )}
           </AnimatePresence>
         </div>
-    </motion.nav>
+    </nav>
   );
 };
 

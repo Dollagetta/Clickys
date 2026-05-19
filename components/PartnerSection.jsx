@@ -197,7 +197,12 @@ export default function PartnerSection({ partners = [] }) {
             className="flex items-center gap-5 bg-white p-4 pr-8 rounded-[2rem] shadow-2xl shadow-slate-200/60 border border-slate-100 cursor-pointer group transition-all duration-500"
           >
             <div className="flex -space-x-4">
-              {[1, 2, 3, 4].map((i) => (
+              {[
+                "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=150&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=150&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&auto=format&fit=crop"
+              ].map((imgUrl, i) => (
                 <motion.div 
                   key={i} 
                   whileHover={{ 
@@ -209,7 +214,7 @@ export default function PartnerSection({ partners = [] }) {
                   className="w-11 h-11 rounded-full border-4 border-white overflow-hidden bg-slate-100 ring-1 ring-slate-100 shadow-md relative group/avatar"
                 >
                   <img 
-                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i + 22}`} 
+                    src={imgUrl} 
                     alt="Shopper" 
                     className="w-full h-full object-cover transition-transform duration-500 group-hover/avatar:scale-110"
                   />

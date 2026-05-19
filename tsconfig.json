@@ -30,8 +30,10 @@
     "next-env.d.ts",
     ".next/types/**/*.ts",
     "**/*.ts",
-    "**/*.tsx"
-, "tailwind.config.js", "app/products/ProductsPage.jsx", "app/products/[slug]/MoreInfo.jsx", "components/products.js"  ],
+    "**/*.tsx",
+    "**/*.js",
+    "**/*.jsx"
+  ],
   "exclude": [
     "node_modules"
   ]

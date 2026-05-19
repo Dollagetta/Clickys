@@ -56,13 +56,23 @@ class AmazonClient {
         scope,
       });
 
-      response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: params.toString(),
-      });
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
+
+      try {
+        response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: params.toString(),
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+      } catch (e: any) {
+        clearTimeout(timeoutId);
+        throw new Error(`Amazon Token Fetch Error: ${e.message}`);
+      }
     }
 
     if (!response.ok) {
@@ -102,7 +112,7 @@ class AmazonClient {
 
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
-        console.warn(`Amazon API Authorization error (${response.status}): Check credentials or account eligibility.`);
+        console.warn(`Amazon API Authorization error (${response.status}): Check your Amazon Affiliate credentials in the Environment variables. The API is skipping product fetch.`);
         return null;
       }
       const errorBody = await response.text();

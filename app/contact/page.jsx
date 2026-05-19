@@ -2,36 +2,8 @@
 import styles from '../../styles/ContactPage.module.css';
 import { FiMessageSquare, FiMapPin, FiPhone, FiMail, FiFacebook, FiTwitter, FiInstagram } from 'react-icons/fi';
 import faqData from '../../components/faq';
-import FAQSection from './faqSection'; // Importing the FAQSection component
-
-/* Metadata for the Contact Us page
-export const metadata = {
-  title: "Contact Us | Clickys.in Support",
-  description: "Get in touch with Clickys.in for queries about Amazon and Flipkart deals, product recommendations, or support. We're here to help you shop smarter!",
-  keywords: [
-    "Clickys.in contact",
-    "Amazon Flipkart deals support",
-    "online shopping help India",
-    "Clickys customer support",
-    "contact for affiliate deals",
-    "shopping query Clickys.in",
-    "get help with online purchases",
-    "Clickys.in customer care"
-  ],
-  openGraph: {
-    title: "Contact Clickys.in | Support for Deals & Queries",
-    description: "Reach out to Clickys.in for help with Amazon and Flipkart deals or shopping queries. Contact us for personalized support!",
-    url: "https://www.clickys.in/contact",
-    siteName: "Clickys.in",
-    type: "website",
-    locale: "en_IN"
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Contact Clickys.in | Shopping Support",
-    description: "Have questions about deals on Clickys.in? Contact us for help with Amazon and Flipkart products!"
-  }
-};*/
+import FAQSection from './faqSection';
+import ContactForm from '../../components/ContactForm'; // Imported ContactForm
 
 export const metadata = {
   title: 'Contact Clickys – Support & Partnerships',
@@ -54,12 +26,14 @@ export default function ContactPage() {
           </div>
         </header>
 
-        {/* Main Content Section: FAQ and Contact Info */}
+        {/* Main Content Section: Contact Form and FAQ Info */}
         <section className={`${styles.mainContentSection} container`}>
           <div className={styles.contactLayout}>
-            {/* FAQ Section replaces Contact Form */}
             <div className={styles.formWrapper}>
-              <FAQSection data={faqData} />
+              <ContactForm />
+              <div className="mt-12">
+                <FAQSection data={faqData} />
+              </div>
             </div>
 
             {/* Contact Information Area */}

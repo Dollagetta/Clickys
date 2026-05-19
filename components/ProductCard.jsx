@@ -1,16 +1,22 @@
 // components/ProductCard.jsx
 "use client";
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import styles from '../styles/ProductCard.module.css';
-import { FiShoppingCart, FiHeart, FiStar, FiShare2 } from 'react-icons/fi';
+import { FiShoppingCart, FiHeart, FiStar, FiShare2, FiEye, FiX } from 'react-icons/fi';
 import { PrismicNextImage } from "@prismicio/next";
 import { useWishlist } from './WishlistContext';
+import { useCompare } from './CompareContext';
+import { FiCheckSquare, FiSquare } from 'react-icons/fi';
+import PriceHistoryChart from './PriceHistoryChart';
 
 const ProductCard = ({ product }) => {
   const { isInWishlist, toggleWishlist } = useWishlist();
+  const { compareItems, toggleCompare, setIsCompareDrawerOpen } = useCompare();
+  const [showPreview, setShowPreview] = useState(false);
    
   const affiliateColors = {
   Amazon: "#FF9900",
@@ -144,6 +150,8 @@ const ProductCard = ({ product }) => {
         finalAffiliateColor = affiliateColors['Amazon']; // default for partner
     }
 
+  const isComparing = compareItems.some(p => p.id === (product.id || id) || (p.asin && p.asin === product.asin));
+
   const isPrismicImage = typeof imageUrl === 'object' && imageUrl !== null && imageUrl.url;
 
   const cardVariants = {
@@ -172,6 +180,7 @@ const ProductCard = ({ product }) => {
   };
 
   return (
+    <>
     <motion.div
       className={styles.card}
       style={{ 
@@ -223,7 +232,22 @@ const ProductCard = ({ product }) => {
         </motion.div>
         <div className={styles.cardContent}>
           <p className={styles.productCategory}>{category}</p>
-          <h3 className={styles.productName}>{name}</h3>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem' }}>
+            <h3 className={styles.productName} style={{ flex: 1 }}>{name}</h3>
+            
+            <button 
+              onClick={(e) => { 
+                e.preventDefault(); 
+                e.stopPropagation(); 
+                toggleCompare(product);
+                setIsCompareDrawerOpen(true);
+              }}
+              className="mt-1 flex items-center justify-center p-1.5 rounded text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+              title={isComparing ? "Remove from Compare" : "Add to Compare"}
+            >
+              {isComparing ? <FiCheckSquare className="text-blue-600 w-5 h-5" /> : <FiSquare className="w-5 h-5" />}
+            </button>
+          </div>
           
           {/* Availability Status */}
           {availabilityStatus && (
@@ -239,23 +263,164 @@ const ProductCard = ({ product }) => {
             <div className={styles.priceContainer}>
               <span className={styles.currentPrice}>{formattedPrice}</span>
             </div>
-            <motion.a
-              href={finalLink}
-              target="_blank"
-              rel="noopener noreferrer sponsored"
-              onClick={(e) => e.stopPropagation()}
-              className={`btn btn-primary ${styles.amazonButton}`}
-              title={buttonText}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              style={{ backgroundColor: 'var(--affcolor)', borderColor: 'var(--affcolor)' }}
-            >
-              {buttonText} <FiShoppingCart style={{ marginLeft: '0.2em' }} />
-            </motion.a>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <motion.a
+                href={finalLink}
+                target="_blank"
+                rel="noopener noreferrer sponsored"
+                onClick={(e) => e.stopPropagation()}
+                className={`btn btn-primary ${styles.amazonButton}`}
+                title={buttonText}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                style={{ backgroundColor: 'var(--affcolor)', borderColor: 'var(--affcolor)' }}
+              >
+                {buttonText} <FiShoppingCart style={{ marginLeft: '0.2em' }} />
+              </motion.a>
+            </div>
+          </div>
+          
+          <div style={{ marginTop: '0.75rem' }}>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <button 
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowPreview(true); }}
+                className={`btn btn-secondary`}
+                title="Quick View"
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  width: '100%',
+                  padding: '0.5rem 0.8rem', 
+                  borderRadius: '8px',
+                  backgroundColor: '#f8fafc', 
+                  color: '#475569', 
+                  border: '1px solid #cbd5e1',
+                  fontSize: '0.875rem',
+                  fontWeight: '500',
+                  cursor: 'pointer'
+                }}
+              >
+                <FiEye style={{ marginRight: '0.3rem' }} /> Preview
+              </button>
+            </motion.div>
           </div>
         </div>
       </div>
     </motion.div>
+    <AnimatePresence>
+        {showPreview && (
+          <div 
+            style={{
+              position: 'fixed',
+              top: 0, left: 0, right: 0, bottom: 0,
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              zIndex: 99999,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '1rem',
+              backdropFilter: 'blur(4px)'
+            }}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowPreview(false); }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                backgroundColor: '#fff',
+                borderRadius: '16px',
+                padding: '2rem',
+                maxWidth: '600px',
+                width: '100%',
+                maxHeight: '90vh',
+                overflowY: 'auto',
+                position: 'relative',
+                boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)'
+              }}
+            >
+              <button 
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowPreview(false); }}
+                style={{
+                  position: 'absolute',
+                  top: '1rem', right: '1rem',
+                  background: 'none', border: 'none',
+                  fontSize: '1.5rem', cursor: 'pointer',
+                  color: '#64748b'
+                }}
+              >
+                <FiX />
+              </button>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <div style={{ textAlign: 'center' }}>
+                  {!isPrismicImage && <Image
+                    src={imageUrl}
+                    alt={name}
+                    width={300}
+                    height={250}
+                    style={{ objectFit: 'contain', margin: '0 auto', display: 'block' }}
+                    unoptimized={true}
+                    onError={(e) => e.currentTarget.src = `https://placehold.co/300x250/CCCCCC/1A1A1A?text=Error&font=Inter`}
+                  />}
+                  {isPrismicImage && <PrismicNextImage field={imageUrl} style={{ objectFit: 'contain', width: '100%', height: 'auto', maxHeight: '250px' }} />}
+                </div>
+
+                <div>
+                  <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#0f172a', marginBottom: '0.5rem' }}>{name}</h3>
+                  <p style={{ color: '#64748b', marginBottom: '1rem', fontWeight: '500' }}>{formattedPrice}</p>
+                  
+                  {(() => {
+                    let descNodes = null;
+                    const descField = product.description || product.product_description || product.shortDescription;
+                    
+                    if (typeof descField === 'string' && descField.trim() !== '') {
+                      descNodes = <p>{descField}</p>;
+                    } else if (Array.isArray(descField) && descField.length > 0) {
+                      const hasText = descField.some(d => d.text && d.text.trim() !== '');
+                      if (hasText) {
+                        descNodes = descField.map((block, i) => <p key={i} style={{ marginBottom: '0.5rem' }}>{block.text}</p>);
+                      }
+                    }
+                    
+                    if (descNodes) {
+                      return (
+                        <div style={{ color: '#334155', lineHeight: '1.6', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
+                          {descNodes}
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
+
+                  <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', marginBottom: '1.5rem' }}>
+                    <motion.a
+                      href={finalLink}
+                      target="_blank"
+                      rel="noopener noreferrer sponsored"
+                      className={`btn btn-primary`}
+                      style={{ 
+                        backgroundColor: finalAffiliateColor, 
+                        borderColor: finalAffiliateColor,
+                        flex: 1,
+                        display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem',
+                        padding: '0.75rem', color: '#fff', borderRadius: '8px', fontWeight: '600', textDecoration: 'none'
+                      }}
+                    >
+                      {buttonText} <FiShoppingCart />
+                    </motion.a>
+                  </div>
+                  
+                  <PriceHistoryChart currentPrice={formattedPrice} />
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 

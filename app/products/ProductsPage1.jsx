@@ -82,8 +82,7 @@ export default function ProductsPage() {
     setIsLoading(true);
     setError(null);
     try {
-      try {
-        const mod = await import('../../components/products');
+      const mod = await import('../../components/products');
         const internalProducts = mod.products || [];
         let allProds = internalProducts;
         if (query && query !== 'All') {

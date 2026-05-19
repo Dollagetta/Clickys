@@ -99,8 +99,10 @@ export default function RootLayout({ children }) {
       <head>
         {/* Analytics script */}
        {/* Analytics script */}
-        <Script id="cuelinks" strategy="afterInteractive" type="text/javascript">
-          {`
+      </head>
+      <body suppressHydrationWarning>
+        <Script id="cuelinks" strategy="afterInteractive" dangerouslySetInnerHTML={{
+          __html: `
             var cId = '239712';
             (function(d, t) {
               var s = document.createElement('script');
@@ -112,12 +114,8 @@ export default function RootLayout({ children }) {
                   : 'http://cdn0.cuelinks.com/js/') + 'cuelinksv2.js';
               document.getElementsByTagName('body')[0].appendChild(s);
             })();
-          `}
-        </Script>
-
-
-      </head>
-      <body suppressHydrationWarning>
+          `
+        }} />
         <ReadingProgressBar />
         <AppProviders> {/* Handles AnimatePresence and AOS initialization */}
           <Navbar key="navbar" />

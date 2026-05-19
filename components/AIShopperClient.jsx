@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
-import { GoogleGenAI } from '@google/genai';
 import ReactMarkdown from 'react-markdown';
 import { FiSend, FiLoader, FiTerminal, FiShoppingCart, FiAlertCircle, FiImage, FiMic, FiX } from 'react-icons/fi';
 import styles from '../styles/AIShopper.module.css';
@@ -140,7 +139,8 @@ export default function AIShopperClient() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch recommendations');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch recommendations');
       }
 
       const { data } = await response.json();
