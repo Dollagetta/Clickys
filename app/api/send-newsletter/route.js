@@ -22,6 +22,12 @@ export async function POST(req) {
       return NextResponse.json({ message: 'Ignored event type' }, { status: 200 });
     }
 
+    // Immediately handle the test trigger to prevent it from querying Prismic and Firebase.
+    // This stops accidental emails when testing Prismic Webhooks in the dashboard.
+    if (body.type === 'test-trigger') {
+      return NextResponse.json({ message: 'Test successful.' }, { status: 200 });
+    }
+
     // Step 1: Identify if any "product" was published
     // For now, fetch the latest product from Prismic to see if it's new
     const client = createClient();
@@ -34,9 +40,6 @@ export async function POST(req) {
     });
 
     if (productsRes.results.length === 0) {
-      if (body.type === 'test-trigger') {
-          return NextResponse.json({ message: 'Test successful, no products found to send.' }, { status: 200});
-      }
       return NextResponse.json({ message: 'No products found' }, { status: 200 });
     }
 
@@ -47,12 +50,25 @@ export async function POST(req) {
     const productImage = latestProduct.data.image?.url;
 
     // Step 2: Fetch all active subscribers from Firestore using Admin SDK to bypass security rules
-    const subscribersSnap = await adminDb
-      .collection('subscribers')
-      .where('isActive', '==', true)
-      .get();
+    let emails = [];
+    try {
+      const subscribersSnap = await adminDb
+        .collection('subscribers')
+        .where('isActive', '==', true)
+        .get();
 
-    const emails = subscribersSnap.docs.map(doc => doc.data().email);
+      emails = subscribersSnap.docs.map(doc => doc.data().email);
+    } catch (dbError) {
+      console.error('Failed to fetch subscribers from Firestore:', dbError.message);
+      // If code is 5 (NOT_FOUND), the Firestore database might not exist yet.
+      if (dbError.code === 5) {
+        console.warn('Firestore database does not exist. Please create it in the Firebase Console.');
+      }
+      return NextResponse.json({ 
+        message: 'Webhook received, but failed to fetch subscribers.', 
+        error: dbError.message 
+      }, { status: 500 });
+    }
 
     if (emails.length === 0) {
       return NextResponse.json({ message: 'No subscribers to notify' }, { status: 200 });
