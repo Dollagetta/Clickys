@@ -81,39 +81,77 @@ export async function POST(req) {
       return NextResponse.json({ message: 'Webhook processed, but emails not sent (no API key)' }, { status: 200 });
     }
 
-    const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'Clickys <noreply@clickys.in>', // Using verified domain
-      to: emails,
-      subject: `New Arrival on Clickys: ${productName}`,
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;">
-          <div style="background-color: #f97316; padding: 20px; text-align: center;">
-            <h1 style="color: white; margin: 0;">Clickys New Arrival!</h1>
-          </div>
-          <div style="padding: 30px;">
-            <h2 style="color: #333;">${productName}</h2>
-            ${productImage ? `<img src="${productImage}" alt="${productName}" style="display: block; max-width: 80%; max-height: 250px; margin: 0 auto 20px auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(249, 115, 22, 0.25); border: 2px solid #f97316; object-fit: contain;" />` : ''}
-            <p style="color: #666; font-size: 16px; line-height: 1.6;">${productExcerpt}</p>
-            <div style="text-align: center; margin-top: 30px;">
-              <a href="${productUrl}" style="background-color: #f97316; color: white; padding: 12px 25px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block;">
-                View on Clickys
-              </a>
-            </div>
-          </div>
-          <div style="background-color: #f8fafc; padding: 20px; text-align: center; color: #999; font-size: 12px;">
-            <p>You're receiving this because you subscribed to Clickys updates.</p>
-            <p>&copy; ${new Date().getFullYear()} Clickys. All rights reserved.</p>
-          </div>
-        </div>
-      `,
-    });
-
-    if (error) {
-      console.error('Resend error:', error);
-      return NextResponse.json({ error }, { status: 500 });
+    const BATCH_SIZE = 50;
+    const emailBatches = [];
+    for (let i = 0; i < emails.length; i += BATCH_SIZE) {
+      emailBatches.push(emails.slice(i, i + BATCH_SIZE));
     }
 
-    return NextResponse.json({ message: 'Notifications sent successfully', data }, { status: 200 });
+    const htmlTemplate = (email) => `
+      <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background-color: #ffffff;">
+        <div style="background-color: #f97316; padding: 30px; text-align: center;">
+          <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">Clickys New Arrival!</h1>
+        </div>
+        <div style="padding: 40px 30px;">
+          <h2 style="color: #1e293b; font-size: 24px; margin-top: 0; margin-bottom: 20px; text-align: center;">${productName}</h2>
+          
+          ${productImage ? `
+            <div style="text-align: center; margin-bottom: 25px;">
+              <img src="${productImage}" alt="${productName}" style="display: block; max-width: 100%; height: auto; max-height: 300px; margin: 0 auto; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); object-fit: cover;" />
+              <p style="color: #64748b; font-size: 13px; font-style: italic; margin-top: 15px; font-weight: 500;">Product Title: ${productName}</p>
+            </div>
+          ` : ''}
+          
+          <p style="color: #334155; font-size: 16px; line-height: 1.6; text-align: center; margin-bottom: 30px;">${productExcerpt}</p>
+          
+          <div style="text-align: center; margin-top: 10px;">
+            <a href="${productUrl}" style="background-color: #f97316; color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block; font-size: 16px; transition: background-color 0.2s;">
+              View on Clickys
+            </a>
+          </div>
+        </div>
+        <div style="background-color: #f8fafc; padding: 24px; text-align: center; color: #64748b; font-size: 13px; border-top: 1px solid #e2e8f0;">
+          <p style="margin: 0 0 8px 0;">You're receiving this individual email because you subscribed to Clickys updates.</p>
+          <p style="margin: 0; display: inline-block;">Sent to <a href="mailto:${email}" style="color: #f97316; text-decoration: none;">${email}</a></p>
+          <p style="margin: 12px 0 0 0;">&copy; ${new Date().getFullYear()} Clickys. All rights reserved.</p>
+        </div>
+      </div>
+    `;
+
+    let finalData = null;
+
+    try {
+      if (resend.batch && resend.batch.send) {
+        for (const batch of emailBatches) {
+          const payload = batch.map(email => ({
+            from: process.env.RESEND_FROM_EMAIL || 'Clickys <noreply@clickys.in>',
+            to: email,
+            subject: `New Arrival on Clickys: ${productName}`,
+            html: htmlTemplate(email)
+          }));
+          const { data, error } = await resend.batch.send(payload);
+          if (error) throw error;
+          finalData = data;
+        }
+      } else {
+        // Fallback to sequential emails for older SDK versions
+        const emailPromises = emails.map(email => 
+          resend.emails.send({
+            from: process.env.RESEND_FROM_EMAIL || 'Clickys <noreply@clickys.in>',
+            to: email,
+            subject: `New Arrival on Clickys: ${productName}`,
+            html: htmlTemplate(email)
+          })
+        );
+        const results = await Promise.all(emailPromises);
+        finalData = results;
+      }
+    } catch (sendError) {
+      console.error('Resend error:', sendError);
+      return NextResponse.json({ error: sendError.message || sendError }, { status: 500 });
+    }
+
+    return NextResponse.json({ message: 'Notifications sent successfully', data: finalData }, { status: 200 });
 
   } catch (error) {
     console.error('Webhook processing failed:', error);
