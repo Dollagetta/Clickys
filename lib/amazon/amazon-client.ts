@@ -112,7 +112,7 @@ class AmazonClient {
 
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
-        console.warn(`Amazon API Authorization error (${response.status}): Check your Amazon Affiliate credentials in the Environment variables. The API is skipping product fetch.`);
+        // Silently handle invalid or missing credentials in production
         return null;
       }
       const errorBody = await response.text();

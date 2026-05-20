@@ -49,24 +49,30 @@ export async function POST(req) {
     }
 
     const docTitle = latestDoc.data?.title || 'New Arrival';
+    const customSubject = latestDoc.data?.newsletter_subject || latestDoc.data?.email_subject;
+    const finalSubject = customSubject ? customSubject : `New Arrival on Clickys: ${docTitle}`;
+    const customHeader = latestDoc.data?.newsletter_header || latestDoc.data?.email_header || 'Clickys New Arrival!';
     
     // Dynamically determine the URL based on the document type
-    let docTypePath = 'products';
+    let productUrl = 'https://www.clickys.in/products';
+    let productImage = latestDoc.data?.image?.url || latestDoc.data?.cover_image?.url || '';
+
     if (latestDoc.type.includes('whatsnew') || latestDoc.type.includes('whats-new')) {
-      docTypePath = 'whats-new';
+      productUrl = `https://www.clickys.in/whats-new`;
+      // Resolve Big Burner / Featured image for What's New
+      productImage = latestDoc.data?.the_big_burner?.url || latestDoc.data?.featured_image?.url || latestDoc.data?.meta_image?.url || latestDoc.data?.image?.url || '';
     } else if (latestDoc.type.includes('deal')) {
-      docTypePath = 'deals';
+      productUrl = `https://www.clickys.in/deals`;
     } else if (latestDoc.type.includes('partner')) {
-      docTypePath = 'partners';
+      // For partners, direct to the home page
+      productUrl = `https://www.clickys.in`;
+      // Resolve Partner image
+      productImage = latestDoc.data?.partner_image?.url || latestDoc.data?.logo?.url || latestDoc.data?.brand_image?.url || latestDoc.data?.image?.url || '';
     } else if (latestDoc.type === 'guide') {
-      docTypePath = 'guide';
-    } else {
-      docTypePath = 'products';
+      productUrl = `https://www.clickys.in/guides`;
     }
 
-    const productUrl = `https://www.clickys.in/${docTypePath}`;
     const productExcerpt = latestDoc.data?.description?.[0]?.text || 'Check out our latest update!';
-    const productImage = latestDoc.data?.image?.url || latestDoc.data?.cover_image?.url || '';
 
     // Step 2: Fetch all active subscribers from Firestore using Admin SDK to bypass security rules
     let emails = [];
@@ -101,30 +107,59 @@ export async function POST(req) {
       return NextResponse.json({ message: 'Webhook processed, but emails not sent (no API key)' }, { status: 200 });
     }
 
+    const promoSchema = `
+      <script type="application/ld+json">
+      [{
+        "@context": "http://schema.org/",
+        "@type": "DiscountOffer",
+        "description": "Clickys Update",
+        "url": "${productUrl}"
+      },
+      {
+        "@context": "http://schema.org/",
+        "@type": "PromotionCard",
+        "image": "${productImage || 'https://www.clickys.in/icon.svg'}"
+      },
+      {
+        "@context": "http://schema.org/",
+        "@type": "Organization",
+        "logo": "https://www.clickys.in/icon.svg"
+      }]
+      </script>
+    `;
+
     const emailBatch = emails.map(email => ({
-      from: process.env.RESEND_FROM_EMAIL || 'Clickys <noreply@clickys.in>',
+      from: process.env.RESEND_FROM_EMAIL || '"Clickys" <updates@clickys.in>',
       to: [email],
-      subject: `New Arrival on Clickys: ${docTitle}`,
+      subject: finalSubject,
       html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;">
-          <div style="background-color: #f97316; padding: 20px; text-align: center;">
-            <h1 style="color: white; margin: 0;">Clickys New Arrival!</h1>
-          </div>
-          <div style="padding: 30px;">
-            <h2 style="color: #333;">${docTitle}</h2>
-            ${productImage ? `<img src="${productImage}" alt="${docTitle}" style="display: block; max-width: 80%; max-height: 250px; margin: 0 auto 20px auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(249, 115, 22, 0.25); border: 2px solid #f97316; object-fit: contain;" />` : ''}
-            <p style="color: #666; font-size: 16px; line-height: 1.6;">${productExcerpt}</p>
-            <div style="text-align: center; margin-top: 30px;">
-              <a href="${productUrl}" style="background-color: #f97316; color: white; padding: 12px 25px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block;">
-                View on Clickys
-              </a>
+        <!DOCTYPE html>
+        <html>
+        <head>
+          ${promoSchema}
+        </head>
+        <body>
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;">
+            <div style="background-color: #f97316; padding: 20px; text-align: center;">
+              <h1 style="color: white; margin: 0;">${customHeader}</h1>
+            </div>
+            <div style="padding: 30px;">
+              <h2 style="color: #333;">${docTitle}</h2>
+              ${productImage ? `<img src="${productImage}" alt="${docTitle}" style="display: block; max-width: 80%; max-height: 250px; margin: 0 auto 20px auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(249, 115, 22, 0.25); border: 2px solid #f97316; object-fit: contain;" />` : ''}
+              <p style="color: #666; font-size: 16px; line-height: 1.6;">${productExcerpt}</p>
+              <div style="text-align: center; margin-top: 30px;">
+                <a href="${productUrl}" style="background-color: #f97316; color: white; padding: 12px 25px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block;">
+                  View on Clickys
+                </a>
+              </div>
+            </div>
+            <div style="background-color: #f8fafc; padding: 20px; text-align: center; color: #999; font-size: 12px;">
+              <p>You're receiving this because you subscribed to Clickys updates.</p>
+              <p>&copy; ${new Date().getFullYear()} Clickys. All rights reserved.</p>
             </div>
           </div>
-          <div style="background-color: #f8fafc; padding: 20px; text-align: center; color: #999; font-size: 12px;">
-            <p>You're receiving this because you subscribed to Clickys updates.</p>
-            <p>&copy; ${new Date().getFullYear()} Clickys. All rights reserved.</p>
-          </div>
-        </div>
+        </body>
+        </html>
       `,
     }));
 
