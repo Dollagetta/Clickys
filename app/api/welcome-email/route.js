@@ -30,13 +30,20 @@ export async function POST(req) {
       to: [email],
       subject: 'Welcome to Clickys!',
       html: `
-        <div style="font-family: sans-serif; padding: 20px;">
-          <h2>Welcome to the Clickys Club! 🎉</h2>
-          <p>Thank you for subscribing to our newsletter. We're thrilled to have you.</p>
-          <p>You'll be the first to know about exclusive deals, new arrivals, and the best product recommendations.</p>
-          <br/>
-          <p>Happy Shopping!</p>
-          <p><strong>The Clickys Team</strong></p>
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;">
+          <div style="background-color: #ffffff; padding: 20px; text-align: center; border-bottom: 1px solid #f0f0f0;">
+            <img src="https://www.clickys.in/clickysbg.png" alt="Clickys Logo" style="height: 60px; display: block; margin: 0 auto;" />
+          </div>
+          <div style="background-color: #f97316; padding: 20px; text-align: center;">
+            <h1 style="color: white; margin: 0;">Welcome to Clickys!</h1>
+          </div>
+          <div style="padding: 30px; text-align: center;">
+            <h2 style="color: #333;">Welcome to the Clickys Club! 🎉</h2>
+            <p style="color: #666; font-size: 16px; line-height: 1.6;">Thank you for subscribing to our newsletter. We're thrilled to have you.</p>
+            <p style="color: #666; font-size: 16px; line-height: 1.6;">You'll be the first to know about exclusive deals, new arrivals, and the best product recommendations.</p>
+            <br/>
+            <p style="color: #333; font-size: 16px; line-height: 1.6;">Happy Shopping!<br/><strong>The Clickys Team</strong></p>
+          </div>
         </div>
       `,
     });
