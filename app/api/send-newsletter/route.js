@@ -133,7 +133,8 @@ export async function POST(req) {
       [{
         "@context": "http://schema.org/",
         "@type": "Organization",
-        "logo": "https://www.clickys.in/icon.svg"
+        "name": "Clickys",
+        "logo": "https://www.clickys.in/clickysbg.png"
       },
       {
         "@context": "http://schema.org/",
@@ -146,7 +147,7 @@ export async function POST(req) {
       {
         "@context": "http://schema.org/",
         "@type": "PromotionCard",
-        "image": "${productImage || 'https://www.clickys.in/icon.svg'}"
+        "image": "${productImage || 'https://www.clickys.in/clickysbg.png'}"
       }]
       </script>
     `;
