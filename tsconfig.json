@@ -35,6 +35,7 @@
     "**/*.jsx"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "vite.config.ts"
   ]
 }
