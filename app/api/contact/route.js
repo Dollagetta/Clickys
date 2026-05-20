@@ -22,7 +22,12 @@ export async function POST(req) {
       );
     }
 
-    const fromEmail = process.env.RESEND_FROM_EMAIL || 'Clickys Contact <updates@clickys.in>';
+    let cleanEmail = 'updates@clickys.in';
+    if (process.env.RESEND_FROM_EMAIL) {
+      const match = process.env.RESEND_FROM_EMAIL.match(/<([^>]+)>/);
+      cleanEmail = match ? match[1] : process.env.RESEND_FROM_EMAIL.trim();
+    }
+    const fromEmail = `Clickys <${cleanEmail}>`;
 
     const { data, error } = await resend.emails.send({
       from: fromEmail,

@@ -18,7 +18,12 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Missing email' }, { status: 400 });
     }
 
-    const fromEmail = process.env.RESEND_FROM_EMAIL || 'Clickys <updates@clickys.in>';
+    let cleanEmail = 'updates@clickys.in';
+    if (process.env.RESEND_FROM_EMAIL) {
+      const match = process.env.RESEND_FROM_EMAIL.match(/<([^>]+)>/);
+      cleanEmail = match ? match[1] : process.env.RESEND_FROM_EMAIL.trim();
+    }
+    const fromEmail = `Clickys <${cleanEmail}>`;
 
     const { data, error } = await resend.emails.send({
       from: fromEmail,

@@ -3,6 +3,8 @@ import { adminDb } from '../../../lib/firebase-admin';
 import { Resend } from 'resend';
 import { createClient } from '../../../prismicio';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req) {
   try {
     const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
@@ -48,31 +50,50 @@ export async function POST(req) {
       return NextResponse.json({ message: 'No relevant changes found in this webhook.' }, { status: 200 });
     }
 
-    const docTitle = latestDoc.data?.title || 'New Arrival';
-    const customSubject = latestDoc.data?.newsletter_subject || latestDoc.data?.email_subject;
+    const extractText = (field) => {
+      if (!field) return '';
+      if (typeof field === 'string') return field;
+      if (Array.isArray(field) && field[0] && field[0].text) return field[0].text;
+      return '';
+    };
+
+    // Extract title
+    let rawTitle = latestDoc.data?.title || latestDoc.data?.name;
+    if (!rawTitle && latestDoc.data?.slices) {
+      // Trying to find title from slices if not in static zone (like whatsnew Big Burner)
+      const titleSlice = latestDoc.data.slices.find(s => s.primary?.title || s.primary?.heading);
+      if (titleSlice) rawTitle = titleSlice.primary.title || titleSlice.primary.heading;
+    }
+    const docTitle = extractText(rawTitle) || 'New Arrival';
+
+    // Extract custom email attributes
+    const customSubject = extractText(latestDoc.data?.newsletter_subject) || extractText(latestDoc.data?.email_subject);
     const finalSubject = customSubject ? customSubject : `New Arrival on Clickys: ${docTitle}`;
-    const customHeader = latestDoc.data?.newsletter_header || latestDoc.data?.email_header || 'Clickys New Arrival!';
+    const customHeader = extractText(latestDoc.data?.newsletter_header) || extractText(latestDoc.data?.email_header) || 'Clickys New Arrival!';
     
     // Dynamically determine the URL based on the document type
     let productUrl = 'https://www.clickys.in/products';
     let productImage = latestDoc.data?.image?.url || latestDoc.data?.cover_image?.url || '';
 
     if (latestDoc.type.includes('whatsnew') || latestDoc.type.includes('whats-new')) {
-      productUrl = `https://www.clickys.in/whats-new`;
-      // Resolve Big Burner / Featured image for What's New
-      productImage = latestDoc.data?.the_big_burner?.url || latestDoc.data?.featured_image?.url || latestDoc.data?.meta_image?.url || latestDoc.data?.image?.url || '';
+      productUrl = `https://www.clickys.in/whats-new/${latestDoc.uid}`;
+      productImage = latestDoc.data?.the_big_burner?.url || latestDoc.data?.featured_image?.url || latestDoc.data?.meta_image?.url || latestDoc.data?.image?.url || productImage;
+      if (!productImage && latestDoc.data?.slices) {
+         const imageSlice = latestDoc.data.slices.find(s => s.primary?.image?.url || s.primary?.background_image?.url);
+         if (imageSlice) productImage = imageSlice.primary.image?.url || imageSlice.primary.background_image?.url;
+      }
     } else if (latestDoc.type.includes('deal')) {
-      productUrl = `https://www.clickys.in/deals`;
+      productUrl = `https://www.clickys.in/deals/${latestDoc.uid}`;
     } else if (latestDoc.type.includes('partner')) {
-      // For partners, direct to the home page
       productUrl = `https://www.clickys.in`;
-      // Resolve Partner image
-      productImage = latestDoc.data?.partner_image?.url || latestDoc.data?.logo?.url || latestDoc.data?.brand_image?.url || latestDoc.data?.image?.url || '';
+      productImage = latestDoc.data?.partner_image?.url || latestDoc.data?.logo?.url || latestDoc.data?.brand_image?.url || latestDoc.data?.image?.url || productImage;
     } else if (latestDoc.type === 'guide') {
-      productUrl = `https://www.clickys.in/guides`;
+      productUrl = `https://www.clickys.in/guides/${latestDoc.uid}`;
+    } else if (latestDoc.type.includes('product')) {
+      productUrl = `https://www.clickys.in/products/${latestDoc.uid}`;
     }
 
-    const productExcerpt = latestDoc.data?.description?.[0]?.text || 'Check out our latest update!';
+    const productExcerpt = extractText(latestDoc.data?.description) || extractText(latestDoc.data?.short_paragraph) || extractText(latestDoc.data?.meta_description) || 'Check out our latest update on Clickys!';
 
     // Step 2: Fetch all active subscribers from Firestore using Admin SDK to bypass security rules
     let emails = [];
@@ -111,25 +132,33 @@ export async function POST(req) {
       <script type="application/ld+json">
       [{
         "@context": "http://schema.org/",
+        "@type": "Organization",
+        "logo": "https://www.clickys.in/icon.svg"
+      },
+      {
+        "@context": "http://schema.org/",
         "@type": "DiscountOffer",
-        "description": "Clickys Update",
+        "description": "${docTitle.replace(/"/g, '')}",
+        "availabilityStarts": "${new Date().toISOString()}",
+        "availabilityEnds": "${new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()}",
         "url": "${productUrl}"
       },
       {
         "@context": "http://schema.org/",
         "@type": "PromotionCard",
         "image": "${productImage || 'https://www.clickys.in/icon.svg'}"
-      },
-      {
-        "@context": "http://schema.org/",
-        "@type": "Organization",
-        "logo": "https://www.clickys.in/icon.svg"
       }]
       </script>
     `;
 
+    let cleanEmail = 'updates@clickys.in';
+    if (process.env.RESEND_FROM_EMAIL) {
+      const match = process.env.RESEND_FROM_EMAIL.match(/<([^>]+)>/);
+      cleanEmail = match ? match[1] : process.env.RESEND_FROM_EMAIL.trim();
+    }
+    
     const emailBatch = emails.map(email => ({
-      from: process.env.RESEND_FROM_EMAIL || '"Clickys" <updates@clickys.in>',
+      from: `Clickys <${cleanEmail}>`,
       to: [email],
       subject: finalSubject,
       html: `
