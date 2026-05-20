@@ -41,8 +41,8 @@ export const metadata = {
   
   // Icons
   icons: {
-    icon: '/clickysbg.png',
-    apple: '/clickysbg.png',
+    icon: '/images/logosvg.svg',
+    apple: '/images/logosvg.svg',
   },
   
   // Open Graph metadata

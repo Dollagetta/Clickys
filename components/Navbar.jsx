@@ -53,9 +53,8 @@ const Navbar = () => {
             className="flex items-center gap-2"
           >
            <div className={styles.logoWrapper}>
-            <Link href="/" className={`group ${styles.logo} flex items-baseline font-black tracking-tighter`} style={{ textDecoration: 'none' }}>
-              <span className="text-green-600 transition-colors duration-300 group-hover:text-green-500 text-[40px]">click</span>
-              <span className="text-[#f9c616] transition-colors duration-300 group-hover:text-orange-400 text-3xl">ys</span>
+            <Link href="/" className={`${styles.logo} flex items-center`} style={{ textDecoration: 'none' }}>
+              <Image src="/images/logosvg.svg" alt="Clickys Logo" width={150} height={50} className="object-contain" priority />
             </Link>
            </div>
           </motion.div>

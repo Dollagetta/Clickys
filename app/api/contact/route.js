@@ -38,7 +38,7 @@ export async function POST(req) {
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;">
           <div style="background-color: #ffffff; padding: 20px; text-align: center; border-bottom: 1px solid #f0f0f0;">
-            <img src="https://www.clickys.in/clickysbg.png" alt="Clickys Logo" style="height: 60px; display: block; margin: 0 auto;" />
+            <img src="https://www.clickys.in/images/logosvg.svg" alt="Clickys Logo" style="height: 60px; display: block; margin: 0 auto;" />
           </div>
           <div style="background-color: #f97316; padding: 20px; text-align: center;">
             <h1 style="color: white; margin: 0;">New Contact Form Message</h1>
