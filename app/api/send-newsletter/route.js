@@ -11,7 +11,7 @@ export async function POST(req) {
 
     // Verify Prismic Webhook Secret
     const PRISMIC_SECRET = 'Dollagetta#2003';
-    if (body.secret !== PRISMIC_SECRET) {
+    if (body.secret?.trim() !== PRISMIC_SECRET) {
       console.warn('Unauthorized webhook attempt');
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }

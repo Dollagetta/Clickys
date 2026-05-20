@@ -8,7 +8,8 @@ export async function POST(req: Request) {
 
     // Verify Prismic Webhook Secret securely
     const PRISMIC_SECRET = 'Dollagetta#2003';
-    if (body.secret && body.secret !== PRISMIC_SECRET) {
+    if (body.secret?.trim() !== PRISMIC_SECRET) {
+      console.warn('Unauthorized revalidation webhook attempt');
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 

@@ -18,13 +18,18 @@ module.exports = {
       const sm = await import('./slicemachine.config.json', { with: { type: 'json' } });
       const client = createClient(sm.default.repositoryName);
       
-      // Fetch multiple types of documents
-      const [guides, products] = await Promise.all([
+      // Fetch multiple types of documents using Promise.allSettled to handle missing types safely
+      const results = await Promise.allSettled([
         client.getAllByType("guide"),
-        client.getAllByType("product")
+        client.getAllByType("product"),
+        client.getAllByType("whatsnew"),
+        client.getAllByType("deal"),
+        client.getAllByType("partner")
       ]);
       
-      prismicDocs = [...guides, ...products];
+      prismicDocs = results
+        .filter(result => result.status === 'fulfilled')
+        .flatMap(result => result.value);
     } catch (e) {
       console.error('Error fetching from Prismic for sitemap:', e);
     }
@@ -36,6 +41,12 @@ module.exports = {
         routePrefix = '/guides';
       } else if (doc.type === 'product') {
         routePrefix = '/products';
+      } else if (doc.type === 'whatsnew') {
+        routePrefix = '/whats-new';
+      } else if (doc.type === 'deal') {
+        routePrefix = '/deals';
+      } else if (doc.type === 'partner') {
+        routePrefix = '/partners';
       } else {
         return;
       }
