@@ -41,6 +41,7 @@ const Footer = () => {
       title: "Support",
       links: [
         { href: "/contact", label: "FAQ" },
+        { href: "/privacy-policy", label: "Privacy Policy" },
       ]
     }
   ];
@@ -57,8 +58,9 @@ const Footer = () => {
                   whileHover={{ scale: 1.05 }}
                   className="inline-block"
                 >
-                  <Link href="/" className={`${styles.footerLogo} flex items-center`} style={{ textDecoration: 'none' }}>
-                    <Image src="/images/logosvg.svg" alt="Clickys Logo" width={150} height={50} className="object-contain" />
+                  <Link href="/" className={`group ${styles.footerLogo} flex items-baseline font-black tracking-tighter`} style={{ textDecoration: 'none' }}>
+                    <span className="text-green-600 transition-colors duration-300 group-hover:text-green-500 text-[40px]">click</span>
+                    <span className="text-[#f9c616] transition-colors duration-300 group-hover:text-orange-400 text-3xl">ys</span>
                   </Link>
                 </motion.div>
                 <p className={styles.footerTagline}>Your trusted guide to Amazon's best finds.</p>

@@ -7,6 +7,7 @@ import ReadingProgressBar from '../components/ReadingProgressBar';
 import ScrollToTopButton from '../components/ScrollToTopButton';
 import AppProviders from '../components/AppProviders'; // For client-side logic like AnimatePresence & AOS
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({
   subsets: ['latin'],
@@ -123,6 +124,7 @@ export default function RootLayout({ children }) {
           <Footer key="footer" />
           <ScrollToTopButton />
         </AppProviders>
+        <Analytics />
       </body>
     </html>
   );
