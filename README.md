@@ -147,23 +147,41 @@ client.getAllByType("guide", {
 })
 ```
 
-If you ever change the fields in Prismic (like adding a `subtitle` field to the Guide), you must also update the React component mapping to display it:
+### ⚡ On-Demand Revalidation (ISR)
+Instead of forcing a full site rebuild on Vercel every time you publish new content in Prismic, this site is configured to use **Incremental Static Regeneration (ISR)** via Next.js.
+When you publish a document in Prismic, a Webhook triggers the `/api/revalidate` endpoint.
 
-```javascript
-// Example in /app/page.jsx mapping logic:
-guides = guidesResponseResult.value.map(doc => {
-  return {
-    id: doc.id,
-    title: doc.data.title,
-    subtitle: doc.data.subtitle, // -> Add the new field mapping here!
-    // ...
-  };
-});
-```
+**Webhook URL:** `https://clickys.in/api/revalidate`
+**Action Triggered:** The system clears the cache only for the created/updated pages (e.g., `/products/[slug]`, `/deals`) automatically. This updates your live site rapidly without using Vercel build credits or causing site-wide downtime.
 
 ---
 
-## 📫 6. Contact & FAQ Page
+## 📧 6. Newsletter, Emails & Subscriptions
+
+This app handles newsletter emails through external integrations. Depending on the setup you want (Firebase, Prismic, Resend), here's how to manage it:
+
+1. **Firebase Firestore (Data Storage):**
+   When a user submits the newsletter form (often in `<Footer>` or a `<NewsletterSubscription>` component), their email is saved to a Firebase collection (e.g., `newsletter_subscribers`).
+   To manage this, log into your Firebase Console. Under Firestore Database, look for the target collection, where you can view or download all subscribed emails.
+   
+2. **Resend.com (Transactional/Marketing Emails):**
+   Newsletters feature an automated alert whenever you publish a product, deal, or what's-new item on Prismic. The Prismic Webhook triggers the Next.js API route `/api/send-newsletter/route.js`.
+   
+   **Smart Routing:** When the newsletter sends to your users, it securely defaults the "Call to Action" links to your active main category hubs:
+   - Products -> `/products`
+   - Deals -> `/deals`
+   - What's New -> `/whats-new`
+   - Partners -> `/partners`
+   
+   *This strategic fallback design protects users from broken deep links (404s) and safely funnels them directly to your heavily optimized index lists.*
+
+3. **Prismic (For Content/Body of the Emails):**
+   If you want to write standard newsletter content without editing code, you can create a "Newsletter Template" Custom Type in Prismic.
+   Fetch it in your API handler before passing the HTML to Resend!
+
+---
+
+## 📫 7. Contact & FAQ Page
 
 To update the main contact details or FAQs, look in the Contact directory.
 
@@ -193,44 +211,7 @@ const faqs = [
 
 ---
 
-## 📧 7. Newsletter, Emails & Subscriptions
-
-This app handles newsletter emails through external integrations. Depending on the setup you want (Firebase, Prismic, Resend), here's how to manage it:
-
-1. **Firebase Firestore (Data Storage):**
-   When a user submits the newsletter form (often in `<Footer>` or a `<NewsletterSubscription>` component), their email is saved to a Firebase collection (e.g., `newsletter_subscribers`).
-   To manage this, log into your Firebase Console. Under Firestore Database, look for the target collection, where you can view or download all subscribed emails.
-   
-2. **Resend.com (Transactional/Marketing Emails):**
-   To send welcome emails or weekly deal blasts, you use Resend. Have a serverless function (Next.js API route like `/api/subscribe/route.js`) receive the form submission.
-   ```javascript
-   // File: /app/api/subscribe/route.js
-   import { Resend } from 'resend';
-   const resend = new Resend(process.env.RESEND_API_KEY);
-
-   export async function POST(req) {
-     const { email } = await req.json();
-     // Send email via Resend
-     await resend.emails.send({
-       from: 'newsletter@clickys.in',
-       to: email,
-       subject: 'Welcome to Clickys Deals!',
-       html: '<p>Thanks for subscribing.</p>'
-     });
-     return Response.json({ success: true });
-   }
-   ```
-   **To enable this**, you need to sign up for Resend.com, verify `clickys.in`, and add `RESEND_API_KEY` to your Vercel Environment Variables.
-
-3. **Prismic (For Content/Body of the Emails):**
-   If you want to write standard newsletter content without editing code, you can create a "Newsletter Template" Custom Type in Prismic.
-   Fetch it in your API handler before passing the HTML to Resend!
-
----
-
 ## 🚀 8. Deploying on Vercel with clickys.in
-
-Follow these steps to take your project live to the world on **Vercel** with your domain (`clickys.in`):
 
 ### Step 1: Upload to GitHub
 1. Create a GitHub repository (e.g., `MyClickys`).

@@ -28,27 +28,45 @@ export async function POST(req) {
       return NextResponse.json({ message: 'Test successful.' }, { status: 200 });
     }
 
-    // Step 1: Identify if a "product" was published from the webhook documents
-    let latestProduct = null;
+    // Step 1: Identify the published document from the webhook documents
+    let latestDoc = null;
     const client = createClient();
 
     if (body.documents && body.documents.length > 0) {
       try {
         const updatedDocs = await client.getAllByIDs(body.documents);
-        latestProduct = updatedDocs.find(doc => doc.type === 'product');
+        // We look for any of these document types
+        latestDoc = updatedDocs.find(doc => 
+          ['product', 'whatsnew', 'deal', 'deals', 'partner', 'partners', 'guide'].includes(doc.type)
+        );
       } catch (err) {
         console.error('Failed to fetch updated documents from Prismic', err);
       }
     }
 
-    if (!latestProduct) {
-      return NextResponse.json({ message: 'No product changes found in this webhook.' }, { status: 200 });
+    if (!latestDoc) {
+      return NextResponse.json({ message: 'No relevant changes found in this webhook.' }, { status: 200 });
     }
 
-    const productName = latestProduct.data?.title || 'New Product';
-    const productUrl = `https://www.clickys.in/products/${latestProduct.uid}`;
-    const productExcerpt = latestProduct.data?.description?.[0]?.text || 'Check out our latest update!';
-    const productImage = latestProduct.data?.image?.url;
+    const docTitle = latestDoc.data?.title || 'New Arrival';
+    
+    // Dynamically determine the URL based on the document type
+    let docTypePath = 'products';
+    if (latestDoc.type.includes('whatsnew') || latestDoc.type.includes('whats-new')) {
+      docTypePath = 'whats-new';
+    } else if (latestDoc.type.includes('deal')) {
+      docTypePath = 'deals';
+    } else if (latestDoc.type.includes('partner')) {
+      docTypePath = 'partners';
+    } else if (latestDoc.type === 'guide') {
+      docTypePath = 'guide';
+    } else {
+      docTypePath = 'products';
+    }
+
+    const productUrl = `https://www.clickys.in/${docTypePath}`;
+    const productExcerpt = latestDoc.data?.description?.[0]?.text || 'Check out our latest update!';
+    const productImage = latestDoc.data?.image?.url || latestDoc.data?.cover_image?.url || '';
 
     // Step 2: Fetch all active subscribers from Firestore using Admin SDK to bypass security rules
     let emails = [];
@@ -58,7 +76,9 @@ export async function POST(req) {
         .where('isActive', '==', true)
         .get();
 
-      emails = subscribersSnap.docs.map(doc => doc.data().email);
+      emails = subscribersSnap.docs
+        .map(doc => doc.data().email)
+        .filter(email => email && typeof email === 'string' && email.trim() !== '');
     } catch (dbError) {
       console.error('Failed to fetch subscribers from Firestore:', dbError.message);
       // If code is 5 (NOT_FOUND), the Firestore database might not exist yet.
@@ -83,16 +103,16 @@ export async function POST(req) {
 
     const emailBatch = emails.map(email => ({
       from: process.env.RESEND_FROM_EMAIL || 'Clickys <noreply@clickys.in>',
-      to: email,
-      subject: `New Arrival on Clickys: ${productName}`,
+      to: [email],
+      subject: `New Arrival on Clickys: ${docTitle}`,
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;">
           <div style="background-color: #f97316; padding: 20px; text-align: center;">
             <h1 style="color: white; margin: 0;">Clickys New Arrival!</h1>
           </div>
           <div style="padding: 30px;">
-            <h2 style="color: #333;">${productName}</h2>
-            ${productImage ? `<img src="${productImage}" alt="${productName}" style="display: block; max-width: 80%; max-height: 250px; margin: 0 auto 20px auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(249, 115, 22, 0.25); border: 2px solid #f97316; object-fit: contain;" />` : ''}
+            <h2 style="color: #333;">${docTitle}</h2>
+            ${productImage ? `<img src="${productImage}" alt="${docTitle}" style="display: block; max-width: 80%; max-height: 250px; margin: 0 auto 20px auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(249, 115, 22, 0.25); border: 2px solid #f97316; object-fit: contain;" />` : ''}
             <p style="color: #666; font-size: 16px; line-height: 1.6;">${productExcerpt}</p>
             <div style="text-align: center; margin-top: 30px;">
               <a href="${productUrl}" style="background-color: #f97316; color: white; padding: 12px 25px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block;">
