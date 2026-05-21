@@ -22,6 +22,8 @@ import { FiZap, FiShoppingCart, FiTrendingUp, FiGift, FiShield, FiThumbsUp, FiAr
 import Image from 'next/image'; // For Buying Guides section images
 import Link from 'next/link'; // For guide card links
 import {products} from '../components/products';
+import NewLaunchesSection from '../components/NewLaunchesSection';
+
 import { createClient } from "../prismicio";
 import { asText } from "@prismicio/client";
 import * as prismic from '@prismicio/client';
@@ -191,6 +193,8 @@ export default async function HomePage() {
           </div>
         </div>
       </header>
+      
+      <NewLaunchesSection />
 
       {/* Featured Products Section */}
       <section className={`${styles.section} ${styles.featuredProductsSection}`} style={{ borderColor: '#d49e32', borderStyle: 'solid', borderWidth: '1px' }}>

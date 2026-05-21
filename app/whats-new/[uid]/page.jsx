@@ -4,6 +4,7 @@ import { createClient } from "../../../prismicio";
 import { components } from "../../../slices";
 import Link from 'next/link';
 import { FiArrowLeft } from 'react-icons/fi';
+import NewLaunchesSection from "../../../components/NewLaunchesSection";
 
 export async function generateMetadata({ params }) {
   const { uid } = await params;
@@ -39,6 +40,7 @@ export default async function WhatsNewPage({ params }) {
         </Link>
         
         <main>
+          <NewLaunchesSection />
           <SliceZone 
             slices={page.data.slices} 
             components={components} 
