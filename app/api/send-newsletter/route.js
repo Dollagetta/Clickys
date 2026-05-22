@@ -60,7 +60,7 @@ export async function POST(req) {
     // Extract title
     let rawTitle = latestDoc.data?.title || latestDoc.data?.name;
     if (!rawTitle && latestDoc.data?.slices) {
-      // Trying to find title from slices if not in static zone (like whatsnew Big Burner)
+      // Trying to find title from slices if not in static zone
       const titleSlice = latestDoc.data.slices.find(s => s.primary?.title || s.primary?.heading);
       if (titleSlice) rawTitle = titleSlice.primary.title || titleSlice.primary.heading;
     }
@@ -73,27 +73,34 @@ export async function POST(req) {
     
     // Dynamically determine the URL based on the document type
     let productUrl = 'https://www.clickys.in/products';
-    let productImage = latestDoc.data?.image?.url || latestDoc.data?.cover_image?.url || '';
-
     if (latestDoc.type.includes('whatsnew') || latestDoc.type.includes('whats-new')) {
       productUrl = `https://www.clickys.in/whats-new/${latestDoc.uid}`;
-      productImage = latestDoc.data?.the_big_burner?.url || latestDoc.data?.featured_image?.url || latestDoc.data?.meta_image?.url || latestDoc.data?.image?.url || productImage;
-      if (!productImage && latestDoc.data?.slices) {
-         const imageSlice = latestDoc.data.slices.find(s => s.primary?.image?.url || s.primary?.background_image?.url);
-         if (imageSlice) productImage = imageSlice.primary.image?.url || imageSlice.primary.background_image?.url;
-      }
     } else if (latestDoc.type.includes('deal')) {
       productUrl = `https://www.clickys.in/deals/${latestDoc.uid}`;
     } else if (latestDoc.type.includes('guide') || latestDoc.type.includes('sliceguide1')) {
       productUrl = `https://www.clickys.in/guide/${latestDoc.uid}`;
     } else if (latestDoc.type.includes('partner')) {
       productUrl = `https://www.clickys.in`;
-      productImage = latestDoc.data?.partner_image?.url || latestDoc.data?.logo?.url || latestDoc.data?.brand_image?.url || latestDoc.data?.image?.url || productImage;
     } else if (latestDoc.type.includes('product')) {
       productUrl = `https://www.clickys.in/products/${latestDoc.uid}`;
     }
 
-    const productExcerpt = extractText(latestDoc.data?.description) || extractText(latestDoc.data?.short_paragraph) || extractText(latestDoc.data?.meta_description) || 'Check out our latest update on Clickys!';
+    // Extract image
+    let productImage = latestDoc.data?.image?.url || latestDoc.data?.cover_image?.url || latestDoc.data?.the_big_burner?.url || latestDoc.data?.featured_image?.url || latestDoc.data?.meta_image?.url || latestDoc.data?.partner_image?.url || latestDoc.data?.logo?.url || latestDoc.data?.brand_image?.url || '';
+    if (!productImage && latestDoc.data?.slices) {
+       const imageSlice = latestDoc.data.slices.find(s => s.primary?.image?.url || s.primary?.background_image?.url);
+       if (imageSlice) productImage = imageSlice.primary.image?.url || imageSlice.primary.background_image?.url;
+    }
+
+    // Extract excerpt
+    let productExcerpt = extractText(latestDoc.data?.description) || extractText(latestDoc.data?.short_paragraph) || extractText(latestDoc.data?.meta_description) || '';
+    if (!productExcerpt && latestDoc.data?.slices) {
+       const descSlice = latestDoc.data.slices.find(s => s.primary?.description || s.primary?.text);
+       if (descSlice) productExcerpt = extractText(descSlice.primary.description || descSlice.primary.text);
+    }
+    if (!productExcerpt) {
+       productExcerpt = 'Check out our latest update on Clickys!';
+    }
 
     // Step 2: Fetch all active subscribers from Firestore using Admin SDK to bypass security rules
     let emails = [];
