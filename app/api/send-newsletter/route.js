@@ -85,22 +85,31 @@ export async function POST(req) {
       productUrl = `https://www.clickys.in/products/${latestDoc.uid}`;
     }
 
+    console.log("Analyzing document type:", latestDoc.type);
+
     // Extract image
     let productImage = latestDoc.data?.image?.url || latestDoc.data?.cover_image?.url || latestDoc.data?.the_big_burner?.url || latestDoc.data?.featured_image?.url || latestDoc.data?.meta_image?.url || latestDoc.data?.partner_image?.url || latestDoc.data?.logo?.url || latestDoc.data?.brand_image?.url || '';
     if (!productImage && latestDoc.data?.slices) {
-       const imageSlice = latestDoc.data.slices.find(s => s.primary?.image?.url || s.primary?.background_image?.url);
-       if (imageSlice) productImage = imageSlice.primary.image?.url || imageSlice.primary.background_image?.url;
+       for (const s of latestDoc.data.slices) {
+         if (s.primary?.image?.url) { productImage = s.primary.image.url; break; }
+         if (s.primary?.background_image?.url) { productImage = s.primary.background_image.url; break; }
+         if (s.primary?.product_image?.url) { productImage = s.primary.product_image.url; break; }
+       }
     }
 
     // Extract excerpt
     let productExcerpt = extractText(latestDoc.data?.description) || extractText(latestDoc.data?.short_paragraph) || extractText(latestDoc.data?.meta_description) || '';
     if (!productExcerpt && latestDoc.data?.slices) {
-       const descSlice = latestDoc.data.slices.find(s => s.primary?.description || s.primary?.text);
-       if (descSlice) productExcerpt = extractText(descSlice.primary.description || descSlice.primary.text);
+       for (const s of latestDoc.data.slices) {
+         if (s.primary?.description) { productExcerpt = extractText(s.primary.description); break; }
+         if (s.primary?.text) { productExcerpt = extractText(s.primary.text); break; }
+       }
     }
     if (!productExcerpt) {
        productExcerpt = 'Check out our latest update on Clickys!';
     }
+    
+    console.log("Extracted Data:", { docTitle, finalSubject, customHeader, productImage, productExcerpt });
 
     // Step 2: Fetch all active subscribers from Firestore using Admin SDK to bypass security rules
     let emails = [];
