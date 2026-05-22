@@ -67,9 +67,20 @@ export async function POST(req) {
     const docTitle = extractText(rawTitle) || 'New Arrival';
 
     // Extract custom email attributes
-    const customSubject = extractText(latestDoc.data?.newsletter_subject) || extractText(latestDoc.data?.email_subject);
+    let customSubject = extractText(latestDoc.data?.newsletter_subject) || extractText(latestDoc.data?.email_subject);
+    let customHeader = extractText(latestDoc.data?.newsletter_header) || extractText(latestDoc.data?.email_header);
+
+    if (latestDoc.data?.slices) {
+       for (const s of latestDoc.data.slices) {
+         if (!customSubject && s.primary?.newsletter_subject) customSubject = extractText(s.primary.newsletter_subject);
+         if (!customSubject && s.primary?.email_subject) customSubject = extractText(s.primary.email_subject);
+         if (!customHeader && s.primary?.newsletter_header) customHeader = extractText(s.primary.newsletter_header);
+         if (!customHeader && s.primary?.email_header) customHeader = extractText(s.primary.email_header);
+       }
+    }
+
     const finalSubject = customSubject ? customSubject : `New Arrival on Clickys: ${docTitle}`;
-    const customHeader = extractText(latestDoc.data?.newsletter_header) || extractText(latestDoc.data?.email_header) || 'Clickys New Arrival!';
+    customHeader = customHeader || 'Clickys New Arrival!';
     
     // Dynamically determine the URL based on the document type
     let productUrl = 'https://www.clickys.in/products';
@@ -194,7 +205,7 @@ export async function POST(req) {
             </div>
             <div style="padding: 30px;">
               <h2 style="color: #333;">${docTitle}</h2>
-              ${productImage ? `<img src="${productImage}" alt="${docTitle}" style="display: block; width: 100%; height: auto; max-height: 400px; margin: 0 auto 20px auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(249, 115, 22, 0.25); border: 2px solid #f97316; object-fit: cover;" />` : ''}
+              ${productImage ? `<div style="text-align: center; margin-bottom: 20px;"><img src="${productImage}" alt="Product Image" width="600" style="display: inline-block; width: 100%; max-width: 600px; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(249, 115, 22, 0.25); border: 2px solid #f97316;" /></div>` : ''}
               <p style="color: #666; font-size: 16px; line-height: 1.6;">${productExcerpt}</p>
               <div style="text-align: center; margin-top: 30px;">
                 <a href="${productUrl}" style="background-color: #f97316; color: white; padding: 14px 30px; font-size: 16px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block;">
