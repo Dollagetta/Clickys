@@ -39,7 +39,7 @@ export async function POST(req) {
         const updatedDocs = await client.getAllByIDs(body.documents);
         // We look for any of these document types
         latestDoc = updatedDocs.find(doc => 
-          ['product', 'whatsnew', 'deal', 'deals', 'partner', 'partners', 'guide'].includes(doc.type)
+          ['product', 'whatsnew', 'deal', 'deals', 'partner', 'partners', 'guide', 'sliceguide1'].includes(doc.type)
         );
       } catch (err) {
         console.error('Failed to fetch updated documents from Prismic', err);
@@ -84,7 +84,7 @@ export async function POST(req) {
       }
     } else if (latestDoc.type.includes('deal')) {
       productUrl = `https://www.clickys.in/deals/${latestDoc.uid}`;
-    } else if (latestDoc.type.includes('guide')) {
+    } else if (latestDoc.type.includes('guide') || latestDoc.type.includes('sliceguide1')) {
       productUrl = `https://www.clickys.in/guide/${latestDoc.uid}`;
     } else if (latestDoc.type.includes('partner')) {
       productUrl = `https://www.clickys.in`;
