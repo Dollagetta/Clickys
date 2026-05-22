@@ -206,7 +206,6 @@ export async function POST(req) {
             <div style="padding: 30px;">
               <h2 style="color: #333;">${docTitle}</h2>
               ${productImage ? `<div style="text-align: center; margin-bottom: 20px;"><img src="${productImage}" alt="Product Image" width="600" style="display: inline-block; width: 100%; max-width: 600px; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(249, 115, 22, 0.25); border: 2px solid #f97316;" /></div>` : ''}
-              <p style="color: #666; font-size: 16px; line-height: 1.6;">${productExcerpt}</p>
               <div style="text-align: center; margin-top: 30px;">
                 <a href="${productUrl}" style="background-color: #f97316; color: white; padding: 14px 30px; font-size: 16px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block;">
                   View on Clickys
