@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import { PrismicNextImage } from "@prismicio/next";
@@ -130,6 +130,28 @@ const PartnerCard = ({ partner, index }) => {
 };
 
 export default function PartnerSection({ partners = [] }) {
+  const [activeShoppers, setActiveShoppers] = useState("50,000+");
+
+  useEffect(() => {
+    // 20 random numbers between 20k and 50k
+    const numbers = [
+      41235, 28450, 31920, 48100, 21500, 39600, 45300, 22400, 36800, 49200,
+      23100, 27500, 43900, 34200, 47820, 26941, 30512, 46105, 38710, 24890
+    ];
+    
+    // Cycle every day based on the year's day
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 0);
+    const diff = now - start;
+    const oneDay = 1000 * 60 * 60 * 24;
+    const day = Math.floor(diff / oneDay);
+    
+    const index = day % numbers.length;
+    
+    // Format number with commas
+    setActiveShoppers(numbers[index].toLocaleString() + "+");
+  }, []);
+
   // If no partners are provided from Prismic, use a placeholder to demonstrate the layout
   const displayPartners = partners.length > 0 ? partners : [
     {
@@ -224,7 +246,7 @@ export default function PartnerSection({ partners = [] }) {
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
-                <span className="text-base md:text-lg font-black text-slate-900 tracking-tight">50,000+</span>
+                <span className="text-base md:text-lg font-black text-slate-900 tracking-tight">{activeShoppers}</span>
                 <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse" />
               </div>
               <span className="text-[10px] md:text-[11px] text-slate-400 font-bold uppercase tracking-[0.15em] group-hover:text-orange-600 transition-colors">Active Shoppers</span>

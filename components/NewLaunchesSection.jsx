@@ -373,10 +373,10 @@ export default function NewLaunchesSection() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ fontSize: 22 }}></span>
             <div>
-              <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: '#111', letterSpacing: '-0.02em' }}>
+              <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 800, color: '#111', letterSpacing: '-0.02em' }}>
                 What&apos;s New
               </h2>
-              <p style={{ margin: 0, fontSize: '12px', color: '#6b7280' }}>
+              <p style={{ margin: 0, fontSize: '15px', color: '#0a0a0a' }}>
                 Latest launches &amp; fresh drops
               </p>
             </div>
@@ -395,7 +395,7 @@ export default function NewLaunchesSection() {
           ref={scrollRef}
           onScroll={onScroll}
           className="nl-scroll"
-          style={{ display: 'flex', gap: 14, overflowX: 'auto', paddingBottom: 4 }}
+          style={{ display: 'flex', gap: 14, overflowX: 'auto', paddingBottom: 4, backgroundColor: '#d97d2c' }}
         >
           {loading
             ? Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)

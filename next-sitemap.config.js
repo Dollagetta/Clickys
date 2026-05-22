@@ -23,7 +23,8 @@ module.exports = {
         client.getAllByType("product"),
         client.getAllByType("whatsnew"),
         client.getAllByType("deal"),
-        client.getAllByType("partner")
+        client.getAllByType("partner"),
+        client.getAllByType("sliceguide1")
       ]);
       
       prismicDocs = results
@@ -44,6 +45,8 @@ module.exports = {
         routePrefix = '/deals';
       } else if (doc.type === 'partner') {
         routePrefix = '/partners';
+      } else if (doc.type === 'sliceguide1') {
+        routePrefix = '/guide';
       } else {
         return;
       }

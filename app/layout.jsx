@@ -19,6 +19,7 @@ const siteName = "Clickys";
 const siteUrl = "https://www.clickys.in"; // Replace with your actual domain
 
 export const metadata = {
+  metadataBase: new URL(siteUrl),
   // Basic metadata
   title: {
     default: "Clickys - Discover Top Amazon Picks & Deals",
