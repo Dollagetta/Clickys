@@ -476,7 +476,6 @@ function DealsPageContent() {
           </div>
         </section>
        )}
-        
       </div>
     </>
   );

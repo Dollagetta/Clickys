@@ -6,8 +6,8 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: 600px; /* Fixed height for chat experience */
-  max-height: 80vh;
+  height: 750px; /* Increased height for chat experience */
+  max-height: 85vh;
 }
 
 .chatArea {

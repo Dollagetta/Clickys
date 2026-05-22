@@ -29,16 +29,11 @@ export const metadata = {
   // Standard metadata
   keywords: "Amazon affiliate, product reviews, best deals, buying guides, tech gadgets, home appliances, electronics, smart home, affiliate marketing, product recommendations",
   applicationName: siteName,
-  authors: [{ name: "AffiliateAura Team", url: `${siteUrl}/about` }],
+  authors: [{ name: "Clickys Team", url: `${siteUrl}/about` }],
   generator: "Pixel Crafte",
   referrer: "origin-when-cross-origin",
   creator: "Pixel Crafte",
   publisher: siteName,
-  formatDetection: {
-    email: "affiliateaurateam@gmail.com",
-    address: "Peddapuram, Andhra Pradesh, India",
-    telephone: "+910000000000",
-  },
   
   // Icons
   icons: {
@@ -52,14 +47,14 @@ export const metadata = {
     siteName,
     locale: "en_US",
     url: siteUrl,
-    title: "AffiliateAura - Discover Top Amazon Picks & Deals",
+    title: "Clickys - Discover Top Amazon Picks & Deals",
     description: "Your ultimate guide to the best products, exclusive deals, and honest reviews for Amazon shopping.",
     images: [
       {
-        url: `${siteUrl}/og-images/homepage-affiliateaura.jpg`, // Ensure this image exists in /public/og-images/
+        url: `${siteUrl}/images/logosvg.svg`,
         width: 1200,
         height: 630,
-        alt: "AffiliateAura - Your Trusted Guide to Amazon's Best Finds",
+        alt: "Clickys - Your Trusted Guide to Amazon's Best Finds",
       }
     ],
   },
@@ -67,10 +62,10 @@ export const metadata = {
   // Twitter metadata
   twitter: {
     card: "summary_large_image",
-    title: "AffiliateAura - Top Amazon Picks, Deals, and Reviews",
+    title: "Clickys - Top Amazon Picks, Deals, and Reviews",
     description: "Your ultimate guide to the best products, exclusive deals, and honest reviews for Amazon shopping.",
-    images: [`${siteUrl}/og-images/homepage-affiliateaura.jpg`], // Ensure this image exists
-    creator: "@AffiliateAura", // Replace with actual Twitter handle
+    images: [`${siteUrl}/images/logosvg.svg`],
+    creator: "@clickys25",
   },
   
   // Verification for search consoles

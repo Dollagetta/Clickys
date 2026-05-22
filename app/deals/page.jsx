@@ -1,7 +1,9 @@
 import DealsPage from "./DealsPage2"
 //import { products } from '../../components/products'
 import { products } from '../../components/flipkartProducts'
-//import { createClient } from '@/prismicio';
+import { createClient } from '../../prismicio';
+import PaginatedGuides from './PaginatedGuides';
+
 // Metadata for the Deals page
 
 /*export const metadata = {
@@ -46,11 +48,43 @@ export const metadata = {
 //const dealProducts = products;
 
 const page = async () => {
-    //const client = createClient();
-    //const data = client.getAllByType('products');
+  const client = createClient();
+  let allSlices = [];
+  
+  try {
+    const guideDocuments = await client.getAllByType('sliceguide1', {
+      orderings: [
+        { field: 'document.first_publication_date', direction: 'desc' }
+      ]
+    });
+    
+    allSlices = guideDocuments.flatMap(doc => {
+      return (doc.data?.slices || []).map(slice => ({
+        ...slice,
+        docUid: doc.uid
+      }));
+    });
+  } catch (error) {
+    console.error("Failed to fetch sliceguide1:", error);
+  }
 
   return (
-  <DealsPage products={ products }/>
+    <>
+      <DealsPage products={ products }/>
+      {allSlices.length > 0 && (
+        <section className="w-full max-w-7xl mx-auto px-4 py-16 mt-8 border-t border-gray-100">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight mb-4">
+              Latest Highlights
+            </h2>
+            <p className="text-lg text-gray-500 max-w-2xl mx-auto font-medium">
+              Our latest insights and carefully curated selections.
+            </p>
+          </div>
+          <PaginatedGuides slices={allSlices} />
+        </section>
+      )}
+    </>
   )
 }
 

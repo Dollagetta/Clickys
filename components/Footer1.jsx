@@ -24,11 +24,11 @@ const Footer = () => {
       links: [
         { href: "/products", label: "All Products" },
         { href: "/deals", label: "Hot Deals" },
-        { href: "/guides", label: "Buying Guides" },
+        { href: "/whats-new", label: "What's New" },
       ]
     },
     {
-      title: "About AffiliateAura",
+      title: "About Clickys",
       links: [
         { href: "/about", label: "About Us" },
         { href: "/contact", label: "Contact" },
@@ -64,10 +64,10 @@ const Footer = () => {
                     {/* Example: Link to a popular guide */}
                     <FiBookOpen className={styles.featuredIcon} />
                     <div>
-                        <Link href="/guides/best-noise-cancelling-headphones-2025" className={styles.featuredLink}>
-                            Our Top Headphone Picks for 2025
+                        <Link href="/whats-new" className={styles.featuredLink}>
+                            Our Latest Updates
                         </Link>
-                        <p className={styles.featuredDescription}>Dive into crystal-clear audio with our expert guide.</p>
+                        <p className={styles.featuredDescription}>Read our latest articles.</p>
                     </div>
                 </div>
                 <div className={styles.featuredItem}>
@@ -99,7 +99,7 @@ const Footer = () => {
         </div>
 
         <div className={styles.footerBottom}>
-          <p className={styles.copyright}>&copy; {currentYear} AffiliateAura. All Rights Reserved.
+          <p className={styles.copyright}>&copy; {currentYear} Clickys. All Rights Reserved.
                            Made with ❤️ by <Link href="https://www.pixelcrafte.co.zw/">PixelCrafte</Link></p>
           <div className={styles.socialIcons}>
             {socialLinks.map(social => (

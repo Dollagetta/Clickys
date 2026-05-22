@@ -23,24 +23,30 @@ export default async function CategoryPage({ params }) {
   const client = createClient();
 
   const [guidesResponseResult, prismicProductsResResult] = await Promise.allSettled([
-    client.getAllByType("guide", {
-      orderings: { field: 'my.guide.date', direction: 'desc' },
+    client.getAllByType("whatsnew", {
+      orderings: { field: 'my.whatsnew.date', direction: 'desc' },
     }),
     client.getAllByType('product')
   ]);
 
-  // Prismic Guides
+  // Prismic Guides (whatsnew)
   let guidesData = [];
   if (guidesResponseResult.status === 'fulfilled') {
     guidesData = guidesResponseResult.value.map(doc => {
-      const fullText = doc.data.guide ? asText(doc.data.guide) : '';
+      let excerptText = 'No excerpt available.';
+      if (doc.data.slices && doc.data.slices.length > 0) {
+        const textSlice = doc.data.slices.find(s => s.slice_type === 'text' || s.primary?.description);
+        if (textSlice && textSlice.primary?.description) {
+           excerptText = asText(textSlice.primary.description).substring(0, 150) + '...';
+        }
+      }
       return {
         id: doc.id,
         slug: doc.uid,
-        title: doc.data.title,
-        imageField: doc.data.image,
+        title: doc.data.title || doc.data.name || 'Untitled',
+        imageField: doc.data.image || doc.data.hero_image,
         category: doc.tags[0] || 'General',
-        excerpt: fullText.substring(0, 150) + '...',
+        excerpt: excerptText,
       };
     });
   }
@@ -114,7 +120,7 @@ export default async function CategoryPage({ params }) {
             <div className={styles.guidesGrid}>
               {filteredGuides.map((guide, index) => (
                 <div key={guide.id} className={styles.guideCard}>
-                  <Link href={`/guides/${guide.slug}`} className={styles.guideLink}>
+                  <Link href={`/whats-new/${guide.slug}`} className={styles.guideLink}>
                     <div className={styles.guideImageWrapper}>
                       {guide.imageField ? (
                         <PrismicNextImage field={guide.imageField} fill style={{objectFit: 'cover'}} />

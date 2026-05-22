@@ -27,7 +27,7 @@ const Footer = () => {
       links: [
         { href: "/products", label: "Amazon Products" },
         { href: "/deals", label: "All Products" },
-        { href: "/guides", label: "What is new?" },
+        { href: "/whats-new", label: "What is new?" },
       ]
     },
     {

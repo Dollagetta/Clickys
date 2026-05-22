@@ -31,6 +31,8 @@ JSON Schema:
   }
 ]`;
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req) {
   try {
     const { userQuery, imageBase64, imageMimeType } = await req.json();

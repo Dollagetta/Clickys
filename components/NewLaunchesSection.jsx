@@ -101,7 +101,7 @@ function LaunchCard({ item }) {
             border: '1.5px solid #e5e7eb',
             letterSpacing: '0.05em',
           }}>
-            🆕 {item.launchDate}
+            🆕 {item.launchDate?.match(/\d{4}/)?.[0] || item.launchDate}
           </span>
         </div>
       </Link>
@@ -208,38 +208,99 @@ function LaunchCard({ item }) {
           </button>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <div style={{ textAlign: 'center' }}>
+            <div style={{ textAlign: 'center', background: '#f8fafc', padding: '1.5rem', borderRadius: '12px' }}>
               <img
                 src={item.imageUrl || fallbackImg}
                 alt={item.name}
                 referrerPolicy="no-referrer"
-                style={{ objectFit: 'contain', margin: '0 auto', display: 'block', maxWidth: '300px', maxHeight: '250px', width: '100%' }}
+                style={{ objectFit: 'contain', margin: '0 auto', display: 'block', maxWidth: '300px', maxHeight: '250px', width: '100%', mixBlendMode: 'multiply' }}
                 onError={(e) => e.currentTarget.src = fallbackImg}
               />
             </div>
 
             <div>
-              <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#0f172a', margin: '0 0 0.5rem 0' }}>{item.name}</h3>
-              <p style={{ color: '#64748b', margin: '0 0 1rem 0', fontWeight: '500' }}>{item.price}</p>
-              
-              <div style={{ color: '#334155', lineHeight: '1.6', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
-                <p>{item.description}</p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                <h3 style={{ fontSize: '1.35rem', fontWeight: '800', color: '#0f172a', margin: '0', lineHeight: '1.3' }}>{item.name}</h3>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button style={{ background: '#f1f5f9', border: 'none', padding: '6px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Share">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#475569" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                  </button>
+                  <button style={{ background: '#f1f5f9', border: 'none', padding: '6px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Compare">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#475569" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 3h5v5"></path><path d="M8 3H3v5"></path><path d="M12 22v-8.3a4 4 0 0 0-1.172-2.828l-8.414-8.414"></path><path d="M21 3l-8.414 8.414A4 4 0 0 0 11.414 14.24"></path></svg>
+                  </button>
+                </div>
               </div>
-
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', marginBottom: '0.5rem' }}>
+              <p style={{ color: '#475569', margin: '0 0 1rem 0', fontWeight: '500', fontSize: '1rem' }}>{item.price}</p>
+              
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', marginBottom: '1.5rem' }}>
                 <a
                   href={item.link}
                   target="_blank"
                   rel="noopener noreferrer sponsored"
-                  style={{ 
-                    backgroundColor: item.platform === 'Amazon' ? '#ff9900' : (item.platform === 'Flipkart' ? '#2874f0' : '#7c3aed'),
+                  style={{
                     flex: 1,
-                    display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem',
-                    padding: '0.75rem', color: '#fff', borderRadius: '8px', fontWeight: '600', textDecoration: 'none'
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                    backgroundColor: item.platform === 'Amazon' ? '#f59e0b' : item.platform === 'Flipkart' ? '#2874f0' : '#0f172a',
+                    color: '#fff',
+                    padding: '0.85rem', borderRadius: '6px',
+                    textDecoration: 'none', fontWeight: 'bold',
+                    transition: 'opacity 0.2s'
                   }}
+                  onMouseOver={(e) => e.target.style.opacity = '0.9'}
+                  onMouseOut={(e) => e.target.style.opacity = '1'}
                 >
                   Buy on {item.platform}
+                  {item.platform === 'Amazon' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>}
                 </a>
+              </div>
+
+              {/* Price History Block */}
+              <div style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1.25rem', marginBottom: '0.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                      <h4 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#0f172a', margin: 0 }}>Price History</h4>
+                      <span style={{ fontSize: '0.7rem', fontWeight: '600', backgroundColor: '#e2e8f0', color: '#0f172a', padding: '2px 8px', borderRadius: '12px' }}>Last 30 Days</span>
+                    </div>
+                    <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0, maxWidth: '200px', lineHeight: '1.4' }}>Track price changes to make sure you're getting the best deal.</p>
+                  </div>
+                  <div style={{ backgroundColor: '#ecfdf5', padding: '8px 12px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
+                    <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#10b981', lineHeight: '1.2', width: '60px' }}>Great time to buy!</span>
+                  </div>
+                </div>
+
+                {/* Fake Graph */}
+                <div style={{ position: 'relative', height: '140px', marginTop: '1rem' }}>
+                  <div style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                    <div style={{ borderBottom: '1px dashed #e2e8f0', width: '100%', height: '1px' }}></div>
+                    <div style={{ borderBottom: '1px dashed #e2e8f0', width: '100%', height: '1px' }}></div>
+                    <div style={{ borderBottom: '1px dashed #e2e8f0', width: '100%', height: '1px' }}></div>
+                    <div style={{ borderBottom: '1px dashed #e2e8f0', width: '100%', height: '1px' }}></div>
+                  </div>
+                  <svg width="100%" height="100%" viewBox="0 0 300 140" preserveAspectRatio="none" style={{ position: 'absolute', top: 0, left: 0 }}>
+                    <path d="M0 40 Q20 40 30 50 T60 40 T90 50 L110 50 L120 100 Q130 110 140 100 T160 105 T180 100 L190 120 L220 120 L230 120 L240 125 L245 130 L260 130 L300 130" fill="none" stroke="#34d399" strokeWidth="3" strokeLinejoin="round" />
+                    <path d="M0 40 Q20 40 30 50 T60 40 T90 50 L110 50 L120 100 Q130 110 140 100 T160 105 T180 100 L190 120 L220 120 L230 120 L240 125 L245 130 L260 130 L300 130 L300 140 L0 140 Z" fill="rgba(52, 211, 153, 0.2)" />
+                  </svg>
+                  {item.price && (
+                    <>
+                      <div style={{ position: 'absolute', top: '30px', left: '-5px', fontSize: '0.65rem', color: '#64748b' }}>{`₹${parseInt(item.price.replace(/[^\d]/g, '')) + 450}`}</div>
+                      <div style={{ position: 'absolute', top: '70px', left: '-5px', fontSize: '0.65rem', color: '#64748b' }}>{`₹${parseInt(item.price.replace(/[^\d]/g, '')) + 300}`}</div>
+                      <div style={{ position: 'absolute', top: '105px', left: '-5px', fontSize: '0.65rem', color: '#64748b' }}>{`₹${parseInt(item.price.replace(/[^\d]/g, '')) + 150}`}</div>
+                      <div style={{ position: 'absolute', top: '122px', left: '-5px', fontSize: '0.65rem', color: '#64748b' }}>{item.price}</div>
+                    </>
+                  )}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px', marginLeft: '25px', fontSize: '0.65rem', color: '#64748b' }}>
+                  <span>Apr 22</span>
+                  <span>Apr 26</span>
+                  <span>Apr 30</span>
+                  <span>May 4</span>
+                  <span>May 8</span>
+                  <span>May 12</span>
+                  <span>May 16</span>
+                  <span>May 21</span>
+                </div>
               </div>
             </div>
           </div>

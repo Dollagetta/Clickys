@@ -39,7 +39,7 @@ export async function POST(req) {
         const updatedDocs = await client.getAllByIDs(body.documents);
         // We look for any of these document types
         latestDoc = updatedDocs.find(doc => 
-          ['product', 'whatsnew', 'deal', 'deals', 'partner', 'partners', 'guide'].includes(doc.type)
+          ['product', 'whatsnew', 'deal', 'deals', 'partner', 'partners'].includes(doc.type)
         );
       } catch (err) {
         console.error('Failed to fetch updated documents from Prismic', err);
@@ -87,8 +87,6 @@ export async function POST(req) {
     } else if (latestDoc.type.includes('partner')) {
       productUrl = `https://www.clickys.in`;
       productImage = latestDoc.data?.partner_image?.url || latestDoc.data?.logo?.url || latestDoc.data?.brand_image?.url || latestDoc.data?.image?.url || productImage;
-    } else if (latestDoc.type === 'guide') {
-      productUrl = `https://www.clickys.in/guides/${latestDoc.uid}`;
     } else if (latestDoc.type.includes('product')) {
       productUrl = `https://www.clickys.in/products/${latestDoc.uid}`;
     }
@@ -178,17 +176,22 @@ export async function POST(req) {
             </div>
             <div style="padding: 30px;">
               <h2 style="color: #333;">${docTitle}</h2>
-              ${productImage ? `<img src="${productImage}" alt="${docTitle}" style="display: block; max-width: 80%; max-height: 250px; margin: 0 auto 20px auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(249, 115, 22, 0.25); border: 2px solid #f97316; object-fit: contain;" />` : ''}
+              ${productImage ? `<img src="${productImage}" alt="${docTitle}" style="display: block; width: 100%; height: auto; max-height: 400px; margin: 0 auto 20px auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(249, 115, 22, 0.25); border: 2px solid #f97316; object-fit: cover;" />` : ''}
               <p style="color: #666; font-size: 16px; line-height: 1.6;">${productExcerpt}</p>
               <div style="text-align: center; margin-top: 30px;">
-                <a href="${productUrl}" style="background-color: #f97316; color: white; padding: 12px 25px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block;">
+                <a href="${productUrl}" style="background-color: #f97316; color: white; padding: 14px 30px; font-size: 16px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block;">
                   View on Clickys
                 </a>
               </div>
             </div>
-            <div style="background-color: #f8fafc; padding: 20px; text-align: center; color: #999; font-size: 12px;">
-              <p>You're receiving this because you subscribed to Clickys updates.</p>
-              <p>&copy; ${new Date().getFullYear()} Clickys. All rights reserved.</p>
+            <div style="background-color: #f8fafc; padding: 30px 20px; text-align: center; color: #999; font-size: 13px;">
+              <div style="margin-bottom: 20px;">
+                <a href="https://www.facebook.com/clickyse/" style="color: #64748b; font-weight: bold; text-decoration: none; margin: 0 12px; letter-spacing: 0.5px;">Facebook</a>
+                <a href="https://www.instagram.com/_clickyse?igsh=bjV3YnZ6OG80MHNq" style="color: #64748b; font-weight: bold; text-decoration: none; margin: 0 12px; letter-spacing: 0.5px;">Instagram</a>
+                <a href="https://www.amazon.in/shop/clickyse" style="color: #64748b; font-weight: bold; text-decoration: none; margin: 0 12px; letter-spacing: 0.5px;">Amazon</a>
+              </div>
+              <p style="margin-bottom: 10px;">You're receiving this because you subscribed to Clickys updates.</p>
+              <p style="margin: 0;">&copy; ${new Date().getFullYear()} Clickys. All rights reserved.</p>
             </div>
           </div>
         </body>

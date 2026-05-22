@@ -168,7 +168,7 @@ const fallbackLaunches = [
   }
 ];
 
-export const dynamic = 'force-dynamic'; // TEMPORARY cache bypass
+export const revalidate = 43200; // 12 hours cache
 
 export async function GET() {
   if (!ai) {

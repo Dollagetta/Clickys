@@ -2,6 +2,9 @@ import ProductsPage from './ProductsPage';
 import {products} from '../../components/products'
 import { Suspense } from 'react';
 import { ProductGridSkeleton } from '../../components/ProductGridSkeleton';
+import { createClient } from '../../prismicio';
+import { SliceZone } from '@prismicio/react';
+import { components } from '../../slices';
 
 /*export const metadata = {
   title: "Amazon Products | Best Deals on Clickys.in",

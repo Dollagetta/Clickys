@@ -101,12 +101,12 @@ The variables typically required are:
 
 ---
 
-## 📚 4. Updating Shopping Guides
+## 📚 4. Updating What's New
 
-Guides are pulled from **Prismic CMS** but use a fallback logic in `/components/guides.js`. 
+What's New articles are pulled from **Prismic CMS** but use a fallback logic in `/components/guides.js`. 
 
-### Managing Hardcoded Guides (`/components/guides.js`)
-If the Prismic fetch fails or if you want to add static guides, add them here. The reading time tag on the UI is automatically calculated from the content's word count!
+### Managing Hardcoded Updates (`/components/guides.js`)
+If the Prismic fetch fails or if you want to add static updates, add them here. The reading time tag on the UI is automatically calculated from the content's word count!
 
 ```javascript
 // File: /components/guides.js

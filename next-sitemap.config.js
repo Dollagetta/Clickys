@@ -20,7 +20,6 @@ module.exports = {
       
       // Fetch multiple types of documents using Promise.allSettled to handle missing types safely
       const results = await Promise.allSettled([
-        client.getAllByType("guide"),
         client.getAllByType("product"),
         client.getAllByType("whatsnew"),
         client.getAllByType("deal"),
@@ -37,9 +36,7 @@ module.exports = {
     const paths = [];
     prismicDocs.forEach(doc => {
       let routePrefix = '';
-      if (doc.type === 'guide') {
-        routePrefix = '/guides';
-      } else if (doc.type === 'product') {
+      if (doc.type === 'product') {
         routePrefix = '/products';
       } else if (doc.type === 'whatsnew') {
         routePrefix = '/whats-new';

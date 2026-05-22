@@ -39,7 +39,7 @@ const Navbar = () => {
     { href: "/", label: "Home" },
     { href: "/products", label: "Products" }, // Example, adjust routes as needed
     { href: "/deals", label: "Hot Deals" },
-    { href: "/guides", label: "Guides" },   // Example
+    { href: "/whats-new", label: "What's New" },   // Example
     { href: "/about", label: "About Us" },
     { href: "/contact", label: "Contact Us" },
   ];
@@ -53,8 +53,9 @@ const Navbar = () => {
     >
       <div className={`container ${styles.navContainer}`}>
         {/* Logo */}
-        <Link href="/" className={styles.logo}>
-          Affiliate<span className={styles.logoAccent}>Aura</span>
+        <Link href="/" className={`group ${styles.logo} flex items-baseline font-black tracking-tighter`} style={{ textDecoration: 'none' }}>
+           <span className="text-green-600 transition-colors duration-300 group-hover:text-green-500 text-[40px]">click</span>
+           <span className="text-[#f9c616] transition-colors duration-300 group-hover:text-orange-400 text-3xl">ys</span>
         </Link>
 
         {/* Desktop Navigation */}
