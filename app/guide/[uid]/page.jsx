@@ -19,9 +19,33 @@ export async function generateMetadata({ params }) {
   // Assuming the first Guide slice has the primary title
   const firstGuideSlice = guide.data.slices.find(s => s.slice_type === 'guide');
   const title = firstGuideSlice?.primary?.title || "Buying Guide";
+  // Extract a description (first snippet of rich text)
+  const descriptionText = firstGuideSlice?.primary?.description?.[0]?.text || "Check out our latest buying guide, tips, and recommendations on Clickys.";
+  const imageUrl = firstGuideSlice?.primary?.image?.url || "https://www.clickys.in/images/clickysbg.png"; // fallback image
 
   return {
     title: `${title} | Clickys`,
+    description: descriptionText,
+    openGraph: {
+      title: `${title} | Clickys`,
+      description: descriptionText,
+      url: `https://www.clickys.in/guide/${uid}`,
+      siteName: 'Clickys',
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+        },
+      ],
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${title} | Clickys`,
+      description: descriptionText,
+      images: [imageUrl],
+    },
   };
 }
 

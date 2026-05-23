@@ -35,39 +35,71 @@ export async function POST(req) {
       let message = '';
       let link = `https://www.clickys.in`; // Base fallback
 
+      let urlPath = '';
+      let imageUrl = null;
+
       // Handle different content types from Prismic
-      if (doc.type === 'product' || doc.type === 'whatsnew') {
-        const title = doc.data?.title?.[0]?.text || doc.data?.productname || 'Check out our new pick!';
-        // Prismic typically stores descriptions or excerpts
-        const description = doc.data?.excerpt || doc.data?.description?.[0]?.text || '';
+      if (doc.type === 'product' || doc.type === 'whatsnew' || doc.type === 'deals') {
+        const rawTitle = doc.data?.title || doc.data?.productname || doc.data?.dealname;
+        const title = typeof rawTitle === 'string' ? rawTitle : rawTitle?.[0]?.text || 'Check out our new pick!';
         
-        let urlPath = '';
+        const rawDesc = doc.data?.description || doc.data?.excerpt;
+        const description = typeof rawDesc === 'string' ? rawDesc : rawDesc?.[0]?.text || '';
+        
         if (doc.type === 'product') {
           urlPath = `/products/${doc.uid}`;
+          imageUrl = doc.data?.image?.url;
         } else if (doc.type === 'whatsnew') {
           urlPath = `/whats-new/${doc.uid}`;
+          // whatsnew usually uses slices for images
+          const sliceImage = doc.data?.slices?.find(s => s.slice_type === 'the_shopping_grid')?.primary?.the_items?.[0]?.product_image?.url 
+                          || doc.data?.slices?.find(s => s.slice_type === 'the_shopping_grid')?.items?.[0]?.product_image?.url;
+          imageUrl = doc.data?.image?.url || sliceImage;
+        } else if (doc.type === 'deals') {
+          urlPath = `/deals/${doc.uid}`;
+          imageUrl = doc.data?.image?.url; // Fallback
         }
 
         message = `✨ ${title}\n\n${description}\n\nShop now: `;
         link = `https://www.clickys.in${urlPath}`;
       } else if (doc.type === 'guide' || doc.type === 'sliceguide1') {
-        const title = doc.data?.title?.[0]?.text || 'New Guide Available';
-        message = `📚 ${title}\n\nRead our latest guide here: `;
+        const guideSlice = doc.data?.slices?.find(s => s.slice_type === 'guide');
+        
+        const rawTitle = guideSlice?.primary?.title || doc.data?.title;
+        const title = typeof rawTitle === 'string' ? rawTitle : rawTitle?.[0]?.text || 'New Guide Available';
+        
+        const rawDesc = guideSlice?.primary?.description || doc.data?.description;
+        const descriptionExtracted = typeof rawDesc === 'string' ? rawDesc : rawDesc?.[0]?.text || '';
+        const descriptionText = descriptionExtracted ? `\n\n${descriptionExtracted.substring(0, 150)}...` : '';
+        
+        imageUrl = guideSlice?.primary?.image?.url || doc.data?.image?.url;
+        
+        message = `📚 ${title}${descriptionText}\n\nRead our latest guide here: `;
         link = `https://www.clickys.in/guide/${doc.uid}`;
       } else {
         continue; // Skip unrecognized types
       }
 
-      // We append the URL into the message, but we can also use Facebook's "link" parameter
-      const graphApiUrl = `https://graph.facebook.com/v20.0/${FACEBOOK_PAGE_ID}/feed`;
+      // We append the URL into the message so it's clickable
+      const finalMessage = `${message}\n${link}`;
       
-      const payload = {
-        message: message,
-        link: link,
+      let graphApiEndpoint = `https://graph.facebook.com/v20.0/${FACEBOOK_PAGE_ID}/feed`;
+      let payload = {
+        message: finalMessage,
         access_token: FACEBOOK_ACCESS_TOKEN
       };
 
-      const res = await fetch(graphApiUrl, {
+      // If we found an image, use the /photos endpoint instead to guarantee a rich image preview
+      if (imageUrl) {
+        graphApiEndpoint = `https://graph.facebook.com/v20.0/${FACEBOOK_PAGE_ID}/photos`;
+        payload.url = imageUrl;
+      } else {
+        // Fallback to standard link post
+        payload.link = link;
+        payload.message = message; // Keep original message structure when using native 'link'
+      }
+
+      const res = await fetch(graphApiEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
