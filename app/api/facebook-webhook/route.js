@@ -75,13 +75,21 @@ export async function POST(req) {
         imageUrl = guideSlice?.primary?.image?.url || doc.data?.image?.url;
         
         message = `${title}${descriptionText}\n\nRead our latest guide here: `;
-        link = `https://www.clickys.in/guide`;
+        link = `https://www.clickys.in/deals`;
       } else {
         continue; // Skip unrecognized types
       }
 
+      // Extract tags
+      let hashtagsArray = ['#clickys', '#Amazon', '#Ad'];
+      if (doc.tags && Array.isArray(doc.tags) && doc.tags.length > 0) {
+        const prismicTags = doc.tags.slice(0, 2).map(tag => `#${tag.split(' ').join('')}`);
+        hashtagsArray.push(...prismicTags);
+      }
+      const hashtags = '\n\n' + hashtagsArray.join(' ');
+
       // We append the URL into the message so it's clickable
-      const finalMessage = `${message}\n${link}`;
+      const finalMessage = `${message}\n${link}${hashtags}`;
       
       let graphApiEndpoint = `https://graph.facebook.com/v20.0/${FACEBOOK_PAGE_ID}/feed`;
       let payload = {
@@ -96,7 +104,7 @@ export async function POST(req) {
       } else {
         // Fallback to standard link post
         payload.link = link;
-        payload.message = message; // Keep original message structure when using native 'link'
+        payload.message = `${message}${hashtags}`; // Keep original message structure when using native 'link'
       }
 
       const res = await fetch(graphApiEndpoint, {
