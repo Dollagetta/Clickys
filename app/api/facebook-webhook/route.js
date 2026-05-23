@@ -43,7 +43,7 @@ export async function POST(req) {
         
         let urlPath = '';
         if (doc.type === 'product') {
-          urlPath = `/finds/${doc.uid}`;
+          urlPath = `/products/${doc.uid}`;
         } else if (doc.type === 'whatsnew') {
           urlPath = `/whats-new/${doc.uid}`;
         }
@@ -76,7 +76,12 @@ export async function POST(req) {
       const fbData = await res.json();
       if (!res.ok) {
         console.error('Facebook Graph API Error:', fbData);
-        continue;
+        // Return the exact Graph build error so it shows up in Prismic Webhook UI
+        return NextResponse.json({ 
+          message: 'Facebook Graph API Error', 
+          error: fbData,
+          attemptedPayload: payload 
+        }, { status: 400 });
       }
       
       postedCount++;
