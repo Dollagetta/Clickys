@@ -1,64 +1,480 @@
 "use client";
 
-import { useState } from 'react';
-import AIShopperClient from './AIShopperClient';
-import PriceTracker from './PriceTracker';
-import ProductComparator from './ProductComparator';
+import { useState, useEffect } from 'react';
+import { FiX, FiSearch, FiCheckCircle, FiLoader } from 'react-icons/fi';
+import { createClient } from '../prismicio';
+import * as prismic from '@prismicio/client';
+import ProductCard from './ProductCard';
 
 export default function SmartShopFeatures() {
-  const [activeMode, setActiveMode] = useState('chat'); // 'chat' | 'track' | 'compare'
+  const [activeModal, setActiveModal] = useState(null); // 'gift' | 'track' | 'compare'
+
+  // --- Gift Finder State ---
+  const [giftStep, setGiftStep] = useState(1);
+  const [giftData, setGiftData] = useState({
+    gender: '',
+    relationship: '',
+    otherRelationship: '',
+    occasion: '',
+    otherOccasion: '',
+    budgetMax: '',
+  });
+  const [giftResults, setGiftResults] = useState([]);
+  const [giftLoading, setGiftLoading] = useState(false);
+  const [giftContact, setGiftContact] = useState('');
+  const [giftContactSubmitted, setGiftContactSubmitted] = useState(false);
+
+  // --- Track Price State ---
+  const [trackData, setTrackData] = useState({
+    productName: '',
+    expectedRange: '',
+    contact: ''
+  });
+  const [trackSubmitted, setTrackSubmitted] = useState(false);
+
+  // --- Compare Products State ---
+  const [compareQuery, setCompareQuery] = useState('');
+  const [compareResults, setCompareResults] = useState([]);
+  const [compareLoading, setCompareLoading] = useState(false);
+  const [selectedToCompare, setSelectedToCompare] = useState([]);
+  const [isComparing, setIsComparing] = useState(false);
+
+  // Modals Close Handler
+  const closeModal = () => {
+    setActiveModal(null);
+    // reseting states
+    setGiftStep(1);
+    setGiftResults([]);
+    setGiftContactSubmitted(false);
+    setTrackSubmitted(false);
+    setTrackData({ productName: '', expectedRange: '', contact: '' });
+    setCompareQuery('');
+    setCompareResults([]);
+    setSelectedToCompare([]);
+    setIsComparing(false);
+  };
+
+  // --- GIFT FINDER LOGIC ---
+  const handleGiftSubmit = async () => {
+    setGiftStep(5);
+    setGiftLoading(true);
+    try {
+      const client = createClient();
+      // Search keywords combining occasion and gender
+      const q = `${giftData.occasion} ${giftData.gender}`.trim();
+      const prismicRes = await client.getAllByType('product', {
+        orderings: [{ field: 'document.first_publication_date', direction: 'desc' }]
+      });
+
+      // Filter locally in JS to find matches (naive search for demonstration)
+      const matching = prismicRes.filter(p => {
+        const title = p.data.title?.toLowerCase() || '';
+        const desc = p.data.description?.toLowerCase() || '';
+        const searchTerms = [
+          giftData.gender.toLowerCase(),
+          giftData.relationship.toLowerCase() === 'other' ? giftData.otherRelationship.toLowerCase() : giftData.relationship.toLowerCase(),
+          giftData.occasion.toLowerCase() === 'other' ? giftData.otherOccasion.toLowerCase() : giftData.occasion.toLowerCase()
+        ];
+        
+        let matchScore = 0;
+        searchTerms.forEach(term => {
+          if (term && (title.includes(term) || desc.includes(term))) {
+            matchScore++;
+          }
+        });
+
+        const priceNum = p.data.price ? parseFloat(p.data.price.replace(/[^0-9.]/g, '')) : Infinity;
+        const budgetAllowed = giftData.budgetMax ? parseFloat(giftData.budgetMax) : Infinity;
+
+        return matchScore > 0 && priceNum <= budgetAllowed;
+      });
+
+      setGiftResults(matching.slice(0, 6));
+    } catch (e) {
+      console.error(e);
+      setGiftResults([]);
+    } finally {
+      setGiftLoading(false);
+    }
+  };
+
+  const handleGiftContactSubmit = (e) => {
+    e.preventDefault();
+    setGiftContactSubmitted(true);
+  };
+
+  // --- TRACK PRICE LOGIC ---
+  const handleTrackSubmit = (e) => {
+    e.preventDefault();
+    setTrackSubmitted(true);
+  };
+
+  // --- COMPARE LOGIC ---
+  const handleCompareSearch = async (e) => {
+    e.preventDefault();
+    if (!compareQuery.trim()) return;
+    setCompareLoading(true);
+    try {
+      const client = createClient();
+      const res = await client.getAllByType('product', {
+        predicates: [prismic.predicate.fulltext('my.product.title', compareQuery)]
+      });
+      setCompareResults(res.slice(0, 6));
+    } catch(err) {
+      console.error(err);
+    } finally {
+      setCompareLoading(false);
+    }
+  };
+
+  const toggleCompareSelect = (product) => {
+    if (selectedToCompare.find(p => p.id === product.id)) {
+      setSelectedToCompare(prev => prev.filter(p => p.id !== product.id));
+    } else {
+      if (selectedToCompare.length < 3) {
+        setSelectedToCompare(prev => [...prev, product]);
+      }
+    }
+  };
 
   return (
     <>
-      <div className="flex overflow-x-auto pb-6 -mx-4 px-4 snap-x snap-mandatory gap-4 md:grid md:grid-cols-3 md:gap-6 md:mx-0 md:px-0 md:overflow-visible md:pb-0 mb-12 sm:mb-16 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+      <div className="flex overflow-x-auto pb-6 -mx-4 px-4 snap-x snap-mandatory gap-4 md:grid md:grid-cols-3 md:gap-6 md:mx-0 md:px-0 md:overflow-visible md:pb-0 mb-8 sm:mb-16 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
         {/* Card 1: Buy a Gift */}
-        <div className="w-[75vw] sm:w-[280px] md:w-full shrink-0 snap-center group relative rounded-[24px] p-[1px] bg-gradient-to-b from-orange-400/40 to-orange-500/40 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_30px_-10px_rgba(249,115,22,0.3)] cursor-pointer" onClick={() => setActiveMode('chat')}>
-          <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-amber-500 rounded-[24px] blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
-          <div className="relative h-full w-full bg-white/80 backdrop-blur-xl rounded-[23px] overflow-hidden p-5 flex flex-col gap-2 border border-white/50 shadow-md transition-colors duration-300 group-hover:bg-white/95">
-            <h2 className="text-xl font-bold tracking-tight text-gray-900 group-hover:text-orange-600 transition-colors duration-300">Buy a Gift</h2>
-            <p className="text-gray-600 flex-grow text-sm">
-              Find the perfect gift in seconds.
+        <div className="w-[75vw] sm:w-[280px] md:w-full shrink-0 snap-center rounded-[24px] overflow-hidden bg-white shadow-lg border border-orange-100 flex flex-col transition-transform duration-300 hover:shadow-xl cursor-pointer hover:-translate-y-1" onClick={() => setActiveModal('gift')}>
+          <div className="h-2 w-full bg-gradient-to-r from-orange-400 to-amber-500"></div>
+          <div className="p-5 flex flex-col gap-2 flex-grow items-center justify-center text-center">
+            <h2 className="text-xl font-bold tracking-tight text-gray-900 mb-2">Find a Gift</h2>
+            <p className="text-gray-600 text-sm mb-4">
+              Step-by-step gift finder to get the perfect match.
             </p>
-            <button className={`inline-flex items-center justify-center w-full px-5 py-2.5 mt-3 text-sm font-bold transition-all duration-300 border border-transparent rounded-full ${activeMode === 'chat' ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg' : 'bg-gray-900 text-white hover:bg-gradient-to-r hover:from-orange-500 hover:to-amber-500'}`}>
-              Start Gift Finder
+            <button className="bg-orange-500 text-white rounded-full px-6 py-2 text-sm font-bold hover:bg-orange-600 transition-colors w-full">
+              Let's Go
             </button>
           </div>
         </div>
         
         {/* Card 2: Track Price */}
-        <div className="w-[75vw] sm:w-[280px] md:w-full shrink-0 snap-center group relative rounded-[24px] p-[1px] bg-gradient-to-b from-emerald-400/40 to-green-500/40 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_30px_-10px_rgba(16,185,129,0.3)] cursor-pointer" onClick={() => setActiveMode('track')}>
-          <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-green-500 rounded-[24px] blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
-          <div className="relative h-full w-full bg-white/80 backdrop-blur-xl rounded-[23px] overflow-hidden p-5 flex flex-col gap-2 border border-white/50 shadow-md transition-colors duration-300 group-hover:bg-white/95">
-            <h2 className="text-xl font-bold tracking-tight text-gray-900 group-hover:text-emerald-600 transition-colors duration-300">Track Price</h2>
-            <p className="text-gray-600 flex-grow text-sm">
-              Get price drop alerts instantly.
+        <div className="w-[75vw] sm:w-[280px] md:w-full shrink-0 snap-center rounded-[24px] overflow-hidden bg-white shadow-lg border border-emerald-100 flex flex-col transition-transform duration-300 hover:shadow-xl cursor-pointer hover:-translate-y-1" onClick={() => setActiveModal('track')}>
+          <div className="h-2 w-full bg-gradient-to-r from-emerald-400 to-green-500"></div>
+          <div className="p-5 flex flex-col gap-2 flex-grow items-center justify-center text-center">
+            <h2 className="text-xl font-bold tracking-tight text-gray-900 mb-2">Track Price</h2>
+            <p className="text-gray-600 text-sm mb-4">
+              Get price drop alerts straight to your WhatsApp/Email.
             </p>
-            <button className={`inline-flex items-center justify-center w-full px-5 py-2.5 mt-3 text-sm font-bold transition-all duration-300 border border-transparent rounded-full ${activeMode === 'track' ? 'bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-lg' : 'bg-gray-900 text-white hover:bg-gradient-to-r hover:from-emerald-500 hover:to-green-500'}`}>
-              Set Price Alert
+            <button className="bg-emerald-500 text-white rounded-full px-6 py-2 text-sm font-bold hover:bg-emerald-600 transition-colors w-full">
+              Set Alert
             </button>
           </div>
         </div>
 
         {/* Card 3: Compare Price */}
-        <div className="w-[75vw] sm:w-[280px] md:w-full shrink-0 snap-center group relative rounded-[24px] p-[1px] bg-gradient-to-b from-orange-400/40 to-green-400/40 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_30px_-10px_rgba(249,115,22,0.3)] cursor-pointer" onClick={() => setActiveMode('compare')}>
-          <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-green-500 rounded-[24px] blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
-          <div className="relative h-full w-full bg-white/80 backdrop-blur-xl rounded-[23px] overflow-hidden p-5 flex flex-col gap-2 border border-white/50 shadow-md transition-colors duration-300 group-hover:bg-white/95">
-            <h2 className="text-xl font-bold tracking-tight text-gray-900 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-orange-600 group-hover:to-green-600 transition-all duration-300">Compare Price</h2>
-            <p className="text-gray-600 flex-grow text-sm">
-              Find the best deal across stores.
+        <div className="w-[75vw] sm:w-[280px] md:w-full shrink-0 snap-center rounded-[24px] overflow-hidden bg-white shadow-lg border border-blue-100 flex flex-col transition-transform duration-300 hover:shadow-xl cursor-pointer hover:-translate-y-1" onClick={() => setActiveModal('compare')}>
+          <div className="h-2 w-full bg-gradient-to-r from-blue-400 to-indigo-500"></div>
+          <div className="p-5 flex flex-col gap-2 flex-grow items-center justify-center text-center">
+            <h2 className="text-xl font-bold tracking-tight text-gray-900 mb-2">Compare Products</h2>
+            <p className="text-gray-600 text-sm mb-4">
+              Compare up to 3 products side-by-side to find the best deal.
             </p>
-            <button className={`inline-flex items-center justify-center w-full px-5 py-2.5 mt-3 text-sm font-bold transition-all duration-300 border border-transparent rounded-full ${activeMode === 'compare' ? 'bg-gradient-to-r from-orange-500 to-green-600 text-white shadow-lg' : 'bg-gray-900 text-white hover:bg-gradient-to-r hover:from-orange-500 hover:to-green-600'}`}>
+            <button className="bg-blue-500 text-white rounded-full px-6 py-2 text-sm font-bold hover:bg-blue-600 transition-colors w-full">
               Compare Now
             </button>
           </div>
         </div>
       </div>
 
-      <div id="active-interface" className="scroll-mt-6">
-        {activeMode === 'chat' && <AIShopperClient />}
-        {activeMode === 'track' && <PriceTracker />}
-        {activeMode === 'compare' && <ProductComparator />}
-      </div>
+      {/* --- OVERLAYS --- */}
+      {activeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-[24px] shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto relative animate-in zoom-in-95 duration-200">
+            <button onClick={closeModal} className="absolute top-4 right-4 p-2 bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 hover:text-gray-900 z-10">
+              <FiX size={20} />
+            </button>
+
+            {/* --- GIFT FINDER UI --- */}
+            {activeModal === 'gift' && (
+              <div className="p-6 md:p-10">
+                <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-900">Gift Finder</h2>
+
+                {/* Step 1: Gender */}
+                {giftStep === 1 && (
+                  <div className="space-y-4 animate-in slide-in-from-right-4">
+                    <h3 className="text-lg font-semibold text-gray-700">What is the gender of the person?</h3>
+                    <div className="flex flex-col gap-3">
+                      {['Male', 'Female', 'Other'].map(opt => (
+                        <button key={opt} onClick={() => { setGiftData({...giftData, gender: opt}); setGiftStep(2); }} className="w-full text-left px-6 py-4 rounded-xl border border-gray-200 hover:border-orange-500 hover:bg-orange-50 transition-colors font-medium">
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 2: Relationship */}
+                {giftStep === 2 && (
+                  <div className="space-y-4 animate-in slide-in-from-right-4">
+                    <h3 className="text-lg font-semibold text-gray-700">What is your relationship to them?</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {['Friend', 'Partner', 'Parent', 'Sibling', 'Colleague'].map(opt => (
+                        <button key={opt} onClick={() => { setGiftData({...giftData, relationship: opt}); setGiftStep(3); }} className="px-6 py-4 rounded-xl border border-gray-200 hover:border-orange-500 hover:bg-orange-50 transition-colors font-medium text-left">
+                          {opt}
+                        </button>
+                      ))}
+                      <div className="sm:col-span-2">
+                        <input type="text" placeholder="Other (please specify)" value={giftData.otherRelationship} onChange={(e) => setGiftData({...giftData, relationship: 'Other', otherRelationship: e.target.value})} className="w-full px-6 py-4 rounded-xl border border-gray-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none" />
+                        {giftData.relationship === 'Other' && giftData.otherRelationship && (
+                          <button onClick={() => setGiftStep(3)} className="mt-3 w-full bg-orange-500 text-white rounded-xl py-3 font-bold hover:bg-orange-600 transition-colors">Next</button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 3: Occasion */}
+                {giftStep === 3 && (
+                  <div className="space-y-4 animate-in slide-in-from-right-4">
+                    <h3 className="text-lg font-semibold text-gray-700">What is the occasion?</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {['Birthday', "Valentine's Day", "Mother's Day", "Father's Day", 'Anniversary', 'Surprise'].map(opt => (
+                        <button key={opt} onClick={() => { setGiftData({...giftData, occasion: opt}); setGiftStep(4); }} className="px-6 py-4 rounded-xl border border-gray-200 hover:border-orange-500 hover:bg-orange-50 transition-colors font-medium text-left">
+                          {opt}
+                        </button>
+                      ))}
+                      <div className="sm:col-span-2">
+                        <input type="text" placeholder="Other (please specify)" value={giftData.otherOccasion} onChange={(e) => setGiftData({...giftData, occasion: 'Other', otherOccasion: e.target.value})} className="w-full px-6 py-4 rounded-xl border border-gray-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none" />
+                        {giftData.occasion === 'Other' && giftData.otherOccasion && (
+                          <button onClick={() => setGiftStep(4)} className="mt-3 w-full bg-orange-500 text-white rounded-xl py-3 font-bold hover:bg-orange-600 transition-colors">Next</button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 4: Budget */}
+                {giftStep === 4 && (
+                  <div className="space-y-4 animate-in slide-in-from-right-4">
+                    <h3 className="text-lg font-semibold text-gray-700">What is your maximum budget? (INR)</h3>
+                    <div className="flex flex-col gap-4">
+                      <input type="number" placeholder="e.g. 2000" value={giftData.budgetMax} onChange={(e) => setGiftData({...giftData, budgetMax: e.target.value})} className="w-full px-6 py-4 rounded-xl border border-gray-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none text-lg" required />
+                      <button onClick={handleGiftSubmit} disabled={!giftData.budgetMax} className="w-full bg-orange-500 text-white rounded-xl py-4 font-bold hover:bg-orange-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed text-lg">
+                        Find Gifts
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 5: Results */}
+                {giftStep === 5 && (
+                  <div className="space-y-6 animate-in slide-in-from-right-4">
+                    {giftLoading ? (
+                      <div className="flex flex-col items-center justify-center py-20 text-orange-500">
+                        <FiLoader className="animate-spin mb-4" size={40} />
+                        <p className="text-gray-600 font-medium">Searching our catalog for the best matches...</p>
+                      </div>
+                    ) : (
+                      <div>
+                        {giftResults.length > 0 ? (
+                          <div>
+                            <h3 className="text-xl font-bold mb-4">We found these gifts for you:</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                              {giftResults.map(p => (
+                                <ProductCard key={p.id} product={{...p.data, id: p.id}} />
+                              ))}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="bg-gray-50 border border-gray-200 rounded-2xl p-8 text-center max-w-lg mx-auto">
+                            {!giftContactSubmitted ? (
+                              <form onSubmit={handleGiftContactSubmit}>
+                                <h3 className="text-xl font-bold text-gray-900 mb-2">Not available right now</h3>
+                                <p className="text-gray-600 mb-6">We couldn't find a perfect match currently. Can you provide your contact for updates regarding the gift?</p>
+                                <input type="text" placeholder="Email or WhatsApp Number" value={giftContact} onChange={e => setGiftContact(e.target.value)} required pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$|^\+?[1-9]\d{1,14}$" title="Please enter a valid email address or phone number" className="w-full px-4 py-3 rounded-lg border border-gray-300 mb-4 focus:ring-2 focus:ring-orange-500 outline-none" />
+                              <div className="flex flex-col gap-4">
+                                <button type="submit" className="bg-orange-500 text-white rounded-lg px-6 py-3 font-bold hover:bg-orange-600 transition-colors w-full">Notify Me</button>
+                                <button type="button" onClick={closeModal} className="text-gray-500 underline font-medium w-full text-center hover:text-gray-700">Back to Home</button>
+                              </div>
+                            </form>
+                          ) : (
+                            <div className="text-green-600 flex flex-col items-center">
+                              <FiCheckCircle size={48} className="mb-4" />
+                              <h3 className="text-xl font-bold mb-2">Thank you!</h3>
+                              <p className="text-gray-600 mb-6">We've saved your details and will alert you the moment we find a matching gift.</p>
+                              <button type="button" onClick={closeModal} className="bg-gray-100 text-gray-700 rounded-lg px-6 py-3 font-bold hover:bg-gray-200 transition-colors">
+                                Back to Home
+                              </button>
+                            </div>
+                          )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* --- TRACK PRICE UI --- */}
+            {activeModal === 'track' && (
+              <div className="p-6 md:p-10">
+                <h2 className="text-2xl md:text-3xl font-bold mb-2 text-gray-900">Track a Price</h2>
+                <p className="text-gray-600 mb-6 border-b pb-6">Enter the product details and we will alert you when it drops to your expected price range.</p>
+
+                {!trackSubmitted ? (
+                  <form onSubmit={handleTrackSubmit} className="space-y-5 animate-in fade-in">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">Product Name or URL</label>
+                      <input type="text" required value={trackData.productName} onChange={e => setTrackData({...trackData, productName: e.target.value})} placeholder="e.g. iPhone 15 Pro Max" className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">Expected Price Maximum (INR)</label>
+                      <input type="number" required value={trackData.expectedRange} onChange={e => setTrackData({...trackData, expectedRange: e.target.value})} placeholder="e.g. 90000" className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">WhatsApp Number or Email</label>
+                      <input type="text" required pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$|^\+?[1-9]\d{1,14}$" title="Please enter a valid email address or phone number" value={trackData.contact} onChange={e => setTrackData({...trackData, contact: e.target.value})} placeholder="Where should we send the alert?" className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      <button type="submit" className="w-full bg-emerald-500 text-white font-bold text-lg py-4 rounded-xl hover:bg-emerald-600 transition-colors mt-4">
+                        Start Tracking
+                      </button>
+                      <button type="button" onClick={closeModal} className="text-gray-500 underline font-medium py-2 hover:text-gray-700 transition">
+                        Back to Home
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="py-12 text-center animate-in zoom-in">
+                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 text-green-500 mb-6">
+                      <FiCheckCircle size={40} />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">Tracking Now</h3>
+                    <p className="text-gray-600 text-lg mb-8">We are keeping an eye on {trackData.productName}. You will be alerted via {trackData.contact}.</p>
+                    <button type="button" onClick={closeModal} className="bg-gray-100 text-gray-700 px-8 py-3 rounded-xl font-bold hover:bg-gray-200 transition">
+                      Back to Home
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* --- COMPARE UI --- */}
+            {activeModal === 'compare' && (
+              <div className="p-6 md:p-10 flex flex-col h-full">
+                <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-900">Compare Products</h2>
+
+                {!isComparing ? (
+                  <div className="flex-grow space-y-6 animate-in fade-in">
+                    <form onSubmit={handleCompareSearch} className="flex gap-2">
+                      <input type="text" placeholder="Search for products in our catalog..." value={compareQuery} onChange={e => setCompareQuery(e.target.value)} className="flex-grow px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none text-lg" required />
+                      <button type="submit" disabled={compareLoading} className="bg-blue-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-600 transition-colors flex items-center justify-center min-w-[100px]">
+                        {compareLoading ? <FiLoader className="animate-spin" /> : 'Search'}
+                      </button>
+                    </form>
+
+                    <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 flex justify-between items-center">
+                      <span className="font-semibold text-blue-900">Selected: {selectedToCompare.length} / 3</span>
+                      <button onClick={() => setIsComparing(true)} disabled={selectedToCompare.length === 0} className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-blue-700 transition">
+                        Compare Now
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+                      {compareResults.map(p => {
+                        const isSelected = selectedToCompare.find(sel => sel.id === p.id);
+                        return (
+                          <div key={p.id} onClick={() => toggleCompareSelect(p)} className={`border-2 rounded-2xl cursor-pointer transition-all ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'}`}>
+                            <div className="pointer-events-none p-4">
+                              <ProductCard product={{...p.data, id: p.id}} />
+                            </div>
+                            <div className="p-4 pt-0 text-center">
+                              <span className={`inline-block px-4 py-2 rounded-full text-sm font-bold ${isSelected ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'}`}>
+                                {isSelected ? 'Selected' : 'Select'}
+                              </span>
+                            </div>
+                          </div>
+                        )
+                      })}
+                      {compareResults.length === 0 && !compareLoading && compareQuery && (
+                        <p className="col-span-full text-center text-gray-500 py-10">No products found matching your search.</p>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="animate-in fade-in">
+                    <div className="flex justify-between items-center mb-6">
+                      <button onClick={() => setIsComparing(false)} className="text-blue-600 font-semibold hover:underline flex items-center">
+                        &larr; Back to select products
+                      </button>
+                      <button onClick={closeModal} className="text-gray-500 font-medium hover:text-gray-900 transition flex items-center gap-2">
+                        Back to Home &times;
+                      </button>
+                    </div>
+                    <div className="overflow-x-auto w-full pb-4">
+                      <table className="w-full min-w-[600px] border-collapse bg-white">
+                        <thead>
+                          <tr>
+                            <th className="p-4 border font-bold text-left bg-gray-50 w-1/4">Features</th>
+                            {selectedToCompare.map(p => (
+                              <th key={p.id} className="p-4 border font-bold text-left bg-gray-50 w-1/4">
+                                {p.data?.title?.substring(0, 30)}...
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td className="p-4 border font-semibold text-gray-700">Image</td>
+                            {selectedToCompare.map(p => (
+                               <td key={p.id} className="p-4 border align-top text-center">
+                                 {p.data?.image?.url ? <img src={p.data.image.url} alt="" className="h-24 object-contain mx-auto" /> : 'No image'}
+                               </td>
+                            ))}
+                          </tr>
+                          <tr>
+                            <td className="p-4 border font-semibold text-gray-700">Price</td>
+                            {selectedToCompare.map(p => (
+                               <td key={p.id} className="p-4 border text-lg font-bold text-green-600">{p.data?.price || 'N/A'}</td>
+                            ))}
+                          </tr>
+                          <tr>
+                            <td className="p-4 border font-semibold text-gray-700">Platform</td>
+                            {selectedToCompare.map(p => (
+                               <td key={p.id} className="p-4 border">{p.data?.platform || 'Amazon'}</td>
+                            ))}
+                          </tr>
+                          <tr>
+                            <td className="p-4 border font-semibold text-gray-700">Discount</td>
+                            {selectedToCompare.map(p => (
+                               <td key={p.id} className="p-4 border">{p.data?.discount || 'None'}</td>
+                            ))}
+                          </tr>
+                          <tr>
+                            <td className="p-4 border font-semibold text-gray-700">Description</td>
+                            {selectedToCompare.map(p => (
+                               <td key={p.id} className="p-4 border text-sm text-gray-600">{p.data?.description?.substring(0, 100)}...</td>
+                            ))}
+                          </tr>
+                          <tr>
+                            <td className="p-4 border font-semibold text-gray-700">Action</td>
+                            {selectedToCompare.map(p => (
+                               <td key={p.id} className="p-4 border">
+                                 <a href={p.data?.link?.url || '#'} target="_blank" className="bg-orange-500 text-white px-4 py-2 rounded font-bold hover:bg-orange-600 block text-center">
+                                   View Deal
+                                 </a>
+                               </td>
+                            ))}
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 }
+
