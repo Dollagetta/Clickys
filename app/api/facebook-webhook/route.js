@@ -47,20 +47,20 @@ export async function POST(req) {
         const description = typeof rawDesc === 'string' ? rawDesc : rawDesc?.[0]?.text || '';
         
         if (doc.type === 'product') {
-          urlPath = `/products/${doc.uid}`;
+          urlPath = `/products`;
           imageUrl = doc.data?.image?.url;
         } else if (doc.type === 'whatsnew') {
-          urlPath = `/whats-new/${doc.uid}`;
+          urlPath = `/whats-new`;
           // whatsnew usually uses slices for images
           const sliceImage = doc.data?.slices?.find(s => s.slice_type === 'the_shopping_grid')?.primary?.the_items?.[0]?.product_image?.url 
                           || doc.data?.slices?.find(s => s.slice_type === 'the_shopping_grid')?.items?.[0]?.product_image?.url;
           imageUrl = doc.data?.image?.url || sliceImage;
         } else if (doc.type === 'deals') {
-          urlPath = `/deals/${doc.uid}`;
+          urlPath = `/deals`;
           imageUrl = doc.data?.image?.url; // Fallback
         }
 
-        message = `✨ ${title}\n\n${description}\n\nShop now: `;
+        message = `${title}\n\n${description}\n\nShop now: `;
         link = `https://www.clickys.in${urlPath}`;
       } else if (doc.type === 'guide' || doc.type === 'sliceguide1') {
         const guideSlice = doc.data?.slices?.find(s => s.slice_type === 'guide');
@@ -74,8 +74,8 @@ export async function POST(req) {
         
         imageUrl = guideSlice?.primary?.image?.url || doc.data?.image?.url;
         
-        message = `📚 ${title}${descriptionText}\n\nRead our latest guide here: `;
-        link = `https://www.clickys.in/guide/${doc.uid}`;
+        message = `${title}${descriptionText}\n\nRead our latest guide here: `;
+        link = `https://www.clickys.in/guide`;
       } else {
         continue; // Skip unrecognized types
       }
