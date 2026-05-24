@@ -38,30 +38,47 @@ export async function POST(req) {
       let urlPath = '';
       let imageUrl = null;
 
+      let categoryForImage = 'Trending';
+      
       // Handle different content types from Prismic
-      if (doc.type === 'product' || doc.type === 'whatsnew' || doc.type === 'deals') {
-        const rawTitle = doc.data?.title || doc.data?.productname || doc.data?.dealname;
+      if (doc.type === 'product') {
+        const rawTitle = doc.data?.title || doc.data?.productname;
         const title = typeof rawTitle === 'string' ? rawTitle : rawTitle?.[0]?.text || 'Check out our new pick!';
-        
         const rawDesc = doc.data?.description || doc.data?.excerpt;
         const description = typeof rawDesc === 'string' ? rawDesc : rawDesc?.[0]?.text || '';
         
-        if (doc.type === 'product') {
-          urlPath = `/products/${doc.uid}`;
-          imageUrl = doc.data?.image?.url;
-        } else if (doc.type === 'whatsnew') {
-          urlPath = `/whats-new/${doc.uid}`;
-          // whatsnew usually uses slices for images
-          const sliceImage = doc.data?.slices?.find(s => s.slice_type === 'the_shopping_grid')?.primary?.the_items?.[0]?.product_image?.url 
-                          || doc.data?.slices?.find(s => s.slice_type === 'the_shopping_grid')?.items?.[0]?.product_image?.url;
-          imageUrl = doc.data?.image?.url || sliceImage;
-        } else if (doc.type === 'deals') {
-          urlPath = `/deals`; // Does deals have a uid page? Fallback
-          imageUrl = doc.data?.image?.url; // Fallback
-        }
-
-        message = `${title}\n\n${description}\n\nShop now: `;
+        urlPath = `/products/${doc.uid}`;
+        imageUrl = doc.data?.image?.url;
         link = `https://www.clickys.in${urlPath}`;
+        message = `${title}\n\n${description}\n\nFind the product here: ${link}`;
+        categoryForImage = 'Product';
+        
+      } else if (doc.type === 'whatsnew') {
+        const rawTitle = doc.data?.title;
+        const title = typeof rawTitle === 'string' ? rawTitle : rawTitle?.[0]?.text || 'Check out our new pick!';
+        const rawDesc = doc.data?.description;
+        const description = typeof rawDesc === 'string' ? rawDesc : rawDesc?.[0]?.text || '';
+        
+        urlPath = `/whats-new/${doc.uid}`;
+        const sliceImage = doc.data?.slices?.find(s => s.slice_type === 'the_shopping_grid')?.primary?.the_items?.[0]?.product_image?.url 
+                        || doc.data?.slices?.find(s => s.slice_type === 'the_shopping_grid')?.items?.[0]?.product_image?.url;
+        imageUrl = doc.data?.image?.url || sliceImage;
+        link = `https://www.clickys.in${urlPath}`;
+        message = `${title}\n\n${description}\n\nFind the product here: ${link}`;
+        categoryForImage = "What's New";
+        
+      } else if (doc.type === 'deals') {
+        const rawTitle = doc.data?.dealname || doc.data?.title;
+        const title = typeof rawTitle === 'string' ? rawTitle : rawTitle?.[0]?.text || 'Check out our new pick!';
+        const rawDesc = doc.data?.description;
+        const description = typeof rawDesc === 'string' ? rawDesc : rawDesc?.[0]?.text || '';
+        
+        urlPath = `/deals`;
+        imageUrl = doc.data?.image?.url;
+        link = `https://www.clickys.in${urlPath}`;
+        message = `${title}\n\n${description}\n\nFind the product here: ${link}`;
+        categoryForImage = "Deals";
+        
       } else if (doc.type === 'guide' || doc.type === 'sliceguide1') {
         const guideSlice = doc.data?.slices?.find(s => s.slice_type === 'guide');
         
@@ -73,9 +90,10 @@ export async function POST(req) {
         const descriptionText = descriptionExtracted ? `\n\n${descriptionExtracted.substring(0, 150)}...` : '';
         
         imageUrl = guideSlice?.primary?.image?.url || doc.data?.image?.url;
-        
-        message = `${title}${descriptionText}\n\nRead our latest guide here: `;
         link = `https://www.clickys.in/guide/${doc.uid}`;
+        message = `${title}${descriptionText}\n\nFind the product here: ${link}`;
+        categoryForImage = "Guide";
+        
       } else {
         continue; // Skip unrecognized types
       }
@@ -88,12 +106,15 @@ export async function POST(req) {
       }
       const hashtags = '\n\n' + hashtagsArray.join(' ');
 
-      // Use the standard /feed endpoint so Facebook can generate a clickable rich preview card 
-      // from the Open Graph tags we added to our pages.
-      const graphApiEndpoint = `https://graph.facebook.com/v20.0/${FACEBOOK_PAGE_ID}/feed`;
+      // Use the /photos endpoint for an image post
+      const rawTitleForOg = message.split('\n')[0];
+      const absoluteOgImage = imageUrl?.startsWith('http') ? imageUrl : (imageUrl ? `https://www.clickys.in${imageUrl}` : 'https://www.clickys.in/images/logosvg.svg');
+      const generatedOgImageUrl = `https://www.clickys.in/api/og?title=${encodeURIComponent(rawTitleForOg)}&category=${encodeURIComponent(categoryForImage)}&image=${encodeURIComponent(absoluteOgImage)}`;
+
+      const graphApiEndpoint = `https://graph.facebook.com/v20.0/${FACEBOOK_PAGE_ID}/photos`;
       const payload = {
         message: `${message}${hashtags}`,
-        link: link,
+        url: generatedOgImageUrl,
         access_token: FACEBOOK_ACCESS_TOKEN
       };
 
