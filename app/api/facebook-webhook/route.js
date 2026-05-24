@@ -88,24 +88,14 @@ export async function POST(req) {
       }
       const hashtags = '\n\n' + hashtagsArray.join(' ');
 
-      // We append the URL into the message so it's clickable
-      const finalMessage = `${message}\n${link}${hashtags}`;
-      
-      let graphApiEndpoint = `https://graph.facebook.com/v20.0/${FACEBOOK_PAGE_ID}/feed`;
-      let payload = {
-        message: finalMessage,
+      // Use the standard /feed endpoint so Facebook can generate a clickable rich preview card 
+      // from the Open Graph tags we added to our pages.
+      const graphApiEndpoint = `https://graph.facebook.com/v20.0/${FACEBOOK_PAGE_ID}/feed`;
+      const payload = {
+        message: `${message}${hashtags}`,
+        link: link,
         access_token: FACEBOOK_ACCESS_TOKEN
       };
-
-      // If we found an image, use the /photos endpoint instead to guarantee a rich image preview
-      if (imageUrl) {
-        graphApiEndpoint = `https://graph.facebook.com/v20.0/${FACEBOOK_PAGE_ID}/photos`;
-        payload.url = imageUrl;
-      } else {
-        // Fallback to standard link post
-        payload.link = link;
-        payload.message = `${message}${hashtags}`; // Keep original message structure when using native 'link'
-      }
 
       const res = await fetch(graphApiEndpoint, {
         method: 'POST',
