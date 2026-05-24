@@ -29,53 +29,20 @@ export default function HomeSearchResults() {
     setIsLoading(true);
     setError(null);
     try {
-      let apiProducts = [];
+      let combined = [];
       try {
-        // For Amazon, if no query, use a generic high-volume term or the category
         const queryParam = (q && q.trim() !== '') ? q : (cat && cat !== 'All' ? cat : 'Trending'); 
-        const amazonRes = await fetch(`/api/amazon/search?q=${encodeURIComponent(queryParam)}`);
-        if (amazonRes.ok) {
-          const data = await amazonRes.json();
-          apiProducts = data.products || [];
+        const searchRes = await fetch(`/api/global-search?q=${encodeURIComponent(queryParam)}`);
+        if (searchRes.ok) {
+          const data = await searchRes.json();
+          combined = data.results || [];
         }
       } catch (err) {
-        console.error('Failed to load Amazon API products', err);
+        console.error('Failed to load global search results', err);
       }
 
-      const client = createClient();
-      const predicates = [prismic.predicate.at('document.type', 'product')];
-      if (q && q.trim() !== '') {
-         predicates.push(prismic.predicate.fulltext('my.product.title', q));
-      }
-      if (cat && cat !== 'All') {
-         predicates.push(prismic.predicate.at('my.product.category', cat));
-      }
-
-      let prismicProducts = [];
-      try {
-        const prismicRes = await client.getAllByType('product', { 
-          predicates,
-          orderings: [{ field: 'document.first_publication_date', direction: 'desc' }]
-        });
-        prismicProducts = prismicRes.map(p => ({
-            id: p.id,
-            name: p.data.title,
-            category: p.data.category || 'General',
-            price: p.data.price,
-            imageUrl: p.data.image,
-            amazonLink: p.data.link?.url,
-            platform: p.data.platform || 'Amazon',
-            rating: 0, 
-            reviewCount: 0,
-            discount: p.data.discount || 0,
-        }));
-      } catch (e) {
-         console.error("Prismic fetch failed", e);
-      }
-
-      let combined = [...apiProducts, ...prismicProducts];
       if (discount > 0) {
-        combined = combined.filter(p => p.discount >= discount);
+        combined = combined.filter(p => (p.discount || 0) >= discount);
       }
       
       if (combined.length === 0) {

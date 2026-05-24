@@ -77,77 +77,18 @@ export default function ProductsPage({ products: initialProductsList = [] }) {
     setIsLoading(true);
     setError(null);
     try {
-      let apiProducts = [];
-      
-      // Use internal products list as baseline
-      const internalBase = initialProductsList.length > 0 ? initialProductsList : [];
-      
-      if (internalBase.length === 0) {
-        try {
-          const mod = await import('../../components/products');
-          apiProducts = mod.products || [];
-        } catch (e) {
-          console.error("Local products failed", e);
-        }
-      } else {
-        apiProducts = internalBase.map(p => ({
-          ...p,
-          platform: p.platform || 'Amazon' // Default to Amazon for local products
-        }));
-      }
-
-      // If a specific query is provided, filter the local products
-      if (query && query !== 'All') {
-        const q = query.toLowerCase();
-        apiProducts = apiProducts.filter(p => 
-          p.name.toLowerCase().includes(q) || 
-          p.category.toLowerCase().includes(q) ||
-          p.platform?.toLowerCase().includes(q)
-        );
-      }
-
-      // Fetch from Prismic
-      const client = createClient();
-      const predicates = [
-        prismic.predicate.at('document.type', 'product')
-      ];
-      
-      if (query && query !== 'All') {
-        predicates.push(prismic.predicate.fulltext('my.product.title', query));
-      }
-
-      let prismicProducts = [];
+      // Fetch from API that combines Amazon + Prismic (all document types)
+      let combined = [];
       try {
-        // Use getAllByType for comprehensive fetching
-        const prismicRes = await client.getAllByType('product', { 
-          predicates,
-          orderings: [{ field: 'document.first_publication_date', direction: 'desc' }]
-        });
-        
-        prismicProducts = prismicRes.map(p => ({
-            id: p.id,
-            name: p.data.title,
-            category: p.data.category || 'General',
-            price: p.data.price,
-            imageUrl: p.data.image,
-            amazonLink: p.data.link?.url,
-            platform: p.data.platform || 'Amazon',
-            rating: 0, 
-            reviewCount: 0,
-            discount: p.data.discount,
-            featuredFind: p.data.featured_find === true,
-            promotionalStatus: p.data.promotional_status || "",
-            availabilityStatus: p.data.availability_status || "",
-        }));
-      } catch(e) {
-        console.error("Prismic fetch failed", e);
+        const queryParam = query || 'All';
+        const searchRes = await fetch(`/api/global-search?q=${encodeURIComponent(queryParam)}`);
+        if (searchRes.ok) {
+          const data = await searchRes.json();
+          combined = data.results || [];
+        }
+      } catch (e) {
+        console.error("Global search failed", e);
       }
-
-      let combined = [...apiProducts, ...prismicProducts];
-
-      // De-duplicate by name or ID if needed, but for now just combine
-      // If we still have nothing and it's a search, maybe fallback to all?
-      // Or just show "No products found" which is better UX for search.
 
       setAllProducts(combined);
       

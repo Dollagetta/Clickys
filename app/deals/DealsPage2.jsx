@@ -67,71 +67,102 @@ function DealsPageContent() {
     const client = createClient(); 
     
     try {
-      // 1. Build Predicates for filtering and searching based on model
-      const predicates = [
-        prismic.predicate.at('document.type', 'product')
-      ];
-      
+      let normalizedProducts = [];
+      let total_pages = 1;
+
       if (searchTerm) {
-        // Using 'data.title' which corresponds to 'Title' field
-        predicates.push(prismic.predicate.fulltext('my.product.title', searchTerm));
-      }
-      if (selectedCategories.length > 0) {
-        // Using 'data.category' which corresponds to 'Category' field
-        predicates.push(prismic.predicate.any('my.product.category', selectedCategories));
-      }
+        // Broad search across the entire site
+        try {
+          const res = await fetch(`/api/global-search?q=${encodeURIComponent(searchTerm)}`);
+          if (res.ok) {
+            const data = await res.json();
+            normalizedProducts = data.results || [];
+            
+            // Apply local advanced filters on the global results
+            if (selectedCategories.length > 0) {
+              normalizedProducts = normalizedProducts.filter(p => selectedCategories.includes(p.category));
+            }
+            if (priceRange.min) {
+              normalizedProducts = normalizedProducts.filter(p => p.price >= Number(priceRange.min));
+            }
+            if (priceRange.max) {
+              normalizedProducts = normalizedProducts.filter(p => p.price <= Number(priceRange.max));
+            }
+            if (minDiscount > 0) {
+              normalizedProducts = normalizedProducts.filter(p => p.discount >= minDiscount);
+            }
+            if (selectedPlatforms.length > 0) {
+              normalizedProducts = normalizedProducts.filter(p => selectedPlatforms.includes(p.platform));
+            }
 
-      // Advanced Filters
-      if (priceRange.min) {
-        predicates.push(prismic.predicate.number.greaterThan('my.product.price', Number(priceRange.min)));
-      }
-      if (priceRange.max) {
-        predicates.push(prismic.predicate.number.lessThan('my.product.price', Number(priceRange.max)));
-      }
-      if (minDiscount > 0) {
-        predicates.push(prismic.predicate.number.greaterThan('my.product.discount', minDiscount));
-      }
-      if (selectedPlatforms.length > 0) {
-        predicates.push(prismic.predicate.any('my.product.platform', selectedPlatforms));
-      }
-
-      // 2. Build Orderings for sorting
-      let orderings = [];
-      if (sortBy === 'price_asc') {
-        // Using 'data.price' which corresponds to your 'Price' field
-        orderings.push({ field: 'my.product.price', direction: 'asc' });
-      } else if (sortBy === 'price_desc') {
-        orderings.push({ field: 'my.product.price', direction: 'desc' });
+            // Client-side sort
+            if (sortBy === 'price_asc') {
+              normalizedProducts.sort((a, b) => a.price - b.price);
+            } else if (sortBy === 'price_desc') {
+              normalizedProducts.sort((a, b) => b.price - a.price);
+            }
+          }
+        } catch (err) {
+          console.error("Global search failed on deals page", err);
+        }
       } else {
-        // Default sort: Newest products first.
-        orderings.push({ field: 'document.first_publication_date', direction: 'desc' });
+        // Standard Prismic filtered search without a strict searchTerm
+        const predicates = [
+          prismic.predicate.at('document.type', 'product')
+        ];
+        
+        if (selectedCategories.length > 0) {
+          predicates.push(prismic.predicate.any('my.product.category', selectedCategories));
+        }
+
+        // Advanced Filters
+        if (priceRange.min) {
+          predicates.push(prismic.predicate.number.greaterThan('my.product.price', Number(priceRange.min)));
+        }
+        if (priceRange.max) {
+          predicates.push(prismic.predicate.number.lessThan('my.product.price', Number(priceRange.max)));
+        }
+        if (minDiscount > 0) {
+          predicates.push(prismic.predicate.number.greaterThan('my.product.discount', minDiscount));
+        }
+        if (selectedPlatforms.length > 0) {
+          predicates.push(prismic.predicate.any('my.product.platform', selectedPlatforms));
+        }
+
+        let orderings = [];
+        if (sortBy === 'price_asc') {
+          orderings.push({ field: 'my.product.price', direction: 'asc' });
+        } else if (sortBy === 'price_desc') {
+          orderings.push({ field: 'my.product.price', direction: 'desc' });
+        } else {
+          orderings.push({ field: 'document.first_publication_date', direction: 'desc' });
+        }
+
+        const response = await client.get({
+          predicates,
+          orderings,
+          page: currentPage,
+          pageSize: itemsPerPage,
+        });
+
+        total_pages = response.total_pages;
+
+        normalizedProducts = response.results.map(p => ({
+            id: p.id,
+            name: p.data.title,
+            category: p.data.category,
+            price: p.data.price,
+            imageUrl: p.data.image,
+            amazonLink: p.data.link?.url,
+            platform: p.data.platform,
+            rating: 0, 
+            reviewCount: 0,
+            discount: p.data.discount,
+        }));
       }
-
-      // 3. Fetch data from Prismic
-      const response = await client.get({
-        predicates,
-        orderings,
-        page: currentPage,
-        pageSize: itemsPerPage,
-      });
-
-      // 4. Normalize the data structure to match your component's expected props
-      const normalizedProducts = response.results.map(p => ({
-          id: p.id,
-          name: p.data.title, // from 'Title' field
-          category: p.data.category, // from 'Category' field
-          price: p.data.price, // from 'Price' field
-          imageUrl: p.data.image, // from 'image' field .url?
-          amazonLink: p.data.link?.url, // from 'link' field
-          platform: p.data.platform, // from 'Platform' field
-          // Assuming rating and reviewCount are not in your Prismic model based on the image
-          rating: 0, 
-          reviewCount: 0,
-          discount: p.data.discount,
-      }));
 
       setProducts(normalizedProducts);
-      setTotalPages(response.total_pages);
+      setTotalPages(total_pages);
 
     } catch (err) {
       setError("We couldn't load the deals right now. Please try again later.");

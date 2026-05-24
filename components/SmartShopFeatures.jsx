@@ -68,50 +68,19 @@ export default function SmartShopFeatures() {
     setGiftStep(5);
     setGiftLoading(true);
     try {
-      const client = createClient();
-      // Search keywords combining occasion and gender
       const q = `${giftData.occasion} ${giftData.gender}`.trim();
-      const prismicRes = await client.getAllByType('product', {
-        orderings: [{ field: 'document.first_publication_date', direction: 'desc' }]
+      const res = await fetch(`/api/global-search?q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      
+      let matching = data.results || [];
+      const budgetAllowed = giftData.budgetMax ? parseFloat(giftData.budgetMax) : Infinity;
+      
+      matching = matching.filter(p => {
+        const priceNum = typeof p.price === 'string' ? parseFloat(p.price.replace(/[^0-9.]/g, '')) : (p.price || 0);
+        return priceNum <= budgetAllowed;
       });
 
-      // Filter locally in JS to find matches (naive search for demonstration)
-      const matching = prismicRes.filter(p => {
-        const title = p.data.title?.toLowerCase() || '';
-        const desc = p.data.description?.toLowerCase() || '';
-        const searchTerms = [
-          giftData.gender.toLowerCase(),
-          giftData.relationship.toLowerCase() === 'other' ? giftData.otherRelationship.toLowerCase() : giftData.relationship.toLowerCase(),
-          giftData.occasion.toLowerCase() === 'other' ? giftData.otherOccasion.toLowerCase() : giftData.occasion.toLowerCase()
-        ];
-        
-        let matchScore = 0;
-        searchTerms.forEach(term => {
-          if (term && (title.includes(term) || desc.includes(term))) {
-            matchScore++;
-          }
-        });
-
-        const priceNum = p.data.price ? parseFloat(p.data.price.replace(/[^0-9.]/g, '')) : Infinity;
-        const budgetAllowed = giftData.budgetMax ? parseFloat(giftData.budgetMax) : Infinity;
-
-        return matchScore > 0 && priceNum <= budgetAllowed;
-      });
-
-      const mappedMatching = matching.slice(0, 6).map(p => ({
-        id: p.id,
-        name: p.data?.title,
-        category: p.data?.category || 'General',
-        price: p.data?.price,
-        imageUrl: p.data?.image,
-        amazonLink: p.data?.link?.url,
-        platform: p.data?.platform || 'Amazon',
-        discount: p.data?.discount,
-        description: p.data?.description,
-        data: p.data
-      }));
-
-      setGiftResults(mappedMatching);
+      setGiftResults(matching.slice(0, 6));
     } catch (e) {
       console.error(e);
       setGiftResults([]);
@@ -142,23 +111,9 @@ export default function SmartShopFeatures() {
     if (!trackSearchQuery.trim()) return;
     setTrackLoading(true);
     try {
-      const client = createClient();
-      const res = await client.getAllByType('product', {
-        filters: [prismic.filter.fulltext('my.product.title', trackSearchQuery)]
-      });
-      const mapped = res.slice(0, 6).map(p => ({
-        id: p.id,
-        name: p.data?.title,
-        category: p.data?.category || 'General',
-        price: p.data?.price,
-        imageUrl: p.data?.image,
-        amazonLink: p.data?.link?.url,
-        platform: p.data?.platform || 'Amazon',
-        discount: p.data?.discount,
-        description: p.data?.description,
-        data: p.data
-      }));
-      setTrackSearchResults(mapped);
+      const res = await fetch(`/api/global-search?q=${encodeURIComponent(trackSearchQuery)}`);
+      const data = await res.json();
+      setTrackSearchResults((data.results || []).slice(0, 6));
     } catch(err) {
       console.error(err);
     } finally {
@@ -181,23 +136,9 @@ export default function SmartShopFeatures() {
     if (!compareQuery.trim()) return;
     setCompareLoading(true);
     try {
-      const client = createClient();
-      const res = await client.getAllByType('product', {
-        filters: [prismic.filter.fulltext('my.product.title', compareQuery)]
-      });
-      const mapped = res.slice(0, 6).map(p => ({
-        id: p.id,
-        name: p.data?.title,
-        category: p.data?.category || 'General',
-        price: p.data?.price,
-        imageUrl: p.data?.image,
-        amazonLink: p.data?.link?.url,
-        platform: p.data?.platform || 'Amazon',
-        discount: p.data?.discount,
-        description: p.data?.description,
-        data: p.data // keep raw data for comparison table
-      }));
-      setCompareResults(mapped);
+      const res = await fetch(`/api/global-search?q=${encodeURIComponent(compareQuery)}`);
+      const data = await res.json();
+      setCompareResults((data.results || []).slice(0, 6));
     } catch(err) {
       console.error(err);
     } finally {
