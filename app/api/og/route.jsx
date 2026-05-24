@@ -6,11 +6,7 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
 
-    const titleStr = searchParams.get('title') || 'Discover Top Picks & Deals';
-    // Trim title if it's too long
-    const title = titleStr.length > 70 ? titleStr.substring(0, 70) + '...' : titleStr;
-    const category = searchParams.get('category') || 'Trending';
-    const image = searchParams.get('image'); 
+    const image = searchParams.get('image');
 
     return new ImageResponse(
       (
@@ -19,95 +15,62 @@ export async function GET(request) {
             height: '100%',
             width: '100%',
             display: 'flex',
-            flexDirection: 'row',
-            backgroundColor: '#ffffff',
-            backgroundImage: 'linear-gradient(135deg, #f0fdf4 0%, #e0e7ff 100%)',
+            backgroundColor: '#ff8c00',
+            backgroundImage: 'linear-gradient(135deg, #ff9f1c 0%, #ff5200 100%)',
             fontFamily: 'sans-serif',
+            padding: '40px',
+            position: 'relative'
           }}
         >
-          {/* Left Side Content */}
           <div
             style={{
               display: 'flex',
-              flexDirection: 'column',
+              width: '100%',
+              height: '100%',
+              backgroundColor: '#ffffff',
+              borderRadius: '24px',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              overflow: 'hidden',
               justifyContent: 'center',
-              alignItems: 'flex-start',
-              width: '50%',
-              padding: '60px',
-              gap: '24px',
+              alignItems: 'center',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-              <div 
-                style={{ 
-                  display: 'flex',
-                  color: '#16a34a',
-                  fontWeight: 'bold',
-                  fontSize: '32px',
-                  letterSpacing: '-1px'
+            {image ? (
+              <img
+                src={image}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
                 }}
-              >
-                Clickys
-              </div>
-              <div style={{ display: 'flex', padding: '6px 16px', background: '#dcfce7', color: '#166534', borderRadius: '30px', fontSize: '20px', fontWeight: 'bold' }}>
-                {category}
-              </div>
-            </div>
-
-            <h1
-              style={{
-                fontSize: '56px',
-                fontWeight: '900',
-                color: '#111827',
-                lineHeight: 1.1,
-                letterSpacing: '-2px',
-                marginTop: '10px'
-              }}
-            >
-              {title}
-            </h1>
-            
-            <div style={{ display: 'flex', marginTop: 'auto', color: '#4b5563', fontSize: '24px', fontWeight: '500' }}>
-              Find gifts, track prices & compare.
-            </div>
+              />
+            ) : (
+              <div style={{ fontSize: '100px', color: '#e5e7eb' }}>📦</div>
+            )}
           </div>
 
-          {/* Right Side Image Frame */}
           <div
             style={{
+              position: 'absolute',
+              bottom: '50px',
+              right: '50px',
               display: 'flex',
+              backgroundColor: '#ffffff',
+              padding: '10px 24px',
+              borderRadius: '100px',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
               alignItems: 'center',
-              justifyContent: 'center',
-              width: '50%',
-              padding: '40px',
             }}
           >
             <div
               style={{
-                display: 'flex',
-                width: '100%',
-                height: '100%',
-                backgroundColor: '#ffffff',
-                borderRadius: '40px',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15)',
-                overflow: 'hidden',
-                justifyContent: 'center',
-                alignItems: 'center',
-                border: '8px solid white',
+                color: '#ff6200',
+                fontWeight: '900',
+                fontSize: '32px',
+                letterSpacing: '-1px',
               }}
             >
-              {image ? (
-                <img
-                  src={image}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                  }}
-                />
-              ) : (
-                <div style={{ fontSize: '100px', color: '#e5e7eb' }}>📦</div>
-              )}
+              Clickys
             </div>
           </div>
         </div>
@@ -118,8 +81,7 @@ export async function GET(request) {
       }
     );
   } catch (e) {
-    console.log(`${e.message}`);
-    return new Response(`Failed to generate the image`, {
+    return new Response('Failed to generate the image', {
       status: 500,
     });
   }
