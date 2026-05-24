@@ -11,9 +11,39 @@ export async function generateMetadata({ params }) {
   const client = createClient();
   const page = await client.getByUID("whatsnew", uid).catch(() => notFound());
 
+  const title = `${page.data.meta_title || page.data.title || "What's New"} | Clickys`;
+  const description = page.data.meta_description || "Discover what's new on Clickys! Check out the latest products and offers.";
+  
+  // Try to find a featured image
+  let ogImage = page.data.meta_image?.url;
+  if (!ogImage) {
+    const shoppingGridImages = page.data.slices
+      ?.filter(s => s.slice_type === 'the_shopping_grid')
+      ?.flatMap(s => s.primary?.the_items || s.items || [])
+      ?.map(item => item.product_image?.url)
+      ?.filter(Boolean) || [];
+    if (shoppingGridImages.length > 0) {
+      ogImage = shoppingGridImages[0];
+    }
+  }
+
   return {
-    title: `${page.data.meta_title || page.data.title || "What's New"} | Clickys`,
-    description: page.data.meta_description,
+    title: title,
+    description: description,
+    openGraph: {
+      title: title,
+      description: description,
+      url: `https://www.clickys.in/whats-new/${uid}`,
+      siteName: "Clickys.in",
+      images: ogImage ? [{ url: ogImage, width: 1200, height: 630, alt: title }] : [],
+      type: "article",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: title,
+      description: description,
+      images: ogImage ? [ogImage] : [],
+    }
   };
 }
 

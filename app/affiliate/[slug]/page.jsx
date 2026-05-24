@@ -24,10 +24,28 @@ export async function generateMetadata({ params }) {
 
   const siteName =
     affiliate?.data?.site_name || "Affiliate Store";
+    
+  const title = `${siteName} Products & Deals | Clickys.in`;
+  const description = affiliate?.data?.description?.[0]?.text || `Explore curated products, trending deals, and top recommendations from ${siteName} on Clickys.in.`;
+  const ogImage = affiliate?.data?.logo?.url;
 
   return {
-    title: `${siteName} Products & Deals | Clickys.in`,
-    description: `Explore curated products, trending deals, and top recommendations from ${siteName} on Clickys.in.`,
+    title: title,
+    description: description,
+    openGraph: {
+      title: title,
+      description: description,
+      url: `https://www.clickys.in/affiliate/${slug}`,
+      siteName: "Clickys.in",
+      images: ogImage ? [{ url: ogImage, width: 1200, height: 630, alt: title }] : [],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: title,
+      description: description,
+      images: ogImage ? [ogImage] : [],
+    }
   };
 }
 

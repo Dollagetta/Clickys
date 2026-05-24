@@ -27,21 +27,34 @@ async function getRelatedProducts(slugs, slug) {
 }
 
 
-// Dynamic metadata generation for each product page
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const product = await getProductData(slug);
   if (!product) {
     return { title: 'Product Not Found' };
   }
+  
+  const title = `${product.name} | Clickys`;
+  const description = product.shortDescription || `Check out the ${product.name} - ${product.category}. Read reviews and find the best price.`;
+  const ogImage = product.imageUrl || '/images/logosvg.svg';
+  
   return {
-    title: `${product.name} | Clickys`,
-    description: product.shortDescription || `Check out the ${product.name} - ${product.category}. Read reviews and find the best price.`,
+    title: title,
+    description: description,
     openGraph: {
-      title: `${product.name} | Clickys`,
-      description: product.shortDescription || `Discover the ${product.name} on Clickys.`,
-      images: [product.imageUrl || '/og-images/default-product.jpg'],
+      title: title,
+      description: description,
+      url: `https://www.clickys.in/products/${slug}`,
+      siteName: "Clickys.in",
+      images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
+      type: "article",
     },
+    twitter: {
+      card: "summary_large_image",
+      title: title,
+      description: description,
+      images: [ogImage],
+    }
   };
 }
 

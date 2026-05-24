@@ -24,6 +24,7 @@ import Image from 'next/image'; // For Buying Guides section images
 import Link from 'next/link'; // For guide card links
 import {products} from '../components/products';
 import NewLaunchesSection from '../components/NewLaunchesSection';
+import HomeSidebar from '../components/HomeSidebar';
 
 import { createClient } from "../prismicio";
 import { asText } from "@prismicio/client";
@@ -31,7 +32,6 @@ import * as prismic from '@prismicio/client';
 import { PrismicNextImage } from "@prismicio/next";
 import { PrismicRichText } from "@prismicio/react";
 
-/* Page-specific metadata
 export const metadata = {
   title: "Clickys.in | Trending Tech & Home Essentials in India",
   description: "Discover the best Amazon and Flipkart deals on tech, home essentials, and grooming products. Shop curated combos, smartwatches, kitchen tools, and more at Clickys.in!",
@@ -49,10 +49,10 @@ export const metadata = {
     "home and electronics saver packs",
     "best combo product picks in India",
     "online store for wellness and style"
-  ],
+  ].join(', '),
   openGraph: {
-    title: "Clickys.in | Best Tech & Home Deals in India",
-    description: "Shop trending gadgets, kitchen essentials, and grooming combos at Clickys.in. Find top Amazon and Flipkart offers for smart living!",
+    title: "Clickys.in | Trending Tech & Home Essentials in India",
+    description: "Discover the best Amazon and Flipkart deals on tech, home essentials, and grooming products. Shop curated combos, smartwatches, kitchen tools, and more at Clickys.in!",
     url: "https://www.clickys.in/",
     siteName: "Clickys.in",
     type: "website",
@@ -63,12 +63,6 @@ export const metadata = {
     title: "Clickys.in | Trending Tech & Home Deals",
     description: "Explore curated Amazon and Flipkart deals on smartwatches, kitchen tools, and grooming essentials at Clickys.in!"
   }
-};*/
-
-export const metadata = {
-  title: 'Clickys – Global Affiliate Hub, Smart Shopping Honest recommendations & Product Reviews',
-  description: 'Clickys brings trusted reviews, smart shopping tips, affiliate deals, honest recommendations, and advertising services with top brands like Amazon, Flipkart.',
-  keywords: 'Clickys, affiliate hub, product reviews, Amazon deals, Flipkart offers, Myntra discounts, Meesho shopping, Ajio deals, Blinkit offers, advertising services',
 };
 
 // Placeholder Data (Prismic will manage this later)
@@ -173,29 +167,35 @@ export default async function HomePage() {
         <HomeSearchResults />
       </Suspense>
       
-      {/* Dynamic Affiliate Showcase Hero Slider */}
-      <header className={`${styles.heroSection} relative`} data-aos="fade-in" data-aos-duration="800" style={{ backgroundImage: 'none', padding: '0', minHeight: '400px' }}>
-        <HeroSlider />
-        <div className="absolute inset-0 z-20 flex flex-col justify-between pt-4 pb-8 h-full w-full pointer-events-none">
-          <div className="w-full pointer-events-auto">
-            <Suspense fallback={<AffiliateCardsSkeleton />}>
-              <AffiliateCards />
-            </Suspense>
-          </div>
-          
-          <div className="container mx-auto px-4 flex flex-col items-center pointer-events-auto mt-auto">
-            <div className={styles.heroActions} data-aos="fade-up" data-aos-delay="200" style={{ marginBottom: '1rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-              <CallToAction text="Explore All Products" link="/products" type="secondary" className={styles.heroCtaButton} icon={<FiZap />} iconPosition="left" premium />
-              <CallToAction text="Browse Amazon Products" link="/products?platform=Amazon" type="primary" className={`${styles.heroCtaButton} ${styles.heroCtaOutline}`} icon={<FiShoppingCart />} iconPosition="left" style={{ backgroundColor: '#cc851f', borderColor: '#ffb300', color: '#ffffff', fontWeight: 'bold', backdropFilter: 'blur(8px)' }} premium />
+      <div className="container mx-auto mt-6 px-4 flex flex-col lg:flex-row gap-6 relative z-10">
+        <HomeSidebar />
+
+        <div className="flex-1 w-full min-w-0">
+          {/* Dynamic Affiliate Showcase Hero Slider */}
+          <header className={`${styles.heroSection} relative rounded-[32px] overflow-hidden`} data-aos="fade-in" data-aos-duration="800" style={{ backgroundImage: 'none', padding: '0', minHeight: '400px' }}>
+            <HeroSlider />
+            <div className="absolute inset-0 z-20 flex flex-col justify-between pt-4 pb-8 h-full w-full pointer-events-none">
+              <div className="w-full pointer-events-auto">
+                <Suspense fallback={<AffiliateCardsSkeleton />}>
+                  <AffiliateCards />
+                </Suspense>
+              </div>
+              
+              <div className="container mx-auto px-4 flex flex-col items-center pointer-events-auto mt-auto">
+                <div className={styles.heroActions} data-aos="fade-up" data-aos-delay="200" style={{ marginBottom: '1rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                  <CallToAction text="Explore All Products" link="/products" type="secondary" className={styles.heroCtaButton} icon={<FiZap />} iconPosition="left" premium />
+                  <CallToAction text="Browse Amazon Products" link="/products?platform=Amazon" type="primary" className={`${styles.heroCtaButton} ${styles.heroCtaOutline}`} icon={<FiShoppingCart />} iconPosition="left" style={{ backgroundColor: '#cc851f', borderColor: '#ffb300', color: '#ffffff', fontWeight: 'bold', backdropFilter: 'blur(8px)' }} premium />
+                </div>
+                <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', textAlign: 'center', textShadow: '0 2px 4px rgba(0,0,0,0.8)', fontWeight: '500', background: 'rgba(0,0,0,0.3)', padding: '4px 12px', borderRadius: '100px', backdropFilter: 'blur(4px)' }} data-aos-delay="400">
+                  As an Amazon Associate, we earn from qualifying purchases.
+                </p>
+              </div>
             </div>
-            <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', textAlign: 'center', textShadow: '0 2px 4px rgba(0,0,0,0.8)', fontWeight: '500', background: 'rgba(0,0,0,0.3)', padding: '4px 12px', borderRadius: '100px', backdropFilter: 'blur(4px)' }} data-aos-delay="400">
-              As an Amazon Associate, we earn from qualifying purchases.
-            </p>
-          </div>
+          </header>
+          
+          <NewLaunchesSection />
         </div>
-      </header>
-      
-      <NewLaunchesSection />
+      </div>
       
       <section className={`${styles.section}`}>
         <div className="container mx-auto px-4 max-w-5xl">
@@ -203,7 +203,7 @@ export default async function HomePage() {
               <FiZap className={styles.titleIcon} /> Smart Shopping Tools
             </h2>
             <p className={`${styles.sectionSubtitle} text-center mb-8`} data-aos="fade-up" data-aos-delay="100">
-              Find gifts, track prices, and compare options with AI.
+              Find gifts, track prices, and compare options.
             </p>
             <SmartShopFeatures />
         </div>
