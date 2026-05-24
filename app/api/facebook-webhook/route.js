@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '../../../prismicio';
 
+// Simple in-memory cache to prevent duplicate posts from webhook retries
+const processedReleases = new Set();
+
 export async function POST(req) {
   try {
     const body = await req.json();
@@ -22,6 +25,16 @@ export async function POST(req) {
       console.warn("Facebook setup incomplete. Missing FACEBOOK_PAGE_ID or FACEBOOK_ACCESS_TOKEN in env variables.");
       return NextResponse.json({ message: 'Facebook credentials missing' }, { status: 500 });
     }
+
+    // Prevent duplicate webhook processing
+    // Prismic webhooks sometimes retry if the response takes too long.
+    const eventSignature = body.documents.join('-');
+    if (processedReleases.has(eventSignature)) {
+      return NextResponse.json({ message: 'Event already processed recently' }, { status: 200 });
+    }
+    processedReleases.add(eventSignature);
+    // Clear the signature after 2 minutes so you can publish the same doc again later if needed
+    setTimeout(() => processedReleases.delete(eventSignature), 2 * 60 * 1000);
 
     const client = createClient();
 
@@ -135,6 +148,23 @@ export async function POST(req) {
         }, { status: 400 });
       }
       
+      const postedId = fbData.post_id || fbData.id;
+      if (postedId) {
+        // Add a comment below the new post
+        const commentEndpoint = `https://graph.facebook.com/v20.0/${postedId}/comments`;
+        const commentPayload = {
+          message: "Visit our Amazon store here: https://www.amazon.in/shop/clickyse",
+          access_token: FACEBOOK_ACCESS_TOKEN
+        };
+        await fetch(commentEndpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(commentPayload)
+        }).catch(err => {
+          console.error("Failed to add Facebook comment:", err);
+        });
+      }
+      
       postedCount++;
     }
 
@@ -145,3 +175,4 @@ export async function POST(req) {
     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
   }
 }
+
