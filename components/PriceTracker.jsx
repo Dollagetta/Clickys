@@ -36,8 +36,19 @@ export default function PriceTracker() {
     setStep(3);
   };
 
+  const validateContact = (contact) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^\+?[0-9]{10,15}$/;
+    return emailRegex.test(contact) || phoneRegex.test(contact);
+  };
+
   const handleSubmitTracking = (e) => {
     e.preventDefault();
+    if (!validateContact(contactMethod)) {
+      alert("Please enter a valid email address or 10-digit phone number.");
+      return;
+    }
+    
     setIsSubmitting(true);
     // Simulate API call to save tracking request
     setTimeout(() => {

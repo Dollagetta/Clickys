@@ -98,14 +98,29 @@ export default function SmartShopFeatures() {
     }
   };
 
+  // Contact validation helper
+  const validateContact = (contact) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^\+?[0-9]{10,15}$/;
+    return emailRegex.test(contact) || phoneRegex.test(contact);
+  };
+
   const handleGiftContactSubmit = (e) => {
     e.preventDefault();
+    if (!validateContact(giftContact)) {
+      alert("Please enter a valid email address or 10-digit phone number.");
+      return;
+    }
     setGiftContactSubmitted(true);
   };
 
   // --- TRACK PRICE LOGIC ---
   const handleTrackSubmit = (e) => {
     e.preventDefault();
+    if (!validateContact(trackData.contact)) {
+      alert("Please enter a valid email address or 10-digit phone number.");
+      return;
+    }
     setTrackSubmitted(true);
   };
 
@@ -409,63 +424,102 @@ export default function SmartShopFeatures() {
                         Back to Home &times;
                       </button>
                     </div>
-                    <div className="overflow-x-auto w-full pb-4">
-                      <table className="w-full min-w-[600px] border-collapse bg-white">
-                        <thead>
-                          <tr>
-                            <th className="p-4 border font-bold text-left bg-gray-50 w-1/4">Features</th>
-                            {selectedToCompare.map(p => (
-                              <th key={p.id} className="p-4 border font-bold text-left bg-gray-50 w-1/4">
-                                {p.data?.title?.substring(0, 30)}...
-                              </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td className="p-4 border font-semibold text-gray-700">Image</td>
-                            {selectedToCompare.map(p => (
-                               <td key={p.id} className="p-4 border align-top text-center">
-                                 {p.data?.image?.url ? <img src={p.data.image.url} alt="" className="h-24 object-contain mx-auto" /> : 'No image'}
-                               </td>
-                            ))}
-                          </tr>
-                          <tr>
-                            <td className="p-4 border font-semibold text-gray-700">Price</td>
-                            {selectedToCompare.map(p => (
-                               <td key={p.id} className="p-4 border text-lg font-bold text-green-600">{p.data?.price || 'N/A'}</td>
-                            ))}
-                          </tr>
-                          <tr>
-                            <td className="p-4 border font-semibold text-gray-700">Platform</td>
-                            {selectedToCompare.map(p => (
-                               <td key={p.id} className="p-4 border">{p.data?.platform || 'Amazon'}</td>
-                            ))}
-                          </tr>
-                          <tr>
-                            <td className="p-4 border font-semibold text-gray-700">Discount</td>
-                            {selectedToCompare.map(p => (
-                               <td key={p.id} className="p-4 border">{p.data?.discount || 'None'}</td>
-                            ))}
-                          </tr>
-                          <tr>
-                            <td className="p-4 border font-semibold text-gray-700">Description</td>
-                            {selectedToCompare.map(p => (
-                               <td key={p.id} className="p-4 border text-sm text-gray-600">{p.data?.description?.substring(0, 100)}...</td>
-                            ))}
-                          </tr>
-                          <tr>
-                            <td className="p-4 border font-semibold text-gray-700">Action</td>
-                            {selectedToCompare.map(p => (
-                               <td key={p.id} className="p-4 border">
-                                 <a href={p.data?.link?.url || '#'} target="_blank" className="bg-orange-500 text-white px-4 py-2 rounded font-bold hover:bg-orange-600 block text-center">
-                                   View Deal
-                                 </a>
-                               </td>
-                            ))}
-                          </tr>
-                        </tbody>
-                      </table>
+                    <div className="w-full pb-4">
+                      {/* Desktop view */}
+                      <div className="hidden md:block overflow-x-auto">
+                        <table className="w-full min-w-[600px] border-collapse bg-white">
+                          <thead>
+                            <tr>
+                              <th className="p-4 border font-bold text-left bg-gray-50 w-1/4">Features</th>
+                              {selectedToCompare.map(p => (
+                                <th key={p.id} className="p-4 border font-bold text-left bg-gray-50 w-1/4">
+                                  {p.data?.title?.substring(0, 30)}...
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td className="p-4 border font-semibold text-gray-700">Image</td>
+                              {selectedToCompare.map(p => (
+                                 <td key={p.id} className="p-4 border align-top text-center">
+                                   {p.data?.image?.url ? <img src={p.data.image.url} alt="" className="h-24 object-contain mx-auto" /> : 'No image'}
+                                 </td>
+                              ))}
+                            </tr>
+                            <tr>
+                              <td className="p-4 border font-semibold text-gray-700">Price</td>
+                              {selectedToCompare.map(p => (
+                                 <td key={p.id} className="p-4 border text-lg font-bold text-green-600">{p.data?.price || 'N/A'}</td>
+                              ))}
+                            </tr>
+                            <tr>
+                              <td className="p-4 border font-semibold text-gray-700">Platform</td>
+                              {selectedToCompare.map(p => (
+                                 <td key={p.id} className="p-4 border">{p.data?.platform || 'Amazon'}</td>
+                              ))}
+                            </tr>
+                            <tr>
+                              <td className="p-4 border font-semibold text-gray-700">Discount</td>
+                              {selectedToCompare.map(p => (
+                                 <td key={p.id} className="p-4 border">{p.data?.discount || 'None'}</td>
+                              ))}
+                            </tr>
+                            <tr>
+                              <td className="p-4 border font-semibold text-gray-700">Description</td>
+                              {selectedToCompare.map(p => (
+                                 <td key={p.id} className="p-4 border text-sm text-gray-600">{p.data?.description?.substring(0, 100)}...</td>
+                              ))}
+                            </tr>
+                            <tr>
+                              <td className="p-4 border font-semibold text-gray-700">Action</td>
+                              {selectedToCompare.map(p => (
+                                 <td key={p.id} className="p-4 border">
+                                   <a href={p.data?.link?.url || '#'} target="_blank" className="bg-orange-500 text-white px-4 py-2 rounded font-bold hover:bg-orange-600 block text-center">
+                                     View Deal
+                                   </a>
+                                 </td>
+                              ))}
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      
+                      {/* Mobile view */}
+                      <div className="md:hidden flex flex-col gap-6">
+                        {selectedToCompare.map(p => (
+                          <div key={p.id} className="border border-blue-200 rounded-xl bg-white shadow-sm flex flex-col overflow-hidden">
+                             <div className="font-bold text-gray-900 border-b border-gray-100 p-4 bg-gray-50">{p.data?.title?.substring(0, 60)}...</div>
+                             <div className="p-4 flex flex-col gap-3">
+                               <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                                 <span className="text-sm font-semibold text-gray-500">Image</span>
+                                 {p.data?.image?.url ? <img src={p.data.image.url} alt="" className="h-16 object-contain" /> : <span className="text-gray-400 text-sm">No image</span>}
+                               </div>
+                               <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                                 <span className="text-sm font-semibold text-gray-500">Price</span>
+                                 <span className="font-bold text-green-600">{p.data?.price || 'N/A'}</span>
+                               </div>
+                               <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                                 <span className="text-sm font-semibold text-gray-500">Platform</span>
+                                 <span className="text-gray-800 text-sm">{p.data?.platform || 'Amazon'}</span>
+                               </div>
+                               <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                                 <span className="text-sm font-semibold text-gray-500">Discount</span>
+                                 <span className="text-gray-800 text-sm">{p.data?.discount || 'None'}</span>
+                               </div>
+                               <div className="flex flex-col gap-1 py-2">
+                                 <span className="text-sm font-semibold text-gray-500">Description</span>
+                                 <span className="text-sm text-gray-700 leading-relaxed">{p.data?.description?.substring(0, 150)}...</span>
+                               </div>
+                             </div>
+                             <div className="p-4 bg-gray-50 border-t border-gray-100">
+                               <a href={p.data?.link?.url || '#'} target="_blank" className="bg-orange-500 text-white w-full py-3 rounded-lg font-bold hover:bg-orange-600 flex justify-center items-center">
+                                 View Deal
+                               </a>
+                             </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )}

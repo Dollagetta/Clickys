@@ -5,9 +5,10 @@ export const runtime = 'edge';
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
+    const image = searchParams.get('image'); 
+    const frameOnly = searchParams.get('frameOnly');
 
-    const image = searchParams.get('image');
-
+    // If frameOnly is true or image is provided, we center the image without text
     return new ImageResponse(
       (
         <div
@@ -22,6 +23,7 @@ export async function GET(request) {
             position: 'relative'
           }}
         >
+          {/* Main Photo inner container */}
           <div
             style={{
               display: 'flex',
@@ -49,6 +51,7 @@ export async function GET(request) {
             )}
           </div>
 
+          {/* Logo overlay at bottom right */}
           <div
             style={{
               position: 'absolute',
@@ -81,6 +84,7 @@ export async function GET(request) {
       }
     );
   } catch (e) {
+    console.log(e.message);
     return new Response('Failed to generate the image', {
       status: 500,
     });
