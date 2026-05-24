@@ -25,8 +25,13 @@ export default function SmartShopFeatures() {
   const [giftContactSubmitted, setGiftContactSubmitted] = useState(false);
 
   // --- Track Price State ---
+  const [trackStep, setTrackStep] = useState(1);
+  const [trackSearchQuery, setTrackSearchQuery] = useState('');
+  const [trackSearchResults, setTrackSearchResults] = useState([]);
+  const [trackLoading, setTrackLoading] = useState(false);
+  const [trackSelectedProduct, setTrackSelectedProduct] = useState(null);
+
   const [trackData, setTrackData] = useState({
-    productName: '',
     expectedRange: '',
     contact: ''
   });
@@ -47,7 +52,11 @@ export default function SmartShopFeatures() {
     setGiftResults([]);
     setGiftContactSubmitted(false);
     setTrackSubmitted(false);
-    setTrackData({ productName: '', expectedRange: '', contact: '' });
+    setTrackStep(1);
+    setTrackSearchQuery('');
+    setTrackSearchResults([]);
+    setTrackSelectedProduct(null);
+    setTrackData({ expectedRange: '', contact: '' });
     setCompareQuery('');
     setCompareResults([]);
     setSelectedToCompare([]);
@@ -89,7 +98,20 @@ export default function SmartShopFeatures() {
         return matchScore > 0 && priceNum <= budgetAllowed;
       });
 
-      setGiftResults(matching.slice(0, 6));
+      const mappedMatching = matching.slice(0, 6).map(p => ({
+        id: p.id,
+        name: p.data?.title,
+        category: p.data?.category || 'General',
+        price: p.data?.price,
+        imageUrl: p.data?.image,
+        amazonLink: p.data?.link?.url,
+        platform: p.data?.platform || 'Amazon',
+        discount: p.data?.discount,
+        description: p.data?.description,
+        data: p.data
+      }));
+
+      setGiftResults(mappedMatching);
     } catch (e) {
       console.error(e);
       setGiftResults([]);
@@ -115,6 +137,35 @@ export default function SmartShopFeatures() {
   };
 
   // --- TRACK PRICE LOGIC ---
+  const handleTrackSearch = async (e) => {
+    e.preventDefault();
+    if (!trackSearchQuery.trim()) return;
+    setTrackLoading(true);
+    try {
+      const client = createClient();
+      const res = await client.getAllByType('product', {
+        filters: [prismic.filter.fulltext('my.product.title', trackSearchQuery)]
+      });
+      const mapped = res.slice(0, 6).map(p => ({
+        id: p.id,
+        name: p.data?.title,
+        category: p.data?.category || 'General',
+        price: p.data?.price,
+        imageUrl: p.data?.image,
+        amazonLink: p.data?.link?.url,
+        platform: p.data?.platform || 'Amazon',
+        discount: p.data?.discount,
+        description: p.data?.description,
+        data: p.data
+      }));
+      setTrackSearchResults(mapped);
+    } catch(err) {
+      console.error(err);
+    } finally {
+      setTrackLoading(false);
+    }
+  };
+
   const handleTrackSubmit = (e) => {
     e.preventDefault();
     if (!validateContact(trackData.contact)) {
@@ -132,9 +183,21 @@ export default function SmartShopFeatures() {
     try {
       const client = createClient();
       const res = await client.getAllByType('product', {
-        predicates: [prismic.predicate.fulltext('my.product.title', compareQuery)]
+        filters: [prismic.filter.fulltext('my.product.title', compareQuery)]
       });
-      setCompareResults(res.slice(0, 6));
+      const mapped = res.slice(0, 6).map(p => ({
+        id: p.id,
+        name: p.data?.title,
+        category: p.data?.category || 'General',
+        price: p.data?.price,
+        imageUrl: p.data?.image,
+        amazonLink: p.data?.link?.url,
+        platform: p.data?.platform || 'Amazon',
+        discount: p.data?.discount,
+        description: p.data?.description,
+        data: p.data // keep raw data for comparison table
+      }));
+      setCompareResults(mapped);
     } catch(err) {
       console.error(err);
     } finally {
@@ -202,7 +265,7 @@ export default function SmartShopFeatures() {
       {activeModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm">
           <div className="bg-white rounded-[24px] shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto relative animate-in zoom-in-95 duration-200">
-            <button onClick={closeModal} className="absolute top-4 right-4 p-2 bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 hover:text-gray-900 z-10">
+            <button type="button" onClick={(e) => { e.preventDefault(); closeModal(); }} className="absolute top-4 right-4 p-2 bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 hover:text-gray-900 z-10 cursor-pointer">
               <FiX size={20} />
             </button>
 
@@ -293,7 +356,7 @@ export default function SmartShopFeatures() {
                             <h3 className="text-xl font-bold mb-4">We found these gifts for you:</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                               {giftResults.map(p => (
-                                <ProductCard key={p.id} product={{...p.data, id: p.id}} />
+                                <ProductCard key={p.id} product={p} />
                               ))}
                             </div>
                           </div>
@@ -332,13 +395,46 @@ export default function SmartShopFeatures() {
             {activeModal === 'track' && (
               <div className="p-6 md:p-10">
                 <h2 className="text-2xl md:text-3xl font-bold mb-2 text-gray-900">Track a Price</h2>
-                <p className="text-gray-600 mb-6 border-b pb-6">Enter the product details and we will alert you when it drops to your expected price range.</p>
+                
+                {trackStep === 1 && (
+                  <div className="space-y-6 animate-in fade-in">
+                    <p className="text-gray-600 mb-6 border-b pb-6">Search for a product from our catalog to track its price drops.</p>
+                    <form onSubmit={handleTrackSearch} className="flex gap-2">
+                      <input type="text" placeholder="Search product name or URL..." value={trackSearchQuery} onChange={e => setTrackSearchQuery(e.target.value)} className="flex-grow px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500 outline-none text-lg" required />
+                      <button type="submit" disabled={trackLoading} className="bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-emerald-600 transition-colors flex items-center justify-center min-w-[100px]">
+                        {trackLoading ? <FiLoader className="animate-spin" /> : 'Search'}
+                      </button>
+                    </form>
+                    
+                    {trackSearchResults.length > 0 && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+                        {trackSearchResults.map(p => (
+                          <div key={p.id} onClick={() => { setTrackSelectedProduct(p); setTrackStep(2); }} className="border border-gray-200 rounded-2xl cursor-pointer hover:border-emerald-500 hover:shadow-md transition-all">
+                            <div className="pointer-events-none p-4">
+                              <ProductCard product={p} />
+                            </div>
+                            <div className="p-4 pt-0 text-center">
+                              <span className="inline-block px-4 py-2 rounded-full text-sm font-bold bg-emerald-100 text-emerald-700">
+                                Select to Track
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {trackSearchResults.length === 0 && !trackLoading && trackSearchQuery && (
+                        <p className="text-center text-gray-500 py-10">No products found matching your search.</p>
+                    )}
+                  </div>
+                )}
 
-                {!trackSubmitted ? (
+                {trackStep === 2 && !trackSubmitted && (
                   <form onSubmit={handleTrackSubmit} className="space-y-5 animate-in fade-in">
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-1">Product Name or URL</label>
-                      <input type="text" required value={trackData.productName} onChange={e => setTrackData({...trackData, productName: e.target.value})} placeholder="e.g. iPhone 15 Pro Max" className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                    <div className="mb-4">
+                       <button type="button" onClick={() => setTrackStep(1)} className="text-emerald-600 font-semibold hover:underline flex items-center mb-6">
+                          &larr; Back to select product
+                       </button>
+                       <p className="text-gray-700">Selected Product: <strong>{trackSelectedProduct?.name}</strong></p>
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1">Expected Price Maximum (INR)</label>
@@ -352,18 +448,17 @@ export default function SmartShopFeatures() {
                       <button type="submit" className="w-full bg-emerald-500 text-white font-bold text-lg py-4 rounded-xl hover:bg-emerald-600 transition-colors mt-4">
                         Start Tracking
                       </button>
-                      <button type="button" onClick={closeModal} className="text-gray-500 underline font-medium py-2 hover:text-gray-700 transition">
-                        Back to Home
-                      </button>
                     </div>
                   </form>
-                ) : (
+                )}
+
+                {trackSubmitted && trackStep === 2 && (
                   <div className="py-12 text-center animate-in zoom-in">
                     <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 text-green-500 mb-6">
                       <FiCheckCircle size={40} />
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">Tracking Now</h3>
-                    <p className="text-gray-600 text-lg mb-8">We are keeping an eye on {trackData.productName}. You will be alerted via {trackData.contact}.</p>
+                    <p className="text-gray-600 text-lg mb-8">We are keeping an eye on <strong>{trackSelectedProduct?.name}</strong>. You will be alerted via {trackData.contact}.</p>
                     <button type="button" onClick={closeModal} className="bg-gray-100 text-gray-700 px-8 py-3 rounded-xl font-bold hover:bg-gray-200 transition">
                       Back to Home
                     </button>
@@ -399,7 +494,7 @@ export default function SmartShopFeatures() {
                         return (
                           <div key={p.id} onClick={() => toggleCompareSelect(p)} className={`border-2 rounded-2xl cursor-pointer transition-all ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'}`}>
                             <div className="pointer-events-none p-4">
-                              <ProductCard product={{...p.data, id: p.id}} />
+                              <ProductCard product={p} />
                             </div>
                             <div className="p-4 pt-0 text-center">
                               <span className={`inline-block px-4 py-2 rounded-full text-sm font-bold ${isSelected ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'}`}>

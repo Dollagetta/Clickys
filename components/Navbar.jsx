@@ -45,6 +45,7 @@ const Navbar = () => {
   return (
     <nav
       className={`${styles.navbar} ${hasScrolled ? styles.scrolled : ''}`}
+      style={{ height: '60px', marginLeft: '0px', paddingTop: '-2.5999999999999996px' }}
     >
       <div className={`container ${styles.navContainer}`}>
         {/* Logo */}

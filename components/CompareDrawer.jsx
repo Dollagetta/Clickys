@@ -41,8 +41,9 @@ export default function CompareDrawer() {
                 Clear All
               </button>
               <button 
-                onClick={() => setIsCompareDrawerOpen(false)}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                type="button"
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsCompareDrawerOpen(false); }}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
                 title="Close"
               >
                 <FiX className="text-2xl text-gray-500" />

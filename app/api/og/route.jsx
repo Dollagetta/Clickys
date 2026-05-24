@@ -1,7 +1,6 @@
 import { ImageResponse } from 'next/og';
 
-export const runtime = 'edge';
-
+// Removed edge runtime due to build error
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
