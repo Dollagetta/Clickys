@@ -27,7 +27,11 @@ export async function generateMetadata({ params }) {
     
   const title = `${siteName} Products & Deals | Clickys.in`;
   const description = affiliate?.data?.description?.[0]?.text || `Explore curated products, trending deals, and top recommendations from ${siteName} on Clickys.in.`;
-  const ogImage = affiliate?.data?.logo?.url;
+  const rawOgImage = affiliate?.data?.logo?.url || 'https://www.clickys.in/images/logosvg.svg';
+
+  const absoluteOgImage = rawOgImage.startsWith('http') ? rawOgImage : `https://www.clickys.in${rawOgImage}`;
+
+  const ogImage = `https://www.clickys.in/api/og?title=${encodeURIComponent(siteName + " Deals")}&category=${encodeURIComponent("Store")}&image=${encodeURIComponent(absoluteOgImage)}`;
 
   return {
     title: title,
@@ -37,14 +41,14 @@ export async function generateMetadata({ params }) {
       description: description,
       url: `https://www.clickys.in/affiliate/${slug}`,
       siteName: "Clickys.in",
-      images: ogImage ? [{ url: ogImage, width: 1200, height: 630, alt: title }] : [],
+      images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
       title: title,
       description: description,
-      images: ogImage ? [ogImage] : [],
+      images: [ogImage],
     }
   };
 }

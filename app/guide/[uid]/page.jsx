@@ -21,7 +21,9 @@ export async function generateMetadata({ params }) {
   const title = firstGuideSlice?.primary?.title || "Buying Guide";
   // Extract a description (first snippet of rich text)
   const descriptionText = firstGuideSlice?.primary?.description?.[0]?.text || "Check out our latest buying guide, tips, and recommendations on Clickys.";
-  const imageUrl = firstGuideSlice?.primary?.image?.url || "https://www.clickys.in/images/clickysbg.png"; // fallback image
+  const rawImageUrl = firstGuideSlice?.primary?.image?.url || "https://www.clickys.in/images/clickysbg.png"; // fallback image
+
+  const absoluteImageUrl = rawImageUrl.startsWith('http') ? rawImageUrl : `https://www.clickys.in${rawImageUrl}`;
 
   return {
     title: `${title} | Clickys`,
@@ -33,7 +35,7 @@ export async function generateMetadata({ params }) {
       siteName: 'Clickys',
       images: [
         {
-          url: imageUrl,
+          url: `https://www.clickys.in/api/og?title=${encodeURIComponent(title)}&category=${encodeURIComponent("Guide")}&image=${encodeURIComponent(absoluteImageUrl)}`,
           width: 1200,
           height: 630,
         },
@@ -44,7 +46,7 @@ export async function generateMetadata({ params }) {
       card: 'summary_large_image',
       title: `${title} | Clickys`,
       description: descriptionText,
-      images: [imageUrl],
+      images: [`https://www.clickys.in/api/og?title=${encodeURIComponent(title)}&category=${encodeURIComponent("Guide")}&image=${encodeURIComponent(absoluteImageUrl)}`],
     },
   };
 }

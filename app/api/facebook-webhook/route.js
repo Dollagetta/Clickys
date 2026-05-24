@@ -47,16 +47,16 @@ export async function POST(req) {
         const description = typeof rawDesc === 'string' ? rawDesc : rawDesc?.[0]?.text || '';
         
         if (doc.type === 'product') {
-          urlPath = `/products`;
+          urlPath = `/products/${doc.uid}`;
           imageUrl = doc.data?.image?.url;
         } else if (doc.type === 'whatsnew') {
-          urlPath = `/whats-new`;
+          urlPath = `/whats-new/${doc.uid}`;
           // whatsnew usually uses slices for images
           const sliceImage = doc.data?.slices?.find(s => s.slice_type === 'the_shopping_grid')?.primary?.the_items?.[0]?.product_image?.url 
                           || doc.data?.slices?.find(s => s.slice_type === 'the_shopping_grid')?.items?.[0]?.product_image?.url;
           imageUrl = doc.data?.image?.url || sliceImage;
         } else if (doc.type === 'deals') {
-          urlPath = `/deals`;
+          urlPath = `/deals`; // Does deals have a uid page? Fallback
           imageUrl = doc.data?.image?.url; // Fallback
         }
 
@@ -75,7 +75,7 @@ export async function POST(req) {
         imageUrl = guideSlice?.primary?.image?.url || doc.data?.image?.url;
         
         message = `${title}${descriptionText}\n\nRead our latest guide here: `;
-        link = `https://www.clickys.in/deals`;
+        link = `https://www.clickys.in/guide/${doc.uid}`;
       } else {
         continue; // Skip unrecognized types
       }

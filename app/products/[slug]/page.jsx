@@ -36,7 +36,12 @@ export async function generateMetadata({ params }) {
   
   const title = `${product.name} | Clickys`;
   const description = product.shortDescription || `Check out the ${product.name} - ${product.category}. Read reviews and find the best price.`;
-  const ogImage = product.imageUrl || '/images/logosvg.svg';
+  const rawOgImage = product.imageUrl || 'https://www.clickys.in/images/logosvg.svg';
+  
+  // Facebook strictly requires absolute URLs for og:image.
+  const absoluteOgImage = rawOgImage.startsWith('http') ? rawOgImage : `https://www.clickys.in${rawOgImage}`;
+  
+  const ogImage = `https://www.clickys.in/api/og?title=${encodeURIComponent(product.name)}&category=${encodeURIComponent(product.category || 'Product')}&image=${encodeURIComponent(absoluteOgImage)}`;
   
   return {
     title: title,
