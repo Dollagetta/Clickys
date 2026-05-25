@@ -3,9 +3,9 @@ import { ImageResponse } from 'next/og';
 const framesConfig = [
   // 1: Clickys Brand (Green & Orange)
   {
-    bgInfo: { backgroundColor: '#10b981', backgroundImage: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', padding: '40px' },
-    innerStyle: { borderRadius: '24px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', border: '4px solid #ff8c00', backgroundColor: '#ffffff' },
-    logoContainer: { bottom: '50px', right: '50px', top: 'auto', left: 'auto', backgroundColor: '#ffffff', borderRadius: '100px', border: 'none' },
+    bgInfo: { backgroundColor: '#10b981', padding: '40px' },
+    innerStyle: { borderRadius: '24px', border: '4px solid #ff8c00', backgroundColor: '#ffffff' },
+    logoContainer: { bottom: '50px', right: '50px', backgroundColor: '#ffffff', borderRadius: '100px' },
     logoText: { color: '#ff8c00' },
   }
 ];
@@ -35,7 +35,14 @@ export async function GET(request) {
       } else {
          imgUrl.searchParams.set('fm', 'jpg');
       }
+      
+      // Force smaller image to prevent Satori memory crash
+      imgUrl.searchParams.set('w', '800');
+      
       image = imgUrl.toString();
+    } else if (image && (image.includes('clickysb.jpeg') || image.includes('logosvg.svg') || image.includes('clickysbg.png'))) {
+      // Local fallback images are empty files, causing Satori to crash with Segmentation Fault
+      image = null;
     }
     
     // Default to frame 0
@@ -66,7 +73,6 @@ export async function GET(request) {
             width: '100%',
             display: 'flex',
             backgroundColor: frame.bgInfo.backgroundColor,
-            backgroundImage: frame.bgInfo.backgroundImage,
             fontFamily: 'sans-serif',
             padding: frame.bgInfo.padding,
             position: 'relative'
@@ -80,7 +86,6 @@ export async function GET(request) {
               height: '100%',
               backgroundColor: frame.innerStyle.backgroundColor,
               borderRadius: frame.innerStyle.borderRadius,
-              boxShadow: frame.innerStyle.boxShadow,
               border: frame.innerStyle.border,
               overflow: 'hidden',
               justifyContent: 'center',
@@ -105,16 +110,12 @@ export async function GET(request) {
           <div
             style={{
               position: 'absolute',
-              top: frame.logoContainer.top,
               bottom: frame.logoContainer.bottom,
-              left: frame.logoContainer.left,
               right: frame.logoContainer.right,
               display: 'flex',
               backgroundColor: frame.logoContainer.backgroundColor,
-              border: frame.logoContainer.border,
               padding: '10px 24px',
               borderRadius: frame.logoContainer.borderRadius,
-              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
               alignItems: 'center',
             }}
           >
