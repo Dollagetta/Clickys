@@ -3,10 +3,10 @@ import { ImageResponse } from 'next/og';
 const framesConfig = [
   // 1: Clickys Brand (Green & Orange)
   {
-    bgInfo: { backgroundColor: '#10b981', padding: '40px' },
-    innerStyle: { borderRadius: '24px', border: '4px solid #ff8c00', backgroundColor: '#ffffff' },
-    logoContainer: { bottom: '50px', right: '50px', backgroundColor: '#ffffff', borderRadius: '100px' },
-    logoText: { color: '#ff8c00' },
+    bgInfo: { backgroundColor: '#ff8c00', padding: '24px' },
+    innerStyle: { borderRadius: '16px', border: 'none', backgroundColor: '#ffffff' },
+    logoContainer: { bottom: '44px', right: '44px', backgroundColor: '#ffffff', borderRadius: '100px' },
+    logoText: { color: '#10b981' },
   }
 ];
 
@@ -78,6 +78,18 @@ export async function GET(request) {
             position: 'relative'
           }}
         >
+          {/* Green Stripe */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              bottom: 0,
+              width: '40px',
+              backgroundColor: '#10b981',
+            }}
+          />
+          
           {/* Main Photo inner container */}
           <div
             style={{
