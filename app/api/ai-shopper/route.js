@@ -63,7 +63,7 @@ export async function POST(req) {
     console.log('Sending request to Gemini with parts:', parts.length);
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview', 
+      model: 'gemini-3.5-flash', 
       contents: contents,
       config: {
         systemInstruction: systemInstruction,

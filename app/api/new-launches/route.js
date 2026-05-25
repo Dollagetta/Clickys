@@ -181,7 +181,7 @@ export async function GET() {
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.5-flash',
         contents: { parts: [{ text: 'Find the 8 newest product launches in India in 2026 ONLY across smartphones, laptops, earbuds, smartwatches. Return only JSON array.' }] },
         config: {
           systemInstruction: systemPrompt,
