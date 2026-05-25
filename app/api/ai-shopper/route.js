@@ -95,6 +95,31 @@ export async function POST(req) {
     return NextResponse.json({ data });
   } catch (error) {
     console.error('Error in AI Shopper route:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    // Return friendly fallback data when Gemini hits quota or fails
+    const fallbackData = [
+      {
+        id: "fallback-1",
+        name: "Apple AirPods Pro (2nd Gen)",
+        category: "Audio",
+        price: "₹24,900",
+        description: "Great noise cancelling earbuds, highly recommended in India.",
+        imageUrl: "https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/MQD83?wid=1144&hei=1144&fmt=jpeg",
+        link: "https://www.amazon.in/s?k=Apple+AirPods+Pro+2nd+Gen&tag=dollagetta-21",
+        platform: "Amazon",
+        rating: 4.8
+      },
+      {
+        id: "fallback-2",
+        name: "Samsung Galaxy S24 Ultra",
+        category: "Smartphones",
+        price: "₹1,29,999",
+        description: "A premium flagship phone with excellent cameras and AI features.",
+        imageUrl: "https://images.samsung.com/is/image/samsung/p6pim/in/2401/gallery/in-galaxy-s24-s928-sm-s928bzkqins-thumb-539573335",
+        link: "https://www.amazon.in/s?k=Samsung+Galaxy+S24+Ultra&tag=dollagetta-21",
+        platform: "Amazon",
+        rating: 4.7
+      }
+    ];
+    return NextResponse.json({ data: fallbackData });
   }
 }

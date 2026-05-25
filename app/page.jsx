@@ -96,15 +96,14 @@ export default async function HomePage() {
       banner, 
       partnersResponseResult, 
       apiAmazonProducts, 
-      prismicAmazonResResult,
+      prismicProductsResResult,
       categoriesResResult
     ] = await Promise.allSettled([
       client.getAllByType("marketingbanner"),
       client.getAllByType("partner"),
       searchAmazonProducts('Trending Deals', 4),
       client.getAllByType('product', {
-        predicates: [prismic.predicate.at('my.product.platform', 'Amazon')],
-        limit: 4
+        limit: 8
       }),
       client.getAllByType('category')
     ]);
@@ -131,20 +130,35 @@ export default async function HomePage() {
 
     const amazonProducts = apiAmazonProducts.status === 'fulfilled' ? apiAmazonProducts.value : [];
     
-    let prismicAmazonProducts = [];
-    if (prismicAmazonResResult.status === 'fulfilled') {
-      prismicAmazonProducts = prismicAmazonResResult.value.map(p => ({
-        id: p.id,
-        name: p.data.title,
-        category: p.data.category || 'General',
-        price: p.data.price,
-        imageUrl: p.data.image,
-        amazonLink: p.data.link?.url,
-        platform: p.data.platform || 'Amazon',
-        rating: 0, 
-        reviewCount: 0,
-        discount: p.data.discount,
-      }));
+    let prismicProducts = [];
+    if (prismicProductsResResult.status === 'fulfilled') {
+      prismicProducts = prismicProductsResResult.value.map(p => {
+        let deducedPlatform = "Amazon";
+        if (p.data.platform) {
+          deducedPlatform = p.data.platform;
+        } else if (p.data.link?.url) {
+          const url = p.data.link.url.toLowerCase();
+          if (url.includes('myntra')) deducedPlatform = 'Myntra';
+          else if (url.includes('ajio')) deducedPlatform = 'Ajio';
+          else if (url.includes('flipkart')) deducedPlatform = 'Flipkart';
+          else if (url.includes('meesho')) deducedPlatform = 'Meesho';
+          else if (url.includes('amazon') || url.includes('amzn')) deducedPlatform = 'Amazon';
+          else deducedPlatform = 'Store';
+        }
+
+        return {
+          id: p.id,
+          name: p.data.title,
+          category: p.data.category || 'General',
+          price: p.data.price,
+          imageUrl: p.data.image,
+          amazonLink: p.data.link?.url,
+          platform: deducedPlatform,
+          rating: 0, 
+          reviewCount: 0,
+          discount: p.data.discount,
+        };
+      });
     }
 
     let categories = [...placeholderCategories];
@@ -264,7 +278,7 @@ export default async function HomePage() {
       <section className={`${styles.section} ${styles.dealsSection}`} style={{ backgroundColor: '#f97316', border: 'none', height: 'auto', minHeight: 'fit-content', borderRadius: '40px', margin: '2rem 0.5rem', padding: '3rem 1rem' }}>
         <div className="container mx-auto max-w-7xl px-2 sm:px-4">
           <h2 className={styles.sectionTitle} data-aos="fade-up" style={{ color: '#fff', fontSize: '1.75rem' }}>
-            <FiGift className={styles.titleIcon} /> Amazon&#39;s Top Deals
+            <FiGift className={styles.titleIcon} /> Top Deals
           </h2>
           <p className={styles.sectionSubtitle} data-aos="fade-up" data-aos-delay="100" style={{ color: 'rgba(255,255,255,0.9)' }}>
             Limited-time offers on fantastic products. Grab them before they&#39;re gone!
@@ -273,7 +287,7 @@ export default async function HomePage() {
             {amazonProducts.map((product) => (
               <ProductCard key={product.id} product={product} isDeal={false} />
             ))}
-            {prismicAmazonProducts.map((product) => (
+            {prismicProducts.map((product) => (
               <ProductCard key={`prismic-${product.id}`} product={product} isDeal={false} />
             ))}
           </div>
