@@ -116,14 +116,6 @@ export async function POST(req) {
         // Use the /photos endpoint for an image post
         let absoluteOgImage = imageUrl?.startsWith('http') ? imageUrl : (imageUrl ? `https://www.clickys.in${imageUrl}` : 'https://www.clickys.in/images/clickysb.jpeg');
         
-        // Ensure prismic images are returned as JPEG, as Satori (@vercel/og) does not support WebP, which causes 500 errors
-        if (absoluteOgImage.includes('prismic.io')) {
-          absoluteOgImage = absoluteOgImage.replace(/auto=format/g, 'fm=jpg').replace(/auto=compress,format/g, 'auto=compress&fm=jpg');
-          if (!absoluteOgImage.includes('fm=')) {
-            absoluteOgImage += (absoluteOgImage.includes('?') ? '&' : '?') + 'fm=jpg';
-          }
-        }
-        
         // Generate the OG image with ONLY the product image inside our custom frame
         // Adding &.png at the end to help Facebook Graph API recognize it as an image URL
         const generatedOgImageUrl = `https://www.clickys.in/api/og?image=${encodeURIComponent(absoluteOgImage)}&frameOnly=true&ext=.png`;

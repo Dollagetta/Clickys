@@ -147,7 +147,29 @@ const framesConfig = [
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const image = searchParams.get('image'); 
+    let image = searchParams.get('image'); 
+    
+    // Clean Prismic image URLs so Satori doesn't crash from WebP or invalid params
+    if (image && image.includes('prismic.io')) {
+      const imgUrl = new URL(image);
+      const autoParams = imgUrl.searchParams.get('auto');
+      if (autoParams) {
+         const cleanAuto = autoParams.split(',').filter(x => x !== 'format' && x !== 'compress').join(',');
+         if (cleanAuto) {
+           imgUrl.searchParams.set('auto', cleanAuto);
+         } else {
+           imgUrl.searchParams.delete('auto');
+         }
+      }
+      // Remove any weird fm=jpg,compress
+      const fm = imgUrl.searchParams.get('fm');
+      if (fm && fm.includes(',')) {
+         imgUrl.searchParams.set('fm', fm.split(',')[0]);
+      } else {
+         imgUrl.searchParams.set('fm', 'jpg');
+      }
+      image = imgUrl.toString();
+    }
     
     // Default to frame 0
     let frameIndex = 0;
