@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import ProductCard from '@/components/ProductCard';
 import { FiSearch, FiFilter, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
-export default function DailyDealsClient({ initialProducts }) {
+export default function DailyDealsClient({ initialProducts }: { initialProducts: any[] }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedPlatform, setSelectedPlatform] = useState('All');
@@ -30,12 +30,12 @@ export default function DailyDealsClient({ initialProducts }) {
 
   // Extract unique categories and platforms for filters
   const categories = useMemo(() => {
-    const cats = new Set(initialProducts.map(p => p.category).filter(Boolean));
+    const cats = new Set<string>(initialProducts.map(p => p.category).filter(Boolean));
     return ['All', ...Array.from(cats)];
   }, [initialProducts]);
 
   const platforms = useMemo(() => {
-    const plats = new Set(initialProducts.map(p => p.platform).filter(Boolean));
+    const plats = new Set<string>(initialProducts.map(p => p.platform).filter(Boolean));
     return ['All', ...Array.from(plats)];
   }, [initialProducts]);
 
@@ -97,7 +97,7 @@ export default function DailyDealsClient({ initialProducts }) {
               }}
             >
               <option value="All" disabled hidden>Category</option>
-              {categories.map(cat => (
+              {categories.map((cat: string) => (
                 <option key={`cat-${cat}`} value={cat}>{cat}</option>
               ))}
             </select>
@@ -114,7 +114,7 @@ export default function DailyDealsClient({ initialProducts }) {
               }}
             >
               <option value="All" disabled hidden>Platform</option>
-              {platforms.map(plat => (
+              {platforms.map((plat: string) => (
                 <option key={`plat-${plat}`} value={plat}>{plat}</option>
               ))}
             </select>
@@ -151,7 +151,7 @@ export default function DailyDealsClient({ initialProducts }) {
              <p className="text-gray-500">Try adjusting your filters or search terms.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
           {currentProducts.map((product, idx) => (
             <ProductCard key={product.id || idx} product={product} />
           ))}
@@ -164,7 +164,7 @@ export default function DailyDealsClient({ initialProducts }) {
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className="px-4 py-2 border border-gray-200 rounded-xl flex items-center gap-2 hover:bg-gray-50 disabled:opacity-50 disabled:hover:bg-transparent transition-colors"
+            className="px-5 py-2.5 border border-gray-200 rounded-xl flex items-center gap-2 hover:bg-gray-50 disabled:opacity-50 disabled:hover:bg-transparent transition-colors shadow-sm"
           >
             <FiChevronLeft size={16} /> Prev
           </button>
@@ -176,7 +176,7 @@ export default function DailyDealsClient({ initialProducts }) {
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="px-4 py-2 border border-gray-200 rounded-xl flex items-center gap-2 hover:bg-gray-50 disabled:opacity-50 disabled:hover:bg-transparent transition-colors"
+            className="px-5 py-2.5 border border-gray-200 rounded-xl flex items-center gap-2 hover:bg-gray-50 disabled:opacity-50 disabled:hover:bg-transparent transition-colors shadow-sm"
           >
             Next <FiChevronRight size={16} />
           </button>

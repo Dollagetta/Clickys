@@ -206,6 +206,8 @@
   justify-content: space-between;
   align-items: center;
   margin-top: auto;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 .priceContainer {
   display: flex;
@@ -231,7 +233,11 @@
   border-radius: var(--rounded-md);
   background-color: var(--affcolor);
   color: white;
-  min-width: max-content;
+  flex: 1;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .cardSkeleton {
   width: 100%; height: 230px; background-color: var(--light-gray); border-radius: var(--rounded-lg);
