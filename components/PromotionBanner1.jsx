@@ -23,18 +23,23 @@ const PromotionBanner = ({
 
   const textAlignmentClass = styles[`align-${alignText}`] || styles['align-center'];
 
+  const actualImageUrl = imageUrl || `https://placehold.co/1200x400/F1C40F/1A1A1A?text=Promotion+Banner&font=Inter`;
+
   return (
     <div className={styles.bannerContainer} data-aos={aosData}>
       <div className={styles.bannerImageWrapper}>
-        {imageUrl && (
+        {actualImageUrl && (
           <Image
-            src={imageUrl}
+            src={actualImageUrl}
             alt={imageAlt}
             layout="fill"
             objectFit="cover"
             priority // Important banners might be above the fold
             className={styles.bannerImage}
-            onError={(e) => e.currentTarget.src = `https://placehold.co/1200x400/CCCCCC/1A1A1A?text=Img+Error&font=Inter`}
+            onError={(e) => {
+              if (e.currentTarget.src.includes('placehold.co')) return;
+              e.currentTarget.src = `https://placehold.co/1200x400/CCCCCC/1A1A1A?text=Img+Error&font=Inter`;
+            }}
           />
         )}
         <div className={styles.bannerOverlay} style={{ backgroundColor: `rgba(0, 0, 0, ${overlayOpacity})` }}></div>

@@ -80,7 +80,10 @@ function LaunchCard({ item }) {
             alt={item.name}
             referrerPolicy="no-referrer"
             style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '12px' }}
-            onError={e => { e.target.src = fallbackImg; }}
+            onError={e => {
+              if (e.target.src === fallbackImg) return;
+              e.target.src = fallbackImg;
+            }}
           />
           {/* Badge */}
           <span style={{
@@ -214,7 +217,10 @@ function LaunchCard({ item }) {
                 alt={item.name}
                 referrerPolicy="no-referrer"
                 style={{ objectFit: 'contain', margin: '0 auto', display: 'block', maxWidth: '300px', maxHeight: '250px', width: '100%', mixBlendMode: 'multiply' }}
-                onError={(e) => e.currentTarget.src = fallbackImg}
+                onError={(e) => {
+                  if (e.currentTarget.src === fallbackImg) return;
+                  e.currentTarget.src = fallbackImg;
+                }}
               />
             </div>
 

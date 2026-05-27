@@ -64,11 +64,14 @@ export async function generateMetadata({ params }) {
 }
 
 // Sub-components for better organization and performance
-const MainImage = ({ src, alt }) => (
+const MainImage = ({ src, alt }) => {
+  const actualSrc = src || `https://placehold.co/600x400/2ECC71/1A1A1A?text=${encodeURIComponent(alt)}&font=Inter`;
+  return (
   <div className={styles.mainImageContainer} data-aos="fade-right">
-    <Image src={src} alt={alt} width={700} height={525} style={{ objectFit: 'contain', borderRadius: 'var(--rounded-lg)' }} priority />
+    <Image src={actualSrc} alt={alt} width={700} height={525} style={{ objectFit: 'contain', borderRadius: 'var(--rounded-lg)' }} priority />
   </div>
-);
+  );
+};
 
 const ThumbnailImages = ({ images, current, productName }) => (
   <div className={styles.thumbnailContainer} data-aos="fade-right" data-aos-delay="100">

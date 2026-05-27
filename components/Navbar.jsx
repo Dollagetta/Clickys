@@ -38,6 +38,7 @@ const Navbar = () => {
     { href: "/whats-new", label: "What's New" },
     { href: "/products", label: "Amazon Products" },
     { href: "/deals", label: "All Products" },
+    { href: "/daily-deals", label: "Daily Deals" },
     { href: "/wishlist", label: "Wishlist" },
     { href: "/about", label: "About Us" },
   ];

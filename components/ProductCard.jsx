@@ -203,7 +203,10 @@ const ProductCard = ({ product }) => {
             priority={true}
             unoptimized={true}
             className={styles.productImage}
-            onError={(e) => e.currentTarget.src = `https://placehold.co/200x150/CCCCCC/1A1A1A?text=Error&font=Inter`}
+            onError={(e) => {
+              if (e.currentTarget.src.includes('placehold.co')) return;
+              e.currentTarget.src = `https://placehold.co/200x150/CCCCCC/1A1A1A?text=Error&font=Inter`;
+            }}
           />}
           {isPrismicImage && <PrismicNextImage field={imageUrl} priority={true} className={styles.productImage} style={{ objectFit: isPartner ? 'cover' : 'contain' }} />}
           
@@ -363,7 +366,10 @@ const ProductCard = ({ product }) => {
                     height={250}
                     style={{ objectFit: 'contain', margin: '0 auto', display: 'block' }}
                     unoptimized={true}
-                    onError={(e) => e.currentTarget.src = `https://placehold.co/300x250/CCCCCC/1A1A1A?text=Error&font=Inter`}
+                    onError={(e) => {
+                      if (e.currentTarget.src.includes('placehold.co')) return;
+                      e.currentTarget.src = `https://placehold.co/300x250/CCCCCC/1A1A1A?text=Error&font=Inter`;
+                    }}
                   />}
                   {isPrismicImage && <PrismicNextImage field={imageUrl} style={{ objectFit: 'contain', width: '100%', height: 'auto', maxHeight: '250px' }} />}
                 </div>

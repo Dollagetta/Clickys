@@ -29,6 +29,8 @@ const ProductCard = ({ product }) => {
     discount = false,
   } = product;
 
+  const actualImageUrl = imageUrl || `https://placehold.co/600x400/2ECC71/1A1A1A?text=${encodeURIComponent(name)}&font=Inter`;
+
   const handleShare = (e) => {
     e.stopPropagation();
     if (navigator.share) {
@@ -63,13 +65,16 @@ const ProductCard = ({ product }) => {
       <Link href={`/products/${slug}`} className={styles.cardLinkWrapper}> {/* Updated Link */}
         <motion.div className={styles.imageWrapper} variants={imageVariants}>
           <Image
-            src={imageUrl}
+            src={actualImageUrl}
             alt={name}
             width={400}
             height={300}
             style={{ objectFit: 'cover' }}
             className={styles.productImage}
-            onError={(e) => e.currentTarget.src = `https://placehold.co/600x400/CCCCCC/1A1A1A?text=Error&font=Inter`}
+            onError={(e) => {
+              if (e.currentTarget.src.includes('placehold.co')) return;
+              e.currentTarget.src = `https://placehold.co/600x400/CCCCCC/1A1A1A?text=Error&font=Inter`;
+            }}
           />
           {product.onPromotion && <span className={styles.promoTag}>Offer</span>}
           <div className={styles.quickActions}>
