@@ -1,7 +1,7 @@
 import NewsletterSubscription from '../components/NewsletterSubscription';
 import SmartShopFeatures from '../components/SmartShopFeatures';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 86400; // Cache for 24 hours to maximize speed and minimize API cost
 import { searchAmazonProducts } from '../lib/amazon/search-products';
 
 // app/page.js (Homepage)

@@ -9,7 +9,7 @@ import { asText } from "@prismicio/client";
 import { PrismicNextImage } from "@prismicio/next";
 import styles from '../../../styles/Home.module.css';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 86400;
 
 export default async function CategoryPage({ params }) {
   const { slug } = await params;

@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const revalidate = 86400;
 // app/privacy-policy/page.js
 
 import Link from 'next/link';

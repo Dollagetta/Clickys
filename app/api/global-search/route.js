@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '../../../prismicio';
 import * as prismic from '@prismicio/client';
 import { searchAmazonProducts } from '../../../lib/amazon/search-products';
+import { products as localProducts } from '../../../components/products';
 
 export async function GET(request) {
   try {
@@ -67,7 +68,17 @@ export async function GET(request) {
        }
     });
 
-    const combined = [...amazonProducts, ...mappedPrismic];
+    // 3. Fetch from local products (including Daily Deals)
+    const lowerQuery = queryParam.toLowerCase();
+    const matchedLocalProducts = isBroad 
+      ? localProducts 
+      : localProducts.filter(p => 
+          (p.name && p.name.toLowerCase().includes(lowerQuery)) || 
+          (p.shortDescription && p.shortDescription.toLowerCase().includes(lowerQuery)) || 
+          (p.category && p.category.toLowerCase().includes(lowerQuery))
+        );
+
+    const combined = [...amazonProducts, ...mappedPrismic, ...matchedLocalProducts];
     return NextResponse.json({ results: combined });
 
   } catch(e) {

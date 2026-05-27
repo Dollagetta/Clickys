@@ -29,7 +29,7 @@ const CategoryHighlight = ({ category, aosData = "zoom-in" }) => {
       whileTap={{ scale: 0.95 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >
-      <Link href={`/categories/${slug}`} className={styles.categoryLink}>
+      <Link href={`/daily-deals?category=${name}`} className={styles.categoryLink}>
         {imageField?.url ? (
           <div className={styles.imageContainer}>
             <PrismicNextImage 

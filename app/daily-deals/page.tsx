@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { fetchProductsFromSheet } from '@/lib/products';
 import DailyDealsClient from './DailyDealsClient';
 
-export const revalidate = 60; // optionally revalidate every 60s
+export const revalidate = 86400; // Cache for 24 hours to maximize speed and minimize API cost
 
 export default async function DealsPage() {
   let products = [];
@@ -46,7 +46,9 @@ export default async function DealsPage() {
           No deals found matching your criteria.
         </div>
       ) : (
-        <DailyDealsClient initialProducts={mappedProducts} />
+        <Suspense fallback={<div>Loading deals...</div>}>
+          <DailyDealsClient initialProducts={mappedProducts} />
+        </Suspense>
       )}
     </div>
   );

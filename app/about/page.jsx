@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const revalidate = 86400;
 // app/about/page.js
 // This is a Server Component by default.
 

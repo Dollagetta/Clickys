@@ -19,9 +19,9 @@ export default function HomeSidebar() {
 
   const goToProducts = (queries = {}) => {
     const params = new URLSearchParams();
-    if (queries.category) params.set('q', queries.category);
+    if (queries.category) params.set('category', queries.category);
     if (queries.platform) params.set('platform', queries.platform);
-    router.push(`/products?${params.toString()}`);
+    router.push(`/daily-deals?${params.toString()}`);
   };
 
   const handlePriceSubmit = (e) => {

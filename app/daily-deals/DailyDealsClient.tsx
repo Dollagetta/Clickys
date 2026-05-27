@@ -1,15 +1,29 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import ProductCard from '@/components/ProductCard';
 import { FiSearch, FiFilter, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
 export default function DailyDealsClient({ initialProducts }: { initialProducts: any[] }) {
+  const searchParams = useSearchParams();
+  const initialCategory = searchParams.get('category') || 'All';
+  const initialPlatform = searchParams.get('platform') || 'All';
+  
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [selectedPlatform, setSelectedPlatform] = useState('All');
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
+  const [selectedPlatform, setSelectedPlatform] = useState(initialPlatform);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(12);
+
+  // Update selected states if query params change
+  useEffect(() => {
+    const cat = searchParams.get('category');
+    if (cat) setSelectedCategory(cat);
+    
+    const plat = searchParams.get('platform');
+    if (plat) setSelectedPlatform(plat);
+  }, [searchParams]);
 
   // Responsive items per page
   useEffect(() => {

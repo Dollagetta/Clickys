@@ -39,8 +39,8 @@ export async function fetchProductsFromSheet(categoryQuery: string | null = null
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       },
-      // Cache data for 1 hour to heavily optimize load times & avoid rate limits
-      next: { revalidate: 3600 } 
+      // Cache data for 24 hours to maximize speed & avoid rate limits
+      next: { revalidate: 86400 } 
     }
   );
 
