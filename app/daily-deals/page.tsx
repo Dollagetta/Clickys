@@ -1,21 +1,17 @@
 import React from 'react';
-
-async function getProducts() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-  try {
-    const res = await fetch(`${baseUrl}/api/products`, { cache: 'no-store' });
-    const data = await res.json();
-    if (!res.ok) return { error: true, message: data.error || 'Fetch failed', raw: data };
-    return { data };
-  } catch (err: any) {
-    return { error: true, message: err.message };
-  }
-}
+import { fetchProductsFromSheet } from '@/lib/products';
 
 export default async function DealsPage() {
-  const response = await getProducts();
-  const products = response.data || [];
-  const error = response.error;
+  let products = [];
+  let error = false;
+  let message = "";
+
+  try {
+    products = await fetchProductsFromSheet();
+  } catch (err: any) {
+    error = true;
+    message = err.message;
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
@@ -25,8 +21,7 @@ export default async function DealsPage() {
       {error && (
         <div className="bg-red-50 text-red-600 p-4 rounded mb-6">
           <h3 className="font-bold">Error loading products:</h3>
-          <p>{response.message}</p>
-          {response.raw && <pre className="mt-2 text-xs overflow-auto max-h-40">{JSON.stringify(response.raw, null, 2)}</pre>}
+          <p>{message}</p>
         </div>
       )}
 
