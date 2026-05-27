@@ -1,6 +1,8 @@
 import React from 'react';
 import { fetchProductsFromSheet } from '@/lib/products';
-import ProductCard from '@/components/ProductCard';
+import DailyDealsClient from './DailyDealsClient';
+
+export const revalidate = 60; // optionally revalidate every 60s
 
 export default async function DealsPage() {
   let products = [];
@@ -14,39 +16,38 @@ export default async function DealsPage() {
     message = err.message;
   }
 
+  // Pre-map the initial products for the client
+  const mappedProducts = products.map((product: any, idx: number) => ({
+    id: `daily-deal-${idx}`,
+    name: product.title || '',
+    category: product.category || 'Uncategorized',
+    price: product.price || '0',
+    amazonLink: product.link || '#',
+    imageUrl: product.image || '',
+    discount: product.discount || '',
+    platform: product.platform || '',
+  }));
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
       {/* Prismic CMS headers/nav can easily sit above this section in your RootLayout */}
-      <h1 className="text-3xl font-bold mb-8">Daily Deals</h1>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Daily Deals</h1>
+        <p className="text-gray-500 mt-2">Discover the best hand-picked deals from top platforms like Amazon, Flipkart, Myntra, and more.</p>
+      </div>
 
-      {error && (
+      {error ? (
         <div className="bg-red-50 text-red-600 p-4 rounded mb-6">
           <h3 className="font-bold">Error loading products:</h3>
           <p>{message}</p>
         </div>
-      )}
-
-      {products.length === 0 && !error && (
+      ) : mappedProducts.length === 0 ? (
         <div className="bg-yellow-50 text-yellow-800 p-4 rounded mb-6">
-          No products found. (API returned an empty array).
+          No deals found matching your criteria.
         </div>
+      ) : (
+        <DailyDealsClient initialProducts={mappedProducts} />
       )}
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-        {products.map((product: any, idx: number) => {
-          const mappedProduct = {
-            id: `daily-deal-${idx}`,
-            name: product.title,
-            category: product.category,
-            price: product.price,
-            amazonLink: product.link,
-            imageUrl: product.image,
-            discount: product.discount,
-            platform: 'Amazon',
-          };
-          return <ProductCard key={idx} product={mappedProduct} />;
-        })}
-      </div>
     </div>
   );
 }

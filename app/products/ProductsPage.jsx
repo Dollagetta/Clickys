@@ -58,7 +58,7 @@ export default function ProductsPage({ products: initialProductsList = [] }) {
   const [selectedPlatforms, setSelectedPlatforms] = useState(platformParam ? [platformParam] : []);
   const allPlatforms = ['Amazon', 'Flipkart', 'Meesho', 'Ajio', 'TataCliQ', 'JioMart', 'Firstcry', 'Zara', 'Shopsy'];
   
-  const [openSections, setOpenSections] = useState({ categories: true, platform: true, discount: true, price: true });
+  const [openSections, setOpenSections] = useState({ categories: false, platform: false, discount: false, price: false });
   const toggleSection = (s) => setOpenSections(prev => ({...prev, [s]: !prev[s]}));
 
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });

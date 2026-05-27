@@ -7,7 +7,7 @@ import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
 export default function HomeSidebar() {
   const router = useRouter();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [openSections, setOpenSections] = useState({ categories: true, platform: true, discount: true, price: true });
+  const [openSections, setOpenSections] = useState({ categories: false, platform: false, discount: false, price: false });
   const toggleSection = (s) => setOpenSections(prev => ({...prev, [s]: !prev[s]}));
 
   const [categorySearchTerm, setCategorySearchTerm] = useState('');

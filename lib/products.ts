@@ -31,9 +31,9 @@ export async function fetchProductsFromSheet(categoryQuery: string | null = null
   const client = await auth.getClient();
   const accessToken = (await client.getAccessToken()).token;
 
-  // Fetching A:F based on our data format (Title, Price, Link, Image, Category, Discount)
+  // Fetching A:G based on our data format (Title, Price, Link, Image, Category, Discount, Platform)
   const response = await fetch(
-    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/A:F`,
+    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/A:G`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -61,7 +61,8 @@ export async function fetchProductsFromSheet(categoryQuery: string | null = null
         link: row[2] || '',
         image: row[3] || '',
         category: row[4] || 'Uncategorized',
-        discount: row[5] || ''
+        discount: row[5] || '',
+        platform: row[6] || ''
       }));
 
   if (categoryQuery) {
