@@ -51,7 +51,8 @@ export default function AffiliateProductsPage({ affiliate, products = [] }) {
 
         return (
           product?.name?.toLowerCase()?.includes(term) ||
-          product?.category?.toLowerCase()?.includes(term)
+          product?.category?.toLowerCase()?.includes(term) ||
+          product?.platform?.toLowerCase()?.includes(term)
         );
       });
     }

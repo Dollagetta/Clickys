@@ -26,12 +26,9 @@ const securityHeaders = [
 ];
 
 const nextConfig = {
-  output: 'standalone',
+  transpilePackages: ['react-icons'],
   poweredByHeader: false,
   compress: true,
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   async headers() {
     return [
       {

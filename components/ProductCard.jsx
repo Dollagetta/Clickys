@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from '../styles/ProductCard.module.css';
-import { FiShoppingCart, FiHeart, FiStar, FiShare2, FiEye, FiX } from 'react-icons/fi';
+import { FiShoppingCart, FiHeart, FiStar, FiShare2, FiEye, FiX, FiTrash2 } from 'react-icons/fi';
 import { PrismicNextImage } from "@prismicio/next";
 import { useWishlist } from './WishlistContext';
 import { useCompare } from './CompareContext';
@@ -16,6 +16,7 @@ import PriceHistoryChart from './PriceHistoryChart';
 const ProductCard = ({ product }) => {
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { compareItems, toggleCompare, setIsCompareDrawerOpen } = useCompare();
+  const [imgError, setImgError] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
    
   const affiliateColors = {
@@ -113,8 +114,11 @@ const ProductCard = ({ product }) => {
 
   const formattedPrice = formatPrice(rawPrice);
 
-  const imageUrl = product.imageUrl || `https://placehold.co/600x400/2ECC71/1A1A1A?text=${encodeURIComponent(name)}&font=Inter`;
+  const initialImageUrl = product.imageUrl || `https://placehold.co/600x400/2ECC71/1A1A1A?text=${encodeURIComponent(name)}&font=Inter`;
+  const imageUrl = imgError ? `https://placehold.co/600x400/CCCCCC/1A1A1A?text=Image+Error&font=Inter` : initialImageUrl;
 
+  const isBankOffer = typeof discount === 'string' && discount.toLowerCase().includes('bank offer');
+  const isDailyDeal = product.platform === 'Daily Deals' || isBankOffer || (product.id && (String(product.id).startsWith('daily-deal-') || String(product.id).startsWith('sheet-')));
 
     const platform = String(platformValue || 'Amazon');
     const hasValidPlatform = platform && platform !== 'null' && platform.trim() !== '';
@@ -194,27 +198,29 @@ const ProductCard = ({ product }) => {
     >
       <div className={styles.cardLinkWrapper}>
         <motion.div className={isPartner ? `${styles.imageWrapper} ${styles.partnerImageWrapper}` : styles.imageWrapper} variants={imageVariants}>
-          {!isPrismicImage && <Image
+          {!isPrismicImage && imageUrl && <Image
             src={imageUrl}
             alt={name}
             width={isPartner ? 400 : 200}
             height={isPartner ? 300 : 150}
             style={{ objectFit: isPartner ? 'cover' : 'contain' }}
-            priority={true}
             unoptimized={true}
             className={styles.productImage}
-            onError={(e) => {
-              if (e.currentTarget.src.includes('placehold.co')) return;
-              e.currentTarget.src = `https://placehold.co/200x150/CCCCCC/1A1A1A?text=Error&font=Inter`;
-            }}
+            onError={() => setImgError(true)}
           />}
-          {isPrismicImage && <PrismicNextImage field={imageUrl} priority={true} className={styles.productImage} style={{ objectFit: isPartner ? 'cover' : 'contain' }} />}
+          {isPrismicImage && imageUrl && <PrismicNextImage field={imageUrl} className={styles.productImage} style={{ objectFit: isPartner ? 'cover' : 'contain' }} />}
           
-          {tagText && <span className={styles.promoTag}>{tagText}</span>}
+          {isDailyDeal && displayPlatform ? (
+            <span className={styles.platformBadge}>{displayPlatform}</span>
+          ) : (
+            tagText && <span className={styles.promoTag}>{tagText}</span>
+          )}
+
+          {isBankOffer && <span className={styles.bankOfferBadge}>Bank Offer</span>}
           {featuredFind && <span className={styles.featuredBadge}>Featured Find</span>}
-          
-          <div className={styles.quickActions}>
-            { (discount && discount > 0) && <button aria-label="Discount" className={styles.discountBadge}>{discount}% Off</button> }
+
+          <div className={`${styles.quickActions} ${isBankOffer ? styles.shiftedActions : ''}`}>
+            { (!isBankOffer && discount && discount > 0) && <button aria-label="Discount" className={styles.discountBadge}>{discount}% Off</button> }
             <button 
               aria-label="Add to wishlist" 
               title="Add to wishlist"
@@ -359,19 +365,16 @@ const ProductCard = ({ product }) => {
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                 <div style={{ textAlign: 'center' }}>
-                  {!isPrismicImage && <Image
+                  {!isPrismicImage && imageUrl && <Image
                     src={imageUrl}
                     alt={name}
                     width={300}
                     height={250}
                     style={{ objectFit: 'contain', margin: '0 auto', display: 'block' }}
                     unoptimized={true}
-                    onError={(e) => {
-                      if (e.currentTarget.src.includes('placehold.co')) return;
-                      e.currentTarget.src = `https://placehold.co/300x250/CCCCCC/1A1A1A?text=Error&font=Inter`;
-                    }}
+                    onError={() => setImgError(true)}
                   />}
-                  {isPrismicImage && <PrismicNextImage field={imageUrl} style={{ objectFit: 'contain', width: '100%', height: 'auto', maxHeight: '250px' }} />}
+                  {isPrismicImage && imageUrl && <PrismicNextImage field={imageUrl} style={{ objectFit: 'contain', width: '100%', height: 'auto', maxHeight: '250px' }} />}
                 </div>
 
                 <div>

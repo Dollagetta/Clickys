@@ -75,16 +75,18 @@ function LaunchCard({ item }) {
       >
         {/* Image */}
         <div style={{ position: 'relative', width: '100%', height: '160px', background: '#f8f8f8', overflow: 'hidden' }}>
-          <img
-            src={item.imageUrl || fallbackImg}
-            alt={item.name}
-            referrerPolicy="no-referrer"
-            style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '12px' }}
-            onError={e => {
-              if (e.target.src === fallbackImg) return;
-              e.target.src = fallbackImg;
-            }}
-          />
+          {(item.imageUrl || fallbackImg) && (
+            <img
+              src={item.imageUrl || fallbackImg}
+              alt={item.name}
+              referrerPolicy="no-referrer"
+              style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '12px' }}
+              onError={e => {
+                if (e.target.src === fallbackImg) return;
+                e.target.src = fallbackImg;
+              }}
+            />
+          )}
           {/* Badge */}
           <span style={{
             position: 'absolute', top: 8, left: 8,
@@ -212,16 +214,18 @@ function LaunchCard({ item }) {
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <div style={{ textAlign: 'center', background: '#f8fafc', padding: '1.5rem', borderRadius: '12px' }}>
-              <img
-                src={item.imageUrl || fallbackImg}
-                alt={item.name}
-                referrerPolicy="no-referrer"
-                style={{ objectFit: 'contain', margin: '0 auto', display: 'block', maxWidth: '300px', maxHeight: '250px', width: '100%', mixBlendMode: 'multiply' }}
-                onError={(e) => {
-                  if (e.currentTarget.src === fallbackImg) return;
-                  e.currentTarget.src = fallbackImg;
-                }}
-              />
+              {(item.imageUrl || fallbackImg) && (
+                <img
+                  src={item.imageUrl || fallbackImg}
+                  alt={item.name}
+                  referrerPolicy="no-referrer"
+                  style={{ objectFit: 'contain', margin: '0 auto', display: 'block', maxWidth: '300px', maxHeight: '250px', width: '100%', mixBlendMode: 'multiply' }}
+                  onError={(e) => {
+                    if (e.currentTarget.src === fallbackImg) return;
+                    e.currentTarget.src = fallbackImg;
+                  }}
+                />
+              )}
             </div>
 
             <div>

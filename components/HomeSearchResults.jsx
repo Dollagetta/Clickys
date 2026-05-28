@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import ProductCard from './ProductCard';
 import styles from '../styles/DealsPage.module.css'; // Just reuse some styles
 import { FiLoader, FiAlertCircle, FiChevronLeft, FiChevronRight, FiArrowLeft } from 'react-icons/fi';
@@ -10,6 +10,7 @@ import * as prismic from '@prismicio/client';
 
 export default function HomeSearchResults() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const q = searchParams.get('q');
   const cat = searchParams.get('category');
   const discount = parseInt(searchParams.get('discount') || '0', 10);
@@ -31,8 +32,7 @@ export default function HomeSearchResults() {
     try {
       let combined = [];
       try {
-        const queryParam = (q && q.trim() !== '') ? q : (cat && cat !== 'All' ? cat : 'Trending'); 
-        const searchRes = await fetch(`/api/global-search?q=${encodeURIComponent(queryParam)}`);
+        const searchRes = await fetch(`/api/global-search?q=${encodeURIComponent(q || '')}&category=${encodeURIComponent(cat || 'All')}`);
         if (searchRes.ok) {
           const data = await searchRes.json();
           combined = data.results || [];
@@ -81,7 +81,7 @@ export default function HomeSearchResults() {
             Search Results {q && q !== 'All' ? `for "${q}"` : ''}
           </h2>
           <button 
-            onClick={() => window.location.href = '/'}
+            onClick={() => router.push('/')}
             style={{ 
               display: 'inline-flex', 
               alignItems: 'center', 

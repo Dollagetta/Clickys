@@ -1,5 +1,4 @@
 import NewsletterSubscription from '../components/NewsletterSubscription';
-import SmartShopFeatures from '../components/SmartShopFeatures';
 
 export const revalidate = 86400; // Cache for 24 hours to maximize speed and minimize API cost
 import { searchAmazonProducts } from '../lib/amazon/search-products';
@@ -210,18 +209,6 @@ export default async function HomePage() {
           <NewLaunchesSection />
         </div>
       </div>
-      
-      <section className={`${styles.section}`}>
-        <div className="container mx-auto px-4 max-w-5xl">
-            <h2 className={`${styles.sectionTitle} text-center`} data-aos="fade-up">
-              <FiZap className={styles.titleIcon} /> Smart Shopping Tools
-            </h2>
-            <p className={`${styles.sectionSubtitle} text-center mb-8`} data-aos="fade-up" data-aos-delay="100">
-              Find gifts, track prices, and compare options.
-            </p>
-            <SmartShopFeatures />
-        </div>
-      </section>
 
       {/* Featured Products Section */}
       <section className={`${styles.section} ${styles.featuredProductsSection}`} style={{ borderColor: '#d49e32', borderStyle: 'solid', borderWidth: '1px' }}>

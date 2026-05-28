@@ -134,6 +134,75 @@
   margin-bottom: 4px;
 }
 
+.bankOfferBadge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #e91e63; /* Pink from image */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  z-index: 12;
+}
+
+.shiftedActions {
+  top: 45px !important;
+}
+
+.platformBadge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: white;
+  color: var(--affcolor);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border: 1px solid var(--affcolor);
+}
+
+.trashAction {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #fff1f2; /* Light pink background */
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e11d48; /* Red trash icon */
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.priceTagBadge {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: #ff5722; /* Vivid Orange */
+  color: white;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 900;
+  z-index: 5;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
 .actionButton {
   background-color: rgba(255, 255, 255, 0.95);
   border: 1px solid #e5e7eb;

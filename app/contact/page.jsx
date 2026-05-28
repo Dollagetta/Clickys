@@ -62,7 +62,7 @@ export default function ContactPage() {
                   <FiMapPin className={styles.contactIcon} />
                   <div>
                     <strong>Our Office:</strong>
-                    <span>Peddapuram, Andhra Pradesh, India</span>
+                    <span>Kakinada, East Godavari, Andhra Pradesh, India</span>
                   </div>
                 </li>
               </ul>
@@ -82,7 +82,7 @@ export default function ContactPage() {
             <h2 className={styles.sectionHeading}>Find Us On The Map</h2>
             <div className={styles.mapEmbed}>
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3813.8627317065757!2d82.1342794738212!3d17.07936581160822!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a37817acfbe52e5%3A0xf2db667eb06d3475!2sK.K.Golden%20Jubilee%20Resorts%20(A%2Fc)%20(convention%20hall)(%20kalyanamandapam)!5e0!3m2!1sen!2sin!4v1748168674929!5m2!1sen!2sin"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15248.868031526463!2d82.2325359520037!3d16.98906161474246!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a38284132d4a227%3A0x3ea7d812c5253676!2sKakinada%2C+Andhra+Pradesh!5e0!3m2!1sen!2sin"
                 width="100%"
                 height="400"
                 style={{ border:0, borderRadius: 'var(--rounded-lg)', boxShadow: 'var(--shadow-md)' }}

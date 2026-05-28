@@ -7,8 +7,8 @@ import { FiSearch, FiFilter, FiChevronLeft, FiChevronRight } from 'react-icons/f
 
 export default function DailyDealsClient({ initialProducts }: { initialProducts: any[] }) {
   const searchParams = useSearchParams();
-  const initialCategory = searchParams.get('category') || 'All';
-  const initialPlatform = searchParams.get('platform') || 'All';
+  const initialCategory = searchParams?.get('category') || 'All';
+  const initialPlatform = searchParams?.get('platform') || 'All';
   
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
@@ -18,10 +18,10 @@ export default function DailyDealsClient({ initialProducts }: { initialProducts:
 
   // Update selected states if query params change
   useEffect(() => {
-    const cat = searchParams.get('category');
+    const cat = searchParams?.get('category');
     if (cat) setSelectedCategory(cat);
     
-    const plat = searchParams.get('platform');
+    const plat = searchParams?.get('platform');
     if (plat) setSelectedPlatform(plat);
   }, [searchParams]);
 
@@ -56,7 +56,11 @@ export default function DailyDealsClient({ initialProducts }: { initialProducts:
   // Filter products based on search and dropdowns
   const filteredProducts = useMemo(() => {
     return initialProducts.filter(product => {
-      const matchesSearch = product.name?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
+      const matchesSearch = 
+        product.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        product.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.platform?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        false;
       const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
       const matchesPlatform = selectedPlatform === 'All' || product.platform === selectedPlatform;
       return matchesSearch && matchesCategory && matchesPlatform;
@@ -79,6 +83,15 @@ export default function DailyDealsClient({ initialProducts }: { initialProducts:
 
   return (
     <div className="w-full">
+      {/* Back button */}
+      <div className="mb-6 flex justify-start">
+        <button 
+          onClick={() => window.location.href = '/'}
+          className="flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-orange-500 transition-colors"
+        >
+          <FiChevronLeft /> Back to Home
+        </button>
+      </div>
       {/* Advanced Filter / Search Bar */}
       <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 mb-8 space-y-4 md:space-y-0 md:flex flex-wrap items-center justify-between gap-4">
         {/* Search */}

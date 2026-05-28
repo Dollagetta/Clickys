@@ -8,7 +8,6 @@ export const components = {
   moving_stripe: dynamic(() => import("./MovingStripe")),
   comparison_section: dynamic(() => import("./ComparisonSection")),
   cta_banner: dynamic(() => import("./CTABanner")),
-  ai_recommendations: dynamic(() => import("./AIRecommendations")),
   the_big_burner: dynamic(() => import("./TheBigBurner")),
   whatsnew: dynamic(() => import("./TheBigBurner")),
   the_shopping_grid: dynamic(() => import("./TheShoppingGrid")),

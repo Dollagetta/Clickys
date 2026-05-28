@@ -34,13 +34,13 @@ const Navbar = () => {
 
   const navLinks = [
     { href: "/", label: "Home" },
-    { href: "/ai-shopper", label: "Smart Shop" },
     { href: "/whats-new", label: "What's New" },
     { href: "/products", label: "Amazon Products" },
     { href: "/deals", label: "All Products" },
     { href: "/daily-deals", label: "Daily Deals" },
     { href: "/wishlist", label: "Wishlist" },
     { href: "/about", label: "About Us" },
+    { href: "/contact", label: "Contact Us" },
   ];
 
   return (

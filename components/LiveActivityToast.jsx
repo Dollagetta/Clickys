@@ -11,7 +11,7 @@ const messages = [
   { icon: FiShoppingBag, text: () => `A user just completed a purchase via our partner link.`, color: "text-purple-500", bg: "bg-purple-100" },
   { icon: FiStar, text: () => `This product just received a 5-star rating!`, color: "text-yellow-500", bg: "bg-yellow-100" },
   { icon: FiZap, text: () => `Flash deal ending soon on top accessories!`, color: "text-orange-500", bg: "bg-orange-100" },
-  { icon: FiMessageCircle, text: () => `Our AI Shopper just helped someone find the perfect gift.`, color: "text-indigo-500", bg: "bg-indigo-100" },
+  { icon: FiMessageCircle, text: () => `Our expert team just helped someone find the perfect gift.`, color: "text-indigo-500", bg: "bg-indigo-100" },
   { icon: FiTag, text: () => `New discount code applied for a smartwatch deal.`, color: "text-teal-500", bg: "bg-teal-100" },
 ];
 
