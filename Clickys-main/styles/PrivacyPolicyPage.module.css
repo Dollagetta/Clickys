@@ -1,0 +1,94 @@
+/* styles/PrivacyPolicyPage.module.css */
+.privacyPageContainer {
+  padding-bottom: 3rem;
+}
+
+.pageHeader {
+  background: linear-gradient(120deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+  color: var(--neutral-white);
+  padding: 3.5rem 1rem;
+  text-align: center;
+  margin-bottom: 3rem;
+  border-bottom: 5px solid var(--primary-yellow);
+}
+
+.pageTitle {
+  font-size: 2.8rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.25);
+}
+
+.pageSubtitle {
+  font-size: 1.15rem;
+  max-width: 750px;
+  margin: 0 auto;
+  opacity: 0.95;
+  line-height: 1.6;
+}
+
+.contentSection {
+  padding: 0 1rem 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.contentSection h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--neutral-black);
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.contentSection h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--neutral-black);
+  margin-top: 2rem;
+  margin-bottom: 0.8rem;
+}
+
+.contentSection p {
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--dark-gray);
+  margin-bottom: 1.2rem;
+}
+
+.contentSection ul {
+  list-style-type: disc;
+  margin-left: 1.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.contentSection li {
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--dark-gray);
+  margin-bottom: 0.5rem;
+}
+
+.contentSection a {
+  color: var(--primary-green);
+  text-decoration: underline;
+  transition: color 0.3s;
+}
+
+.contentSection a:hover {
+  color: var(--secondary-green);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .pageHeader { padding: 2.5rem 1rem; }
+  .pageTitle { font-size: 2.2rem; }
+  .pageSubtitle { font-size: 1rem; }
+  .contentSection h2 { font-size: 1.5rem; }
+  .contentSection h3 { font-size: 1.2rem; }
+  .contentSection p, .contentSection li { font-size: 1rem; }
+}
