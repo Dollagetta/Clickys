@@ -192,18 +192,18 @@ export default function HomeSidebar() {
       )}
 
       {/* Desktop static layout & Mobile Toggle Header */}
-      <aside className={`w-full lg:w-72 shrink-0 bg-white border border-gray-200 p-5 lg:p-6 rounded-2xl h-max lg:sticky lg:top-24 self-start shadow-sm mb-4 lg:mb-0 ${isMobileOpen ? 'hidden lg:block' : 'block'}`}>
-        <div className="flex justify-between items-center lg:mb-6 lg:pb-4 lg:border-b">
+      <aside className={`w-full lg:w-[220px] xl:w-[250px] shrink-0 bg-white border border-gray-200 p-3 lg:p-4 rounded-2xl shadow-sm mb-4 lg:mb-0 lg:sticky lg:top-24 self-start lg:-ml-[77px] lg:-mt-[110px] ${isMobileOpen ? 'hidden lg:block' : 'flex flex-row lg:flex-col justify-between items-center lg:items-stretch block'}`} style={{ maxHeight: '85vh', overflowY: 'auto' }}>
+        <div className="flex justify-between items-center w-full lg:mb-4 lg:pb-3 lg:border-b">
           <h2 className="text-xl lg:text-2xl font-extrabold flex items-center text-gray-900 border-none pb-0 mb-0">Filter</h2>
           <button 
-            className="lg:hidden p-2 bg-gray-100 rounded-lg text-gray-600 hover:bg-gray-200"
+            className="lg:hidden p-2 bg-gray-100 rounded-lg text-gray-600 hover:bg-gray-200 ml-auto"
             onClick={() => setIsMobileOpen(true)}
           >
             <FiChevronDown size={24} />
           </button>
         </div>
         
-        <div className="hidden lg:block">
+        <div className="hidden lg:block w-full">
           {renderFilters()}
         </div>
       </aside>

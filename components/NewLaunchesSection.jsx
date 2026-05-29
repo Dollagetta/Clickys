@@ -45,8 +45,7 @@ function LaunchCard({ item }) {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        minWidth: '200px',
-        maxWidth: '200px',
+        width: '100%',
         background: '#fff',
         borderRadius: '16px',
         overflow: 'hidden',
@@ -54,7 +53,6 @@ function LaunchCard({ item }) {
         transition: 'transform 0.22s ease, box-shadow 0.22s ease',
         textDecoration: 'none',
         color: 'inherit',
-        flexShrink: 0,
         border: '1.5px solid #f0f0f0',
         position: 'relative'
       }}
@@ -324,8 +322,8 @@ function LaunchCard({ item }) {
 function SkeletonCard() {
   return (
     <div style={{
-      minWidth: '200px', maxWidth: '200px', height: '290px',
-      background: '#f3f4f6', borderRadius: '16px', flexShrink: 0,
+      width: '100%', height: '290px',
+      background: '#f3f4f6', borderRadius: '16px',
       animation: 'pulse 1.5s ease-in-out infinite',
     }} />
   );
@@ -395,21 +393,16 @@ export default function NewLaunchesSection() {
             <Link href="/whats-new" style={{ fontSize: '12px', color: '#111', fontWeight: 600, textDecoration: 'none', marginRight: 8 }}>
               See all →
             </Link>
-            <button onClick={() => scroll(-1)} style={btnStyle(canScrollLeft)} disabled={!canScrollLeft} aria-label="Scroll left">‹</button>
-            <button onClick={() => scroll(1)} style={btnStyle(canScrollRight)} disabled={!canScrollRight} aria-label="Scroll right">›</button>
           </div>
         </div>
 
-        {/* Scrollable Row */}
+        {/* Product Grid */}
         <div
-          ref={scrollRef}
-          onScroll={onScroll}
-          className="nl-scroll"
-          style={{ display: 'flex', gap: 14, overflowX: 'auto', paddingBottom: 4, backgroundColor: '#d97d2c' }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 pb-1 pt-2 w-full"
         >
           {loading
-            ? Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
-            : launches.map(item => <LaunchCard key={item.id} item={item} />)
+            ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
+            : launches.slice(0, 4).map(item => <LaunchCard key={item.id} item={item} />)
           }
         </div>
       </div>

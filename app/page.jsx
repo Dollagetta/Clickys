@@ -17,6 +17,9 @@ import AffiliateCardsSkeleton from '../components/AffiliateCardsSkeleton';
 import CompactSearchBar from '../components/CompactSearchBar';
 import HomeSearchResults from '../components/HomeSearchResults';
 import HeroSlider from '../components/HeroSlider';
+import PriceTracker from '../components/PriceTracker';
+import ProductComparator from '../components/ProductComparator';
+import GiftFinder from '../components/GiftFinder';
 import styles from '../styles/Home.module.css';
 import { FiZap, FiShoppingCart, FiTrendingUp, FiGift, FiShield, FiThumbsUp, FiArrowRight, FiMessageSquare, FiAward, FiCheckCircle, FiClock } from 'react-icons/fi';
 import Image from 'next/image'; // For Buying Guides section images
@@ -209,6 +212,33 @@ export default async function HomePage() {
           <NewLaunchesSection />
         </div>
       </div>
+
+      {/* Modern Interactive Tools Section */}
+      <section className="py-16 my-10 relative overflow-hidden" style={{ borderRadius: '40px', margin: '2rem 1rem', backgroundColor: '#cd7214', color: '#0a0a0b', fontSize: '20px', fontWeight: 'bold' }}>
+        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 rounded-full bg-pink-200 opacity-30 blur-3xl pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-[400px] h-[400px] rounded-full bg-orange-200 opacity-30 blur-3xl pointer-events-none"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-b from-transparent via-white/40 to-transparent pointer-events-none"></div>
+        
+        <div className="container mx-auto px-4 relative z-10 w-full">
+          <div className="text-center mb-10" data-aos="fade-up">
+            <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">Smart Shopping Tools</h2>
+            <p className="text-lg max-w-2xl mx-auto" style={{ color: '#030304' }}>Track prices, compare products, and find the perfect gifts seamlessly.</p>
+          </div>
+          
+          <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-6 pt-2 px-1 md:grid md:grid-cols-3 md:overflow-visible md:snap-none md:gap-6 hide-scrollbar max-w-[1400px] mx-auto items-stretch h-auto min-h-[420px]">
+            <div className="flex-none w-[85vw] md:w-auto h-full snap-center">
+               <PriceTracker />
+            </div>
+            <div className="flex-none w-[85vw] md:w-auto h-full snap-center">
+               <ProductComparator />
+            </div>
+            <div className="flex-none w-[85vw] md:w-auto h-full snap-center">
+               <GiftFinder />
+            </div>
+          </div>
+          
+        </div>
+      </section>
 
       {/* Featured Products Section */}
       <section className={`${styles.section} ${styles.featuredProductsSection}`} style={{ borderColor: '#d49e32', borderStyle: 'solid', borderWidth: '1px' }}>
