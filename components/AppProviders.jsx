@@ -18,6 +18,35 @@ export default function AppProviders({ children }) {
       offset: 30, // Trigger animations a bit sooner
       delay: 50,  // Slight delay for staggered effect if multiple elements animate
     });
+
+    // Disable right-click
+    const handleContextMenu = (e) => {
+      e.preventDefault();
+    };
+
+    // Disable Inspect Element (shortcuts)
+    const handleKeyDown = (e) => {
+      // F12 key
+      if (e.keyCode === 123) {
+        e.preventDefault();
+      }
+      // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+      if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
+        e.preventDefault();
+      }
+      // Ctrl+U (View Source)
+      if (e.ctrlKey && e.keyCode === 85) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener('contextmenu', handleContextMenu);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('contextmenu', handleContextMenu);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   return (

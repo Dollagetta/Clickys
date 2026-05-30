@@ -271,7 +271,7 @@ function DealsPageContent() {
             <p className={styles.pageSubtitle}>
               Search top products from Amazon, Flipkart, and more—all in one place, handpicked by experts.
             </p>
-            <p className={styles.disclaimer} style={{ color: '#0a0909' }}>We might earn commission on qualifying purchases at no extra cost to you.</p>
+            <p className={styles.disclaimer} style={{ color: '#0a0909' }}>As an Amazon Affiliate we may earn from qualifying purchases.</p>
           </div>
         </header>
 
