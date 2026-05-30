@@ -25,7 +25,13 @@ export default function ContactForm() {
         body: JSON.stringify(formData),
       });
 
-      const data = await res.json();
+      let data;
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.indexOf("application/json") !== -1) {
+        data = await res.json();
+      } else {
+        data = { error: 'Received unexpected response from server' };
+      }
 
       if (!res.ok) {
         throw new Error(data.error || 'Failed to send message');

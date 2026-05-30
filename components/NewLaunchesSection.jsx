@@ -7,6 +7,7 @@ const BADGE_COLORS = {
   'Hot Drop':       { bg: '#ff7a00', text: '#fff' },
   'Exclusive':      { bg: '#7c3aed', text: '#fff' },
   'Bestseller':     { bg: '#16a34a', text: '#fff' },
+  'Trending':       { bg: '#f97316', text: '#fff' },
 };
 
 function getFallbackImage(category, name) {
@@ -85,26 +86,38 @@ function LaunchCard({ item }) {
               }}
             />
           )}
+          {/* Discount at the top */}
+          {item.discount && (
+            <span style={{
+              position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
+              background: '#ef4444', color: '#fff',
+              fontSize: '10px', fontWeight: 700,
+              padding: '2px 8px', borderBottomLeftRadius: '6px', borderBottomRightRadius: '6px',
+              zIndex: 10,
+            }}>
+              {item.discount}
+            </span>
+          )}
           {/* Badge */}
           <span style={{
             position: 'absolute', top: 8, left: 8,
-            background: badge.bg, color: badge.text,
+            background: item.badge?.toLowerCase() === 'trending' ? '#f97316' : badge.bg, color: badge.text,
             fontSize: '10px', fontWeight: 700,
             padding: '3px 8px', borderRadius: '100px',
             letterSpacing: '0.04em', textTransform: 'uppercase',
           }}>
             {item.badge || 'New'}
           </span>
-          {/* NEW pill */}
+          {/* 2026 pill */}
           <span style={{
             position: 'absolute', top: 8, right: 8,
-            background: '#fff', color: '#111',
+            background: '#f97316', color: '#fff',
             fontSize: '9px', fontWeight: 700,
             padding: '2px 7px', borderRadius: '100px',
-            border: '1.5px solid #e5e7eb',
+            border: '1.5px solid #f97316',
             letterSpacing: '0.05em',
           }}>
-            🆕 {item.launchDate?.match(/\d{4}/)?.[0] || item.launchDate}
+            {item.launchDate?.match(/\d{4}/)?.[0] || item.launchDate}
           </span>
         </div>
       </Link>
@@ -118,7 +131,7 @@ function LaunchCard({ item }) {
           style={{ textDecoration: 'none', color: 'inherit' }}
         >
           <span style={{ fontSize: '10px', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            {item.brand} · {item.category}
+            {item.brand && item.brand.toLowerCase() !== 'clickys' ? `${item.brand} · ${item.category}` : item.category}
           </span>
           <p style={{ fontSize: '13px', fontWeight: 700, color: '#111', lineHeight: 1.35, margin: '4px 0 0 0',
             display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
@@ -131,10 +144,10 @@ function LaunchCard({ item }) {
         </Link>
         
         <div style={{ marginTop: 'auto', paddingTop: 8, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: '14px', fontWeight: 800, color: '#111' }}>{item.price}</span>
+          <span style={{ fontSize: '14px', fontWeight: 800, color: '#f97316' }}>{item.price}</span>
           <span style={{
             fontSize: '11px', fontWeight: 600,
-            color: item.platform === 'Amazon' ? '#ff9900' : item.platform === 'Flipkart' ? '#2874f0' : '#7c3aed',
+            color: item.platform === 'Amazon' ? '#ff9900' : item.platform === 'Flipkart' ? '#2874f0' : item.platform === 'Myntra' ? '#ff3f6c' : item.platform === 'Ajio' ? '#8458B3' : item.platform === 'Meesho' ? '#f43397' : '#f97316',
           }}>
             {item.platform}
           </span>
@@ -238,7 +251,7 @@ function LaunchCard({ item }) {
                   </button>
                 </div>
               </div>
-              <p style={{ color: '#475569', margin: '0 0 1rem 0', fontWeight: '500', fontSize: '1rem' }}>{item.price}</p>
+              <p style={{ color: '#f97316', margin: '0 0 1rem 0', fontWeight: '700', fontSize: '1rem' }}>{item.price}</p>
               
               <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', marginBottom: '1.5rem' }}>
                 <a
@@ -248,7 +261,7 @@ function LaunchCard({ item }) {
                   style={{
                     flex: 1,
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                    backgroundColor: item.platform === 'Amazon' ? '#f59e0b' : item.platform === 'Flipkart' ? '#2874f0' : '#0f172a',
+                    backgroundColor: item.platform === 'Amazon' ? '#f59e0b' : item.platform === 'Flipkart' ? '#2874f0' : item.platform === 'Myntra' ? '#ff3f6c' : item.platform === 'Ajio' ? '#8458B3' : item.platform === 'Meesho' ? '#f43397' : '#f97316',
                     color: '#fff',
                     padding: '0.85rem', borderRadius: '6px',
                     textDecoration: 'none', fontWeight: 'bold',
@@ -338,7 +351,14 @@ export default function NewLaunchesSection() {
 
   useEffect(() => {
     fetch('/api/new-launches')
-      .then(r => r.json())
+      .then(async r => {
+        if (!r.ok) throw new Error('Network response was not ok');
+        const contentType = r.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          return r.json();
+        }
+        throw new Error("Received HTML instead of JSON from server");
+      })
       .then(data => { setLaunches(data.launches || []); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
@@ -375,22 +395,22 @@ export default function NewLaunchesSection() {
         .nl-scroll::-webkit-scrollbar { display: none; }
         .nl-scroll { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
-      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 20px' }}>
+      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '20px 24px', backgroundColor: '#ffffff', borderWidth: '8px', borderStyle: 'solid', borderColor: '#f28b24', borderRadius: '50px' }}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ fontSize: 22 }}></span>
             <div>
-              <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 800, color: '#111', letterSpacing: '-0.02em' }}>
+              <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 800, color: '#110f0f', letterSpacing: '-0.02em' }}>
                 What&apos;s New
               </h2>
-              <p style={{ margin: 0, fontSize: '15px', color: '#0a0a0a' }}>
+              <p style={{ margin: 0, fontSize: '15px', fontWeight: 'bold', color: '#0a0909' }}>
                 Latest launches &amp; fresh drops
               </p>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Link href="/whats-new" style={{ fontSize: '12px', color: '#111', fontWeight: 600, textDecoration: 'none', marginRight: 8 }}>
+            <Link href="/whats-new" style={{ fontSize: '14px', color: '#080707', fontWeight: 'bold', textDecoration: 'none', marginRight: 8 }}>
               See all →
             </Link>
           </div>
@@ -399,6 +419,7 @@ export default function NewLaunchesSection() {
         {/* Product Grid */}
         <div
           className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 pb-1 pt-2 w-full"
+          style={{ backgroundColor: '#a62c2c' }}
         >
           {loading
             ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)

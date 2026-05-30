@@ -84,25 +84,17 @@ export default function DailyDealsClient({ initialProducts }: { initialProducts:
   return (
     <div className="w-full">
       {/* Back button */}
-      <div className="mb-6 flex justify-start">
-        <button 
-          onClick={() => window.location.href = '/'}
-          className="flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-orange-500 transition-colors"
-        >
-          <FiChevronLeft /> Back to Home
-        </button>
-      </div>
+
       {/* Advanced Filter / Search Bar */}
-      <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 mb-8 space-y-4 md:space-y-0 md:flex flex-wrap items-center justify-between gap-4">
-        {/* Search */}
-        <div className="relative flex-grow max-w-md">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <FiSearch className="text-gray-400" />
+      <div className="bg-white p-5 md:p-8 rounded-3xl shadow-sm border border-gray-100 mb-10 space-y-6">
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <FiSearch className="text-gray-400 w-5 h-5" />
           </div>
           <input
             type="text"
-            className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-            placeholder="Search deals..."
+            className="block w-full pl-12 pr-4 py-4 md:py-5 border-none bg-gray-50 rounded-2xl focus:ring-4 focus:ring-orange-500/20 focus:bg-white transition-all text-base md:text-lg font-medium placeholder-gray-400 text-gray-900"
+            placeholder="Search products, brands, or categories..."
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
@@ -112,39 +104,41 @@ export default function DailyDealsClient({ initialProducts }: { initialProducts:
         </div>
 
         {/* Filters */}
-        <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex items-center space-x-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
-            <FiFilter className="text-gray-500" />
-            <select
-              className="bg-transparent text-sm text-gray-700 outline-none cursor-pointer"
-              value={selectedCategory}
-              onChange={(e) => {
-                setSelectedCategory(e.target.value);
-                setCurrentPage(1);
-              }}
-            >
-              <option value="All" disabled hidden>Category</option>
-              {categories.map((cat: string) => (
-                <option key={`cat-${cat}`} value={cat}>{cat}</option>
-              ))}
-            </select>
-          </div>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3 overflow-x-auto pb-2 sm:pb-0 no-scrollbar snap-x">
+            <div className="flex items-center space-x-2 bg-white px-4 py-3 rounded-xl border border-gray-200 hover:border-gray-300 transition-colors shrink-0 snap-center shadow-sm">
+              <FiFilter className="text-orange-500 shrink-0" />
+              <select
+                className="bg-transparent text-sm md:text-base font-semibold text-gray-700 outline-none cursor-pointer pr-4"
+                value={selectedCategory}
+                onChange={(e) => {
+                  setSelectedCategory(e.target.value);
+                  setCurrentPage(1);
+                }}
+              >
+                <option value="All">All Categories</option>
+                {categories.filter(c => c !== 'All').map((cat: string) => (
+                  <option key={`cat-${cat}`} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
 
-          <div className="flex items-center space-x-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
-            <FiFilter className="text-gray-500" />
-            <select
-              className="bg-transparent text-sm text-gray-700 outline-none cursor-pointer"
-              value={selectedPlatform}
-              onChange={(e) => {
-                setSelectedPlatform(e.target.value);
-                setCurrentPage(1);
-              }}
-            >
-              <option value="All" disabled hidden>Platform</option>
-              {platforms.map((plat: string) => (
-                <option key={`plat-${plat}`} value={plat}>{plat}</option>
-              ))}
-            </select>
+            <div className="flex items-center space-x-2 bg-white px-4 py-3 rounded-xl border border-gray-200 hover:border-gray-300 transition-colors shrink-0 snap-center shadow-sm">
+              <FiFilter className="text-orange-500 shrink-0" />
+              <select
+                className="bg-transparent text-sm md:text-base font-semibold text-gray-700 outline-none cursor-pointer pr-4"
+                value={selectedPlatform}
+                onChange={(e) => {
+                  setSelectedPlatform(e.target.value);
+                  setCurrentPage(1);
+                }}
+              >
+                <option value="All">All Platforms</option>
+                {platforms.filter(c => c !== 'All').map((plat: string) => (
+                  <option key={`plat-${plat}`} value={plat}>{plat}</option>
+                ))}
+              </select>
+            </div>
           </div>
           
           {(selectedCategory !== 'All' || selectedPlatform !== 'All' || searchTerm !== '') && (
@@ -155,17 +149,12 @@ export default function DailyDealsClient({ initialProducts }: { initialProducts:
                 setSearchTerm('');
                 setCurrentPage(1);
               }}
-              className="text-sm text-red-500 hover:text-red-700 underline"
+              className="text-sm font-semibold text-red-500 hover:text-red-700 bg-red-50 px-4 py-3 rounded-xl transition-colors shrink-0"
             >
-              Clear
+              Clear Filters
             </button>
           )}
         </div>
-      </div>
-
-      {/* Results Header */}
-      <div className="mb-6 flex justify-between items-center text-sm text-gray-500">
-        <p>Showing {filteredProducts.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} - {Math.min(currentPage * itemsPerPage, filteredProducts.length)} of {filteredProducts.length} deals</p>
       </div>
 
       {/* Grid */}
@@ -174,7 +163,7 @@ export default function DailyDealsClient({ initialProducts }: { initialProducts:
              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4 text-gray-400">
                  <FiSearch size={24} />
              </div>
-             <h3 className="text-lg font-bold text-gray-800 mb-1">No deals found</h3>
+             <h3 className="text-lg font-bold text-gray-800 mb-1">No products found</h3>
              <p className="text-gray-500">Try adjusting your filters or search terms.</p>
         </div>
       ) : (
@@ -187,26 +176,38 @@ export default function DailyDealsClient({ initialProducts }: { initialProducts:
 
       {/* Pagination Controls */}
       {totalPages > 1 && (
-        <div className="mt-12 flex justify-center items-center gap-6 font-medium text-gray-600">
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="px-5 py-2.5 border border-gray-200 rounded-xl flex items-center gap-2 hover:bg-gray-50 disabled:opacity-50 disabled:hover:bg-transparent transition-colors shadow-sm"
-          >
-            <FiChevronLeft size={16} /> Prev
-          </button>
-          
-          <span className="text-gray-500 text-sm md:text-base">
-            Page {currentPage} of {totalPages}
-          </span>
+        <div className="mt-12 flex flex-col md:flex-row justify-between items-center gap-6 pb-4">
+          <div className="flex w-full md:w-auto items-center overflow-x-auto no-scrollbar pb-2 px-1 snap-x gap-2">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+              <button
+                key={page}
+                onClick={() => handlePageChange(page)}
+                className={`w-10 h-10 shrink-0 snap-center rounded-full font-semibold transition-all shadow-sm flex items-center justify-center border
+                  ${currentPage === page 
+                    ? 'bg-orange-500 text-white border-orange-500 hover:bg-orange-600' 
+                    : 'bg-white text-gray-600 border-gray-200 hover:border-orange-500 hover:text-orange-500'}`}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
 
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className="px-5 py-2.5 border border-gray-200 rounded-xl flex items-center gap-2 hover:bg-gray-50 disabled:opacity-50 disabled:hover:bg-transparent transition-colors shadow-sm"
-          >
-            Next <FiChevronRight size={16} />
-          </button>
+          <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-5 py-3 bg-white border border-gray-200 rounded-xl flex items-center gap-2 hover:border-orange-500 hover:text-orange-500 disabled:opacity-50 disabled:hover:border-gray-200 disabled:hover:text-gray-600 transition-all shadow-sm font-semibold text-gray-600"
+            >
+              <FiChevronLeft size={18} /> Prev
+            </button>
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-5 py-3 bg-white border border-gray-200 rounded-xl flex items-center gap-2 hover:border-orange-500 hover:text-orange-500 disabled:opacity-50 disabled:hover:border-gray-200 disabled:hover:text-gray-600 transition-all shadow-sm font-semibold text-gray-600"
+            >
+              Next <FiChevronRight size={18} />
+            </button>
+          </div>
         </div>
       )}
     </div>

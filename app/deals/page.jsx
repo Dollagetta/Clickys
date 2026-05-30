@@ -1,4 +1,4 @@
-import DealsPage from "./DealsPage2"
+import DealsPage from "./DealsPage"
 //import { products } from '../../components/products'
 import { products } from '../../components/flipkartProducts'
 import { createClient } from '../../prismicio';

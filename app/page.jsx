@@ -1,7 +1,6 @@
 import NewsletterSubscription from '../components/NewsletterSubscription';
 
 export const revalidate = 86400; // Cache for 24 hours to maximize speed and minimize API cost
-import { searchAmazonProducts } from '../lib/amazon/search-products';
 
 // app/page.js (Homepage)
 // This is a Server Component by default.
@@ -97,13 +96,11 @@ export default async function HomePage() {
     const [
       banner, 
       partnersResponseResult, 
-      apiAmazonProducts, 
       prismicProductsResResult,
       categoriesResResult
     ] = await Promise.allSettled([
       client.getAllByType("marketingbanner"),
       client.getAllByType("partner"),
-      searchAmazonProducts('Trending Deals', 4),
       client.getAllByType('product', {
         limit: 8
       }),
@@ -130,8 +127,7 @@ export default async function HomePage() {
       }));
     }
 
-    const amazonProducts = apiAmazonProducts.status === 'fulfilled' ? apiAmazonProducts.value : [];
-    
+
     let prismicProducts = [];
     if (prismicProductsResResult.status === 'fulfilled') {
       prismicProducts = prismicProductsResResult.value.map(p => {
@@ -144,7 +140,6 @@ export default async function HomePage() {
           else if (url.includes('ajio')) deducedPlatform = 'Ajio';
           else if (url.includes('flipkart')) deducedPlatform = 'Flipkart';
           else if (url.includes('meesho')) deducedPlatform = 'Meesho';
-          else if (url.includes('amazon') || url.includes('amzn')) deducedPlatform = 'Amazon';
           else deducedPlatform = 'Store';
         }
 
@@ -200,10 +195,10 @@ export default async function HomePage() {
               <div className="container mx-auto px-4 flex flex-col items-center pointer-events-auto mt-auto">
                 <div className={styles.heroActions} data-aos="fade-up" data-aos-delay="200" style={{ marginBottom: '1rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
                   <CallToAction text="Explore All Products" link="/products" type="secondary" className={styles.heroCtaButton} icon={<FiZap />} iconPosition="left" premium />
-                  <CallToAction text="Browse Amazon Products" link="/products?platform=Amazon" type="primary" className={`${styles.heroCtaButton} ${styles.heroCtaOutline}`} icon={<FiShoppingCart />} iconPosition="left" style={{ backgroundColor: '#cc851f', borderColor: '#ffb300', color: '#ffffff', fontWeight: 'bold', backdropFilter: 'blur(8px)' }} premium />
+                  <CallToAction text="Browse Partner Products" link="/products" type="primary" className={`${styles.heroCtaButton} ${styles.heroCtaOutline}`} icon={<FiShoppingCart />} iconPosition="left" style={{ backgroundColor: '#cc851f', borderColor: '#ffb300', color: '#ffffff', fontWeight: 'bold', backdropFilter: 'blur(8px)' }} premium />
                 </div>
                 <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', textAlign: 'center', textShadow: '0 2px 4px rgba(0,0,0,0.8)', fontWeight: '500', background: 'rgba(0,0,0,0.3)', padding: '4px 12px', borderRadius: '100px', backdropFilter: 'blur(4px)' }} data-aos-delay="400">
-                  As an Amazon Associate, we earn from qualifying purchases.
+                  Affiliate links help support our mission of bringing you the best tech & home essentials.
                 </p>
               </div>
             </div>
@@ -214,7 +209,7 @@ export default async function HomePage() {
       </div>
 
       {/* Modern Interactive Tools Section */}
-      <section className="py-16 my-10 relative overflow-hidden" style={{ borderRadius: '40px', margin: '2rem 1rem', backgroundColor: '#cd7214', color: '#0a0a0b', fontSize: '20px', fontWeight: 'bold' }}>
+      <section className="py-16 my-10 mx-4 md:mx-auto max-w-7xl relative overflow-hidden rounded-[40px] text-gray-900 font-bold" style={{ backgroundColor: '#f26b0d' }}>
         <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 rounded-full bg-pink-200 opacity-30 blur-3xl pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-[400px] h-[400px] rounded-full bg-orange-200 opacity-30 blur-3xl pointer-events-none"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-b from-transparent via-white/40 to-transparent pointer-events-none"></div>
@@ -222,7 +217,7 @@ export default async function HomePage() {
         <div className="container mx-auto px-4 relative z-10 w-full">
           <div className="text-center mb-10" data-aos="fade-up">
             <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">Smart Shopping Tools</h2>
-            <p className="text-lg max-w-2xl mx-auto" style={{ color: '#030304' }}>Track prices, compare products, and find the perfect gifts seamlessly.</p>
+            <p className="text-lg max-w-2xl mx-auto text-gray-900/80">Track prices, compare products, and find the perfect gifts seamlessly.</p>
           </div>
           
           <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-6 pt-2 px-1 md:grid md:grid-cols-3 md:overflow-visible md:snap-none md:gap-6 hide-scrollbar max-w-[1400px] mx-auto items-stretch h-auto min-h-[420px]">
@@ -301,15 +296,12 @@ export default async function HomePage() {
             Limited-time offers on fantastic products. Grab them before they&#39;re gone!
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
-            {amazonProducts.map((product) => (
-              <ProductCard key={product.id} product={product} isDeal={false} />
-            ))}
             {prismicProducts.map((product) => (
               <ProductCard key={`prismic-${product.id}`} product={product} isDeal={false} />
             ))}
           </div>
           <div className="mt-12 text-center" data-aos="fade-up" data-aos-delay="200">
-            <CallToAction text="View All Daily Deals" link="https://amzn.to/4nUHKao" type="primary" icon={<FiArrowRight />} style={{ backgroundColor: '#fff', color: '#f97316', border: 'none' }} />
+            <CallToAction text="View All Products" link="/daily-deals" type="primary" icon={<FiArrowRight />} style={{ backgroundColor: '#fff', color: '#f97316', border: 'none' }} />
           </div>
         </div>
       </section>
@@ -317,7 +309,7 @@ export default async function HomePage() {
 
 
       {/* Trust Signals Section */}
-      <section className={`${styles.section} ${styles.trustSection} bg-white py-12 md:py-20`}>
+      <section className={`${styles.section} ${styles.trustSection} py-12 md:py-20`} style={{ backgroundColor: '#29a629' }}>
         <div className="container mx-auto px-4">
           <h2 className={`${styles.sectionTitle} text-3xl md:text-4xl font-extrabold text-gray-900 mb-6`}>Why Trust Clickys?</h2>
           <p className={`${styles.sectionSubtitle} text-lg text-gray-600 max-w-2xl mx-auto mb-10`}>

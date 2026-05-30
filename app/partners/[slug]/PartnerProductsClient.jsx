@@ -19,9 +19,6 @@ export default function PartnerProductsClient({
 
   return (
     <div className="w-full">
-      <Link href="/" className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors mb-6 text-sm font-semibold">
-        <FiArrowLeft /> Back to Home
-      </Link>
       {/* ================= SEARCH SECTION ================= */}
       <div className="bg-white rounded-3xl border border-gray-100 p-6 mb-12 shadow-sm">
         <div className="relative max-w-md mx-auto">

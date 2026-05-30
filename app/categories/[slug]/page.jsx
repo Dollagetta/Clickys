@@ -83,12 +83,7 @@ export default async function CategoryPage({ params }) {
     <>
       <div className="container mx-auto max-w-7xl px-4 py-8">
         
-        {/* Back Button */}
-        <div className="mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-green-600 transition-colors font-semibold bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
-            <FiArrowLeft /> Back to Home
-          </Link>
-        </div>
+
 
         <div className="flex items-center gap-4 mb-10">
           <h1 className="text-4xl font-bold text-gray-900 capitalize">

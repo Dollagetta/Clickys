@@ -39,7 +39,7 @@ export default function CompactSearchBar() {
   };
 
   return (
-    <div className={styles.searchContainer}>
+    <div className={styles.searchContainer} style={{ borderWidth: '6px', borderRadius: '50px', borderColor: '#f0173b' }}>
       <form className={styles.searchForm} onSubmit={handleSearch}>
         {isSearching ? (
           <button 
@@ -57,7 +57,7 @@ export default function CompactSearchBar() {
           type="text" 
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search products..." 
+          placeholder="Search from All products, deals and partners..." 
           className={styles.searchInput}
         />
         <div className={styles.selectWrapper}>

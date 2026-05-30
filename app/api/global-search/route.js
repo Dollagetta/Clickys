@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '../../../prismicio';
 import * as prismic from '@prismicio/client';
-import { searchAmazonProducts } from '../../../lib/amazon/search-products';
-import { products as localProducts } from '../../../components/products';
-import { products as flipkartProducts } from '../../../components/flipkartProducts';
+import { fetchProductsFromSheet } from '../../../lib/products';
 
 export async function GET(request) {
   try {
@@ -22,17 +20,21 @@ export async function GET(request) {
       }
     }
 
-    // 1. Fetch from Prismic (Any matching document)
+    // 1. Fetch from Prismic (Products only)
     const client = createClient();
     let prismicPromise;
     if (isBroad) {
       prismicPromise = client.get({
+        filters: [prismic.filter.at('document.type', 'product')],
         pageSize: 40,
         orderings: [{ field: 'document.first_publication_date', direction: 'desc' }]
       });
     } else {
       prismicPromise = client.get({
-        filters: [prismic.filter.fulltext('document', queryParam)],
+        filters: [
+          prismic.filter.at('document.type', 'product'),
+          prismic.filter.fulltext('document', queryParam)
+        ],
         pageSize: 40
       });
     }
@@ -42,14 +44,7 @@ export async function GET(request) {
       return { results: [] };
     });
 
-    // 2. Fetch from Amazon Partners (PAAPI)
-    // Wrap to prevent Amazon failures from crashing the request
-    const amazonPromise = searchAmazonProducts(queryParam, 12).catch(e => {
-      console.error("Amazon global search error:", e);
-      return [];
-    });
-
-    const [prismicRes, amazonProducts] = await Promise.all([prismicPromise, amazonPromise]);
+    const prismicRes = await prismicPromise;
 
     const mappedPrismic = (prismicRes.results || []).map(p => {
        // Helper to extract a usable title/image/link
@@ -61,8 +56,7 @@ export async function GET(request) {
        if (p.type === 'partner') platform = 'Partner';
        else if (link) {
           const url = link.toLowerCase();
-          if (url.includes('amazon') || url.includes('amzn')) platform = 'Amazon';
-          else if (url.includes('flipkart')) platform = 'Flipkart';
+          if (url.includes('flipkart')) platform = 'Flipkart';
           else if (url.includes('myntra')) platform = 'Myntra';
           else if (url.includes('meesho')) platform = 'Meesho';
           else if (url.includes('ajio')) platform = 'Ajio';
@@ -84,27 +78,11 @@ export async function GET(request) {
        }
     });
 
-    // 3. Fetch from local products (including Daily Deals)
-    const lowerQuery = queryParam.toLowerCase();
-    const allLocal = [...localProducts, ...flipkartProducts].map(p => ({
-      ...p,
-      platform: (p.amazonLink || '').toLowerCase().includes('flipkart') || (p.amazonLink || '').toLowerCase().includes('fktr.in') ? 'Flipkart' : 'Amazon'
-    }));
+    const lowerQuery = (queryParam || '').toLowerCase();
 
-    const matchedLocalProducts = isBroad 
-      ? allLocal 
-      : allLocal.filter(p => 
-          (p.name && p.name.toLowerCase().includes(lowerQuery)) || 
-          (p.shortDescription && p.shortDescription.toLowerCase().includes(lowerQuery)) || 
-          (p.category && p.category.toLowerCase().includes(lowerQuery)) ||
-          (p.platform && p.platform.toLowerCase().includes(lowerQuery)) ||
-          (p.amazonLink && p.amazonLink.toLowerCase().includes(lowerQuery)) // Match by URL too
-        );
-
-    // 4. Fetch from Google Sheet (Daily Deals)
+    // 2. Fetch from Google Sheet (Daily Deals)
     let sheetProducts = [];
     try {
-      const { fetchProductsFromSheet } = await import('../../../lib/products');
       const rawSheetProducts = await fetchProductsFromSheet().catch(() => []);
       sheetProducts = rawSheetProducts
         .filter(p => {
@@ -120,7 +98,7 @@ export async function GET(request) {
           category: p.category,
           price: p.price,
           imageUrl: p.image,
-          amazonLink: p.link,
+          amazonLink: p.link, // kept prop name as it might be used globally as link, even if not strictly amazon
           platform: p.platform || 'Daily Deals',
           discount: p.discount,
           description: p.description
@@ -129,9 +107,9 @@ export async function GET(request) {
       console.error("Sheet products search error:", e);
     }
 
-    let combined = [...amazonProducts, ...mappedPrismic, ...matchedLocalProducts, ...sheetProducts];
+    let combined = [...mappedPrismic, ...sheetProducts];
 
-    // Client-side Category Filter (since Amazon & Prismic fulltext might ignore exact category matches)
+    // Client-side Category Filter
     if (category && category !== 'All') {
        const lowerCat = category.toLowerCase();
        combined = combined.filter(p => p.category && p.category.toLowerCase().includes(lowerCat));
@@ -141,6 +119,6 @@ export async function GET(request) {
 
   } catch(e) {
     console.error(e);
-    return NextResponse.json({ results: [], error: true }, { status: 500 });
+    return NextResponse.json({ results: [], error: true, details: e.message || 'Unknown error' }, { status: 200 });
   }
 }

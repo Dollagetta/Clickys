@@ -14,7 +14,13 @@ export default function BuyingGuidesSection() {
       try {
         const res = await fetch("/api/whats-new");
         if (!res.ok) throw new Error("Failed to fetch whats new");
-        const data = await res.json();
+        let data = [];
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+           data = await res.json();
+        } else {
+           throw new Error("Received HTML instead of JSON from server");
+        }
         setGuides(data.slice(0, 3)); // Only show latest 3 guides
       } catch (err) {
         console.error("Error fetching guides:", err);

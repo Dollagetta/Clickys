@@ -175,7 +175,7 @@ export default function PartnerSection({ partners = [] }) {
     <section className="py-20 bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         {/* ================= HEADING ================= */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8" style={{ borderWidth: '10px', borderRadius: '20px', borderColor: '#ec7d0e' }}>
           <div className="max-w-xl text-left">
             <motion.div 
               initial={{ opacity: 0, x: -20 }}

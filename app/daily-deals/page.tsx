@@ -32,11 +32,10 @@ export default async function DealsPage() {
   }));
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
-      {/* Prismic CMS headers/nav can easily sit above this section in your RootLayout */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Daily Deals</h1>
-        <p className="text-gray-500 mt-2">Discover the best hand-picked deals from top platforms like Amazon, Flipkart, Myntra, and more.</p>
+    <div className="mx-auto max-w-7xl px-4 py-8 md:py-12">
+      <div className="mb-10 text-center md:text-left bg-[#1ca231] p-8 md:p-12 rounded-3xl shadow-sm">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-[#ffffff] tracking-tight">All Products</h1>
+        <p className="text-[#ffffff] mt-3 text-lg max-w-2xl mx-auto md:mx-0 text-opacity-90">Discover the best hand-picked products and exclusive drops from top lifestyle platforms.</p>
       </div>
 
       {error ? (
@@ -56,8 +55,8 @@ export default async function DealsPage() {
           </div>
         </div>
       ) : mappedProducts.length === 0 ? (
-        <div className="bg-yellow-50 text-yellow-800 p-4 rounded mb-6">
-          No deals found matching your criteria.
+        <div className="bg-orange-50 text-orange-800 p-4 rounded-xl mb-6">
+          No products found matching your criteria.
         </div>
       ) : (
         <Suspense fallback={<div>Loading deals...</div>}>

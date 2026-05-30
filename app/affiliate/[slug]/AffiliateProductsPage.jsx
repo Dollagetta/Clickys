@@ -144,13 +144,7 @@ export default function AffiliateProductsPage({ affiliate, products = [] }) {
           <div className="relative z-10 container mx-auto px-4 py-14 md:py-20">
 
             {/* Back */}
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 text-white/90 hover:text-white transition-colors mb-8 bg-white/10 px-4 py-2 rounded-full backdrop-blur-md"
-            >
-              <FiArrowLeft />
-              Back to Home
-            </Link>
+
 
             {/* Affiliate Info */}
             <div className="flex flex-col items-center text-center">

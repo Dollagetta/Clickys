@@ -1,9 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { db } from '../lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { handleFirestoreError, OperationType } from '../lib/firestoreError';
 import { motion } from 'framer-motion';
 import { FiZap } from 'react-icons/fi';
 import CallToAction from './CallToAction';
@@ -21,6 +18,10 @@ export default function NewsletterSubscription() {
     setErrorMessage('');
 
     try {
+      const { getDb } = await import('../lib/firebase');
+      const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
+      
+      const db = await getDb();
       const path = 'subscribers';
       await addDoc(collection(db, path), {
         email: email,
@@ -41,7 +42,12 @@ export default function NewsletterSubscription() {
       console.error(error);
       setStatus('error');
       setErrorMessage('Failed to subscribe. Please try again later.');
-      handleFirestoreError(error, OperationType.CREATE, 'subscribers');
+      try {
+        const { handleFirestoreError, OperationType } = await import('../lib/firestoreError');
+        handleFirestoreError(error, OperationType.CREATE, 'subscribers');
+      } catch (e) {
+        console.error("Failed to handle error", e);
+      }
     }
   };
 

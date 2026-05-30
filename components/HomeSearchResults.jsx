@@ -34,7 +34,13 @@ export default function HomeSearchResults() {
       try {
         const searchRes = await fetch(`/api/global-search?q=${encodeURIComponent(q || '')}&category=${encodeURIComponent(cat || 'All')}`);
         if (searchRes.ok) {
-          const data = await searchRes.json();
+          let data = {};
+          const contentType = searchRes.headers.get("content-type");
+          if (contentType && contentType.includes("application/json")) {
+             data = await searchRes.json();
+          } else {
+             throw new Error("Received HTML instead of JSON from server");
+          }
           combined = data.results || [];
         }
       } catch (err) {

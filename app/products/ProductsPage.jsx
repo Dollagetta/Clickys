@@ -83,7 +83,13 @@ export default function ProductsPage({ products: initialProductsList = [] }) {
         const queryParam = query || 'All';
         const searchRes = await fetch(`/api/global-search?q=${encodeURIComponent(queryParam)}`);
         if (searchRes.ok) {
-          const data = await searchRes.json();
+          let data = {};
+          const contentType = searchRes.headers.get("content-type");
+          if (contentType && contentType.includes("application/json")) {
+             data = await searchRes.json();
+          } else {
+             throw new Error("Received HTML instead of JSON from server");
+          }
           combined = data.results || [];
         }
       } catch (e) {
@@ -171,9 +177,6 @@ export default function ProductsPage({ products: initialProductsList = [] }) {
       <div className={styles.productsPageContainer}>
         <header className={styles.pageHeader} style={{ backgroundColor: '#c09758', backgroundImage: 'none' }}>
           <div className="container" style={{ position: 'relative' }}>
-            <Link href="/" style={{ position: 'absolute', top: '-1rem', left: '1rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', fontWeight: 600, textDecoration: 'none' }}>
-              <FiArrowLeft /> Back to Home
-            </Link>
             <FiBox className={styles.headerIcon} />
             <h1 className={styles.pageTitle}>Explore All Products</h1>
             <p className={styles.pageSubtitle} style={{ color: '#ffffff', fontWeight: 'bold' }}>The ultimate collection of our best finds and recommendations.</p>

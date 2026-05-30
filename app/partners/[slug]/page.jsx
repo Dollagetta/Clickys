@@ -64,7 +64,7 @@ export default async function PartnerPage({ params }) {
         <div className="bg-white rounded-3xl overflow-hidden shadow-xl border border-gray-100 flex flex-col lg:flex-row h-full group relative">
           <div className="relative lg:w-5/12 xl:w-1/2 h-80 lg:h-auto min-h-[380px] shrink-0 overflow-hidden bg-gray-100">
             {partner_banner_image?.url ? (
-              <PrismicNextImage field={partner_banner_image} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt={partner_name} />
+              <PrismicNextImage field={partner_banner_image} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="" />
             ) : (
               <div className="w-full h-full bg-gray-200" />
             )}
@@ -77,7 +77,7 @@ export default async function PartnerPage({ params }) {
             <div className="absolute top-6 right-6 z-30">
               <div className="w-28 h-28 bg-white rounded-3xl shadow-2xl ring-4 ring-white/90 p-3 flex items-center justify-center overflow-hidden">
                 {partner_logo?.url ? (
-                  <PrismicNextImage field={partner_logo} className="w-full h-full object-contain" alt={`${partner_name} logo`} />
+                  <PrismicNextImage field={partner_logo} className="w-full h-full object-contain" alt="" />
                 ) : (
                   <div className="w-16 h-16 bg-gray-100 rounded-2xl" />
                 )}

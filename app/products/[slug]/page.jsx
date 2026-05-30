@@ -144,7 +144,7 @@ export default async function ProductDetailPage({ params }) {
               target="_blank"
               rel="noopener noreferrer sponsored"
             />
-            <p className={styles.affiliateNote}>Prices and availability are subject to change. As an Amazon Associate, we earn from qualifying purchases.</p>
+            <p className={styles.affiliateNote}>Prices and availability are subject to change. As an affiliate partner, we earn from qualifying purchases.</p>
 
             <div className={styles.shareProduct}>
               <button className={styles.actionButtonSmall}><FiShare2 /> Share this product</button>

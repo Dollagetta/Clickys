@@ -65,7 +65,7 @@ const Footer = () => {
                 </motion.div>
                 <p className={styles.footerTagline}>Your trusted guide to Amazon's best finds.</p>
                 <p className={styles.disclosure}>
-                    As an Amazon Associate, we earn from qualifying purchases. All product recommendations are independently chosen by our editorial team.
+                    As an affiliate partner, we earn from qualifying purchases. All product recommendations are independently chosen by our editorial team.
                 </p>
             </div>
             <div className={styles.footerFeaturedContent}>

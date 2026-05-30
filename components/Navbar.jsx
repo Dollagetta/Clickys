@@ -33,39 +33,31 @@ const Navbar = () => {
   };
 
   const navLinks = [
-    { href: "/wishlist", label: "Wishlist" },
     { href: "/", label: "Home" },
-    { href: "/whats-new", label: "What's New" },
-    { href: "/products", label: "Amazon" },
-    { href: "/deals", label: "Daily Deals" },
     { href: "/daily-deals", label: "All Products" },
+    { href: "/deals", label: "Daily Deals" },
+    { href: "/compare", label: "Compare" },
     { href: "/tracker", label: "Price Tracker" },
     { href: "/gifts", label: "Gift Finder" },
-    { href: "/compare", label: "Compare" },
+    { href: "/whats-new", label: "What's New" },
+    { href: "/wishlist", label: "Wishlist" },
   ];
 
   return (
-    <nav
-      className={`${styles.navbar} ${hasScrolled ? styles.scrolled : ''}`}
-      style={{ height: '45px', paddingLeft: 0, paddingRight: 0, marginLeft: 0, paddingTop: '0.40000000000000036px' }}
-    >
-      <div className={`container ${styles.navContainer}`} style={{ maxWidth: '100%', padding: '0 5px' }}>
+    <nav className={`${styles.navbar} ${hasScrolled ? styles.scrolled : ''}`}>
+      <div className={`container ${styles.navContainer}`}>
         {/* Logo */}
-        <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="flex items-center"
-            style={{ marginLeft: '-15px' }}
-          >
+        <motion.div whileHover={{ scale: 1.05 }} className="flex items-center">
            <div className={styles.logoWrapper}>
             <Link href="/" className={`group ${styles.logo} flex items-baseline font-black tracking-tighter`} style={{ textDecoration: 'none' }}>
-              <span className="text-green-600 transition-colors duration-300 group-hover:text-green-500 text-[28px]" style={{ paddingTop: '-12px', marginTop: '1px', marginLeft: '36px', marginBottom: '-2px', marginRight: '3px', paddingBottom: '2px' }}>click</span>
+              <span className="text-green-600 transition-colors duration-300 group-hover:text-green-500 text-[28px]">click</span>
               <span className="text-[#f9c616] transition-colors duration-300 group-hover:text-orange-400 text-xl">ys</span>
             </Link>
            </div>
           </motion.div>
 
           {/* Desktop Navigation */}
-          <motion.ul className={`${styles.navMenu} ${styles.desktopNav} flex-shrink-0 flex-nowrap overflow-x-hidden`} style={{ gap: '0.4rem', fontSize: '0.8rem', marginLeft: 'auto' }}>
+          <motion.ul className={`${styles.navMenu} ${styles.desktopNav}`} style={{ gap: '0.4rem', fontSize: '0.8rem', marginLeft: 'auto' }}>
             {navLinks.map((link) => (
               <motion.li key={link.href} variants={menuItemVariants} whileHover={{scale: 1.05}} whileTap={{scale:0.95}}>
                 <Link href={link.href} style={{ whiteSpace: 'nowrap', padding: '0.2rem 0.4rem' }}>{link.label}</Link>
