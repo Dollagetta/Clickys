@@ -115,7 +115,7 @@ export default function PriceTracker() {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Search from all products e.g. iPhone"
-                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all outline-none text-sm font-medium text-gray-900"
+                    className="w-full pl-10 pr-4 py-3 bg-[#ffffff] border-2 border-gray-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all outline-none text-sm font-medium text-[#ffffff]"
                   />
                   <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                 </div>

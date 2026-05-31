@@ -8,7 +8,6 @@ import ScrollToTopButton from '../components/ScrollToTopButton';
 import AppProviders from '../components/AppProviders'; // For client-side logic like AnimatePresence & AOS
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({
   subsets: ['latin'],
@@ -93,8 +92,27 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={inter.variable}>
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "Clickys",
+              url: "https://www.clickys.in",
+              description: "Your ultimate guide to the best products, exclusive deals, and honest reviews for Amazon shopping.",
+              publisher: {
+                "@type": "Organization",
+                name: "Clickys",
+                logo: {
+                  "@type": "ImageObject",
+                  url: "https://www.clickys.in/images/logosvg.svg"
+                }
+              }
+            })
+          }}
+        />
         {/* Analytics script */}
-       {/* Analytics script */}
       </head>
       <body suppressHydrationWarning>
         <Script id="cuelinks" strategy="afterInteractive">
@@ -122,7 +140,6 @@ export default function RootLayout({ children }) {
           <ScrollToTopButton />
         </AppProviders>
         <Analytics />
-        <SpeedInsights />
       </body>
     </html>
   );

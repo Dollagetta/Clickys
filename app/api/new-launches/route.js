@@ -14,7 +14,10 @@ function shuffleArray(array) {
 
 export async function GET() {
   const client = createClient();
-  const allProducts = await client.getAllByType('product');
+  const allProducts = await client.getAllByType('product', {
+    limit: 20,
+    orderings: [{ field: 'document.first_publication_date', direction: 'desc' }]
+  });
   
   // Filter products
   const validProducts = allProducts.filter(p => p.data && p.data.title && p.data.price);

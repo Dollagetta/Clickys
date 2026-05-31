@@ -43,6 +43,9 @@ export const metadata = {
   title: 'Clickys – Amazon Products | Top Deals & Reviews',
   description: 'Discover Amazon bestsellers with Clickys. Explore electronics, fashion, health, kitchen essentials, laptops, Best AirPods, Best Smartphones, Alexa & more with trusted reviews and offers.',
   keywords: 'Amazon deals, Amazon products, Amazon reviews, laptops Amazon, AirPods Amazon, Alexa Amazon Echo, Amazon fashion, Amazon electronics',
+  alternates: {
+    canonical: '/products',
+  },
 };
 
 const page = () => {

@@ -2,7 +2,7 @@
 // import products from './components/products';
 // import allGuides from './components/guides';
 
-module.exports = {
+export default {
   siteUrl: process.env.SITE_URL || 'https://clickys.in',
   generateRobotsTxt: true,
   changefreq: 'weekly',
@@ -13,18 +13,27 @@ module.exports = {
 
   additionalPaths: async (config) => {
     let prismicDocs = [];
+    let googleGuides = [];
+
+    // 1. Fetch from Google Sheets for Guides
+    /* try {
+      const { fetchGuidesFromSheet } = await import('./lib/guides.ts');
+      googleGuides = await fetchGuidesFromSheet(false);
+    } catch (e) {
+      console.error('Error fetching from Google Sheets for sitemap:', e);
+    } */
+
+    // 2. Fetch from Prismic for other documents
     try {
       const { createClient } = await import('@prismicio/client');
       const sm = await import('./slicemachine.config.json', { with: { type: 'json' } });
       const client = createClient(sm.default.repositoryName);
       
-      // Fetch multiple types of documents using Promise.allSettled to handle missing types safely
       const results = await Promise.allSettled([
         client.getAllByType("product"),
         client.getAllByType("whatsnew"),
         client.getAllByType("deal"),
-        client.getAllByType("partner"),
-        client.getAllByType("sliceguide1")
+        client.getAllByType("partner")
       ]);
       
       prismicDocs = results
@@ -35,6 +44,18 @@ module.exports = {
     }
 
     const paths = [];
+
+    // Add Google Guides to paths
+    googleGuides.forEach(guide => {
+      paths.push({
+        loc: `/guides/${guide.slug}`,
+        lastmod: new Date().toISOString(),
+        changefreq: 'weekly',
+        priority: 0.8,
+      });
+    });
+
+    // Add Prismic Docs to paths
     prismicDocs.forEach(doc => {
       let routePrefix = '';
       if (doc.type === 'product') {
@@ -45,8 +66,6 @@ module.exports = {
         routePrefix = '/deals';
       } else if (doc.type === 'partner') {
         routePrefix = '/partners';
-      } else if (doc.type === 'sliceguide1') {
-        routePrefix = '/guide';
       } else {
         return;
       }

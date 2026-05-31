@@ -1,6 +1,7 @@
 import NewsletterSubscription from '../components/NewsletterSubscription';
 
 export const revalidate = 86400; // Cache for 24 hours to maximize speed and minimize API cost
+export const dynamic = 'force-dynamic';
 
 // app/page.js (Homepage)
 // This is a Server Component by default.
@@ -36,6 +37,9 @@ import { PrismicRichText } from "@prismicio/react";
 export const metadata = {
   title: "Clickys.in | Trending Tech & Home Essentials in India",
   description: "Discover the best Amazon and Flipkart deals on tech, home essentials, and grooming products. Shop curated combos, smartwatches, kitchen tools, and more at Clickys.in!",
+  alternates: {
+    canonical: '/',
+  },
   keywords: [
     "trending tech and home essentials",
     "top picks for kitchen and grooming",
@@ -92,20 +96,41 @@ export default async function HomePage() {
 
     const client = createClient();
     
-    // Parallelize all data fetching for better performance
+    // Parallelize all data fetching with a global timeout for safety
+    console.log('[HomePage] Starting data fetch...');
+    const fetchWithTimeout = (promise, ms = 15000) => 
+      Promise.race([
+        promise, 
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Fetch Timeout')), ms))
+      ]);
+
+    const fetchData = async () => {
+      try {
+        return await Promise.allSettled([
+          fetchWithTimeout(client.getAllByType("marketingbanner")),
+          fetchWithTimeout(client.getAllByType("partner")),
+          fetchWithTimeout(client.getAllByType('product', { limit: 8 })),
+          fetchWithTimeout(client.getAllByType('category'))
+        ]);
+      } catch (err) {
+        console.error('[HomePage] critical fetch error:', err);
+        return [
+          { status: 'rejected', reason: err },
+          { status: 'rejected', reason: err },
+          { status: 'rejected', reason: err },
+          { status: 'rejected', reason: err }
+        ];
+      }
+    };
+
+    const results = await fetchData();
     const [
       banner, 
       partnersResponseResult, 
       prismicProductsResResult,
       categoriesResResult
-    ] = await Promise.allSettled([
-      client.getAllByType("marketingbanner"),
-      client.getAllByType("partner"),
-      client.getAllByType('product', {
-        limit: 8
-      }),
-      client.getAllByType('category')
-    ]);
+    ] = results;
+    console.log('[HomePage] Data fetch completed');
 
     const bannerData = banner.status === 'fulfilled' ? banner.value : [];
 
