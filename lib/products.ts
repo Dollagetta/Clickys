@@ -69,6 +69,7 @@ async function _fetchProductsFromSheet() {
       // Map rows to structured objects (ensure we filter out empty rows/headers)
       let products = rows
           .filter((row: any[]) => row && row[0] && row[0] !== 'Title')
+          .reverse()
           .map((row: any[]) => ({
             title: row[0] || '',
             price: row[1] || '',

@@ -191,7 +191,7 @@ export async function POST(req) {
       subject: finalSubject,
       html: `
         <!DOCTYPE html>
-        <html>
+        <html lang="en">
         <head>
           ${promoSchema}
         </head>

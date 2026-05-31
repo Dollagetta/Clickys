@@ -82,7 +82,7 @@ export default function DailyDealsClient({ initialProducts }: { initialProducts:
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full" style={{ backgroundColor: '#b43939' }}>
       {/* Back button */}
 
       {/* Advanced Filter / Search Bar */}

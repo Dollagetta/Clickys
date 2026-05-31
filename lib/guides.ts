@@ -115,17 +115,18 @@ export const fetchGuidesFromSheet = async (fullRange = true) => {
   }
 };
 
-function processRows(rows, fullRange) {
+function processRows(rows: any[], fullRange: boolean) {
   if (!rows || rows.length <= 1) return [];
   
   // Filter out header row if it contains 'Title'
-  const dataRows = (rows[0] && rows[0][0] === 'Title') ? rows.slice(1) : rows;
+  let dataRows = (rows[0] && rows[0][0] === 'Title') ? rows.slice(1) : rows;
+  dataRows = dataRows.filter((row: any[]) => row && row[0]);
+  dataRows.reverse();
 
   const seenSlugs = new Set();
 
   return dataRows
-    .filter(row => row && row[0]) // title must be present
-    .map(row => {
+    .map((row: any[]) => {
       const baseSlug = slugify(row[0] || '');
       let slug = baseSlug;
       let counter = 1;
