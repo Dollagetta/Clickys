@@ -218,7 +218,6 @@ export async function POST(req) {
                 <a href="https://www.instagram.com/_clickyse?igsh=bjV3YnZ6OG80MHNq" style="color: #64748b; font-weight: bold; text-decoration: none; margin: 0 12px; letter-spacing: 0.5px;">Instagram</a>
                 <a href="https://www.amazon.in/shop/clickyse" style="color: #64748b; font-weight: bold; text-decoration: none; margin: 0 12px; letter-spacing: 0.5px;">Amazon</a>
               </div>
-              <p style="margin-bottom: 10px;">You're receiving this because you subscribed to Clickys updates.</p>
               <p style="margin: 0;">&copy; ${new Date().getFullYear()} Clickys. All rights reserved.</p>
             </div>
           </div>

@@ -29,13 +29,6 @@ export default function NewsletterSubscription() {
         isActive: true,
       });
 
-      // Send welcome email via Resend
-      fetch('/api/welcome-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      }).catch(err => console.error('Failed to send welcome email:', err));
-
       setStatus('success');
       setEmail('');
     } catch (error) {
