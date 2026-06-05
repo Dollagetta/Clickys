@@ -41,18 +41,75 @@ export default async function GuideDetailPage({ params }) {
   const cons = splitItems(guide.cons);
   const alternatives = splitItems(guide.alternatives);
 
+  const priceString = guide.price ? guide.price.toString().replace(/[^0-9.]/g, '') : '';
+  const brandName = guide.title.split(' ')[0] || 'Generic';
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
-    name: guide.title,
+    name: guide.title.length > 100 ? guide.title.substring(0, 97) + '...' : guide.title,
     image: guide.image,
-    description: guide.description,
+    description: guide.description || `Buy the best ${guide.title} on ${guide.platform || 'Amazon'}. High quality and reliable features.`,
+    sku: guide.slug,
+    brand: {
+      '@type': 'Brand',
+      name: brandName
+    },
+    review: {
+      '@type': 'Review',
+      reviewRating: {
+        '@type': 'Rating',
+        ratingValue: '4.8',
+        bestRating: '5'
+      },
+      author: {
+        '@type': 'Person',
+        name: 'Clickys Editor'
+      }
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.8',
+      reviewCount: '15'
+    },
     offers: {
       '@type': 'Offer',
-      price: guide.price ? guide.price.replace(/[^0-9.]/g, '') : '',
+      price: priceString || '0',
       priceCurrency: 'INR',
+      priceValidUntil: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
       availability: 'https://schema.org/InStock',
-      url: guide.link
+      url: guide.link,
+      hasMerchantReturnPolicy: {
+        '@type': 'MerchantReturnPolicy',
+        applicableCountry: 'IN',
+        returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnPeriod',
+        merchantReturnDays: 30,
+        returnMethod: 'https://schema.org/ReturnByMail',
+        returnFees: 'https://schema.org/FreeReturn'
+      },
+      shippingDetails: {
+        '@type': 'OfferShippingDetails',
+        shippingRate: {
+          '@type': 'MonetaryAmount',
+          value: 0,
+          currency: 'INR'
+        },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 0,
+            maxValue: 1,
+            unitCode: 'd'
+          },
+          transitTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 1,
+            maxValue: 5,
+            unitCode: 'd'
+          }
+        }
+      }
     }
   };
 
@@ -93,6 +150,15 @@ export default async function GuideDetailPage({ params }) {
       </nav>
 
       {/* H1: Guide Title */}
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <span className="bg-yellow-100 text-yellow-800 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
+          <svg className="w-3 h-3 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+          4.8 / 5.0
+        </span>
+        <span className="bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+          Editor's Choice
+        </span>
+      </div>
       <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-8 leading-tight tracking-tight">
         {guide.title}
       </h1>

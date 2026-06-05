@@ -1,245 +1,199 @@
-# 📦 Clickys Website Documentation
+# 📦 Clickys Website Comprehensive Technical Manual
 
-Welcome to the documentation for **Clickys Website**! This comprehensive guide walks you through maintaining the app, updating static/dynamic content, managing APIs, handling newsletter subscriptions, and deploying a live instance to Vercel with your custom domain.
+Welcome to the development and maintenance handbook for the **Clickys Website**! This interactive documentation details the full system architecture, content synchronization pipelines, dynamic build processes, automated indexing setup, and deployment guides.
 
 ---
 
-## 🏗️ 1. Managing Static & Hardcoded Content
+## 🚀 Key Automated Features Added in This Iteration
 
-Some parts of the application are hardcoded into the React components to act as fallback or fast-rendering sections. Here is how you can update them.
+1. **Automated Sitemap Generation on Deployment**  
+   Every time the site compiles or builds (`npm run build`), the custom build runner automatically runs `next-sitemap` through a `postbuild` script hook. This dynamically fetches all pages (both static and client routes) and writes a production-ready, search-engine-optimized sitemap to `/public/sitemap.xml`.
+2. **Dynamic Google Sheets Integration for Sitemap Indexing**  
+   The build pipeline securely hooks into Google Sheets using `google-auth-library` inside the sitemap engine to map, slugify, and sync your dynamic Guides (`/guides/[slug]`) and Products at compilation time, ensuring that search crawlers automatically discover newly-added entries from your spreadsheets.
+3. **Smart Site URL Normalization**  
+   The system automatically sanitizes `SITE_URL` inputs, ensuring that the sitemap location outputs always resolve to safe, fully-qualified protocols (e.g., `https://www.clickys.in`), preventing search console validation errors.
 
-### Updating the About Us Page (`/app/about/page.jsx`)
-To change the mission text, core values, or images on the About Us page, edit `/app/about/page.jsx`:
+---
 
-```javascript
-// File: /app/about/page.jsx
+## 🏗️ 1. Project System Architecture
 
-// 1. Changing the Hero Image
-<Image
-  src="https://picsum.photos/seed/clickys/700/500" // -> CHANGE THIS URL to your new image URL
-  alt="The Clickys Team or Concept Art"
-  width={700}
-  height={500}
-/>
+The Clickys web application combines high-performance static rendering, real-time client-side interactions, and headless content databases:
 
-// 2. Changing the Content text
-<div className={styles.storyTextContent}>
-  <h2 className={styles.sectionHeading}><FiTarget /> Our Story & Mission</h2>
-  <p>
-    Clickys was born from a simple idea... // -> CHANGE THIS PARAGRAPH
-  </p>
-</div>
+```
+                  ┌───────────────────────┐
+                  │   Client Browser/Bot  │
+                  └───────────┬───────────┘
+                              │
+               Requests sitemap.xml / Page
+                              │
+               ┌──────────────▼──────────────┐
+               │    Next.js 15+ App Server   │
+               └──────────────┬──────────────┘
+                              │
+         ┌────────────────────┼────────────────────┐
+         │ (Static Pages)     │ (Headless APIs)    │ (Data Sheets)
+ ┌───────▼────────┐   ┌───────▼────────┐   ┌───────▼────────┐
+ │  Local App     │   │  Prismic CMS   │   │  Google Sheets │
+ │  Routes/Styles │   │  Headless API  │   │  Spreadsheets  │
+ └────────────────┘   └────────────────┘   └────────────────┘
+```
+
+- **Framework**: Next.js 15+ (App Router, styled in Tailwind CSS).
+- **Theme**: Neutral Slate & Emerald Green accents, utilizing smooth animations via `framer-motion`.
+- **Database & Persistence**: Firebase Firestore (for storing newsletters and tracking subscriber states).
+- **Dynamic Content Head**: 
+  - **Prismic CMS**: Controls products, whats-new items, deals, slide promotions, and partner grids.
+  - **Google Sheets Spreadsheet (Read-Only)**: Manages active deals checklist, curated recommendation guides, and dynamic routing directories.
+- **Email Service**: Resend API integration (triggered for welcome letters and newsletter distributions).
+
+---
+
+## 📁 2. Workspace File Directory Structure
+
+```bash
+/
+├── app/                  # Next.js App Router (Layouts, pages, API routes, sitemaps)
+├── components/           # UI Elements & Interactive custom widgets
+│   └── ui/               # Tailored React-icons & framer-motion visuals
+├── lib/                  # Backend SDK utilities, sheets controllers, and db configs
+│   ├── firebase.js       # Firebase Client SDK initializer
+│   ├── firebase-admin.js # Firebase Cloud Admin setup
+│   ├── guides.ts         # Google Sheets Guides router
+│   └── products.ts       # Google Sheets Products router
+├── public/               # Static assets & generated indices (robots.txt, sitemap.xml)
+├── slices/               # Prismic CMS Custom Type Slice templates
+├── styles/               # Styling configuration rules
+├── metadata.json         # Platform capability metadata
+├── next-sitemap.config.js# Sitemap generation build profile
+├── slicemachine.config.json # Prismic custom schema config
+└── package.json          # Main dependency manifest & deployment build hooks
 ```
 
 ---
 
-## 🏠 2. Updating the Home Page (`/app/page.jsx`)
+## 🛠️ 3. Environment Variables Specification
 
-The Home Page mixes content from the Prismic CMS, Amazon Product API, and local hardcoded fallback data.
+Define these environment configuration variables in your hosting provider (e.g., Vercel, Cloud Run, Replit) or local `.env`:
 
-### To Change Hardcoded Categories
-At the top of `/app/page.jsx`, there is an array named `categories`. Update the array to change the circular category icons shown on the homepage.
+| Key | Type | Description | Required | Source |
+| :--- | :--- | :--- | :--- | :--- |
+| `SITE_URL` | String | Base address of the live site (e.g. `https://www.clickys.in`) | **Yes** | Domain Host |
+| `GOOGLE_CLIENT_EMAIL` | String | Google Cloud Service Account Email | **Yes** | Google Cloud Console |
+| `GOOGLE_PRIVATE_KEY` | String | google service account private certificate (JSON formatting, escapes `\n`) | **Yes** | Google Cloud Console |
+| `PRODUCT_SHEET_ID` | String | spreadsheet ID detailing inventory sheets | **Yes** | Google Sheets URL |
+| `GUIDE_SHEET_ID` | String | spreadsheet ID detailing guides catalog | **Yes** | Google Sheets URL |
+| `NEXT_PUBLIC_PRISMIC_ENVIRONMENT` | String | Repository name registered in Prismic dashboard | **Yes** | Prismic Console |
+| `RESEND_API_KEY` | String | Mailer gateway secret token | Optional | Resend Dashboard |
+| `NEXT_PUBLIC_FIREBASE_API_KEY` | String | Public credential for newsletter collections | Optional | Firebase Console |
 
+---
+
+## 🔍 4. Automated Sitemap Build Mechanics
+
+Sitemap configuration is managed globally inside `/next-sitemap.config.js`.
+
+### How it is Triggered
+1. When you deploy or run a production build, your loader handles compilation:
+   ```bash
+   npm run build
+   ```
+2. Once the Next.js static page analyzer finishes, the custom `postbuild` hook executes `next-sitemap`.
+3. `next-sitemap` reads the compiled pages and triggers `additionalPaths()` inside `next-sitemap.config.js` to query external APIs.
+4. It compiles everything into a physical index file (`/public/sitemap.xml`) and separate node indices (`/public/sitemap-0.xml`), which are immediately accessible to search crawlers without slowing down your runtime performance!
+
+### Sitemap Configuration Profile (`next-sitemap.config.js`)
 ```javascript
-// File: /app/page.jsx
-
-const categories = [
-  { id: 'cat1', name: 'Electronics', slug: 'electronics', imageUrl: '...', productCount: 1200 },
-  { id: 'cat2', name: 'Fashion', slug: 'fashion', imageUrl: '...', productCount: 850 },
-  // Add or edit categories here. Ensure the imageUrl is a valid image link!
-];
+export default {
+  siteUrl: process.env.SITE_URL || 'https://clickys.in',
+  generateRobotsTxt: true,
+  changefreq: 'weekly',
+  priority: 0.7,
+  // ... imports & queries Google Sheets + Prismic Docs to return paths array ...
+};
 ```
 
 ---
 
-## 🛒 3. Updating Products & Deals
+## 📊 5. Content Curation & Updating Pipelines
 
-Products come from two main sources: **Prismic CMS** and the local **Products Database**, with Amazon Products coming from the Amazon API.
+Here is the blueprint to update different sections of the website.
 
-### All Products / Deals Section
-If you want to manually insert deals or update the fallback product list, edit the local products file:
+### A. Updating Dynamic Guides (Google Sheets)
+Dynamic guides in `/app/guides/[slug]` utilize Google Sheets as an active headless source. To add or adjust a guide:
+1. Open the spreadsheet linked to your `GUIDE_SHEET_ID`.
+2. Format your columns as follows:
+   - **Column A**: `Title` (Used to form the header title & auto-slug URL)
+   - **Column B**: `Price` (Target sale or referential price)
+   - **Column C**: `Link` (Redirect affiliate or product checkout URL)
+   - **Column D**: `Image` (Image URL)
+   - **Column E**: `Category` (Group tag - e.g. "Technology", "Fashion")
+   - **Column F**: `Discount` (Markdown discount or promotion label)
+   - **Column G**: `Platform` (Fulfillment platform - e.g. "Amazon", "Myntra")
+   - **Column H**: `Description` (Intro text block)
+   - **Column I**: `Features` | **Column J**: `Pros` | **Column K**: `Cons` | **Column L**: `Alternatives`
+3. Dynamic routing updates the endpoint on the fly. The sitemap imports them at deployment compilation.
 
-```javascript
-// File: /components/products.js
-
-export const products = [
-  {
-    id: 'p1',
-    name: 'Awesome Laptop XYZ', // -> CHANGE NAME
-    slug: 'awesome-laptop-xyz', 
-    price: 999.00,             // -> CHANGE PRICE
-    originalPrice: 1299.00,
-    rating: 4.8,
-    imageUrl: 'https://example.com/laptop.jpg', // -> CHANGE IMAGE
-    onPromotion: true,
-    // ...other properties
-  },
-];
+### B. Updating Prismic Custom Types
+The dynamic storefront components fetch data on-demand from Prismic CMS. To edit content schemas, launch:
+```bash
+npm run slicemachine
 ```
+Log into the Prismic UI and publish documents matching these specific Custom Types:
+- `product`: Accessible under `/products/[uid]`
+- `whatsnew`: Accessible under `/whats-new/[uid]`
+- `deal`: Accessible under `/deals/[uid]`
+- `partner`: Highlighted inside your home-page partnership brand networks.
 
-### Amazon Products Section & API Integration
-The home page automatically searches Amazon for specific Deals. This lives in `/app/page.jsx`.
-
-```javascript
-// File: /app/page.jsx
-
-const [
-  // ...other fetches
-  apiAmazonProducts, 
-] = await Promise.allSettled([
-  // ...other fetches
-  searchAmazonProducts('Trending Deals', 4), // -> CHANGE 'Trending Deals' to 'Laptops' or any keyword. Change '4' to how many products to fetch.
-]);
-```
-
-**Amazon Product API Credentials:**
-To ensure `searchAmazonProducts` functions properly in production, you must have Amazon Product Advertising API (PA-API) credentials and define them in your environment variables. 
-The variables typically required are:
-- `AMAZON_CREDENTIAL_ID` (Your AWS Access Key)
-- `AMAZON_CREDENTIAL_SECRET` (Your AWS Secret Key)
-- `AMAZON_ASSOCIATE_TAG` (Your Amazon Affiliate ID - like `clickys-20`)
+### C. Modifying Fallback Static Data
+If you need to adjust fallback values, look inside these dedicated files:
+- **Core Category Circles**: Located in `/app/page.jsx` (the `categories` array constant).
+- **Local Fallback Products**: Located in `/components/products.js` (the `products` array export).
+- **Local Fallback Guides**: Located in `/components/guides.js` (the `allGuides` array export).
+- **Company Story & Milestones**: Located in `/app/about/page.jsx`.
+- **Contact Channels**: Located in `/app/contact/page.jsx`.
 
 ---
 
-## 📚 4. Updating What's New
+## 🤖 6. Incremental Static Regeneration (ISR) Webhooks
 
-What's New articles are pulled from **Prismic CMS** but use a fallback logic in `/components/guides.js`. 
-
-### Managing Hardcoded Updates (`/components/guides.js`)
-If the Prismic fetch fails or if you want to add static updates, add them here. The reading time tag on the UI is automatically calculated from the content's word count!
-
-```javascript
-// File: /components/guides.js
-
-export const allGuides = [
-  {
-    id: 'g1',
-    title: 'The Ultimate Guide to Buying a Laptop in 2026', // -> CHANGE TITLE
-    slug: 'ultimate-laptop-buying-guide',
-    excerpt: 'Discover everything you need to know...', // -> CHANGE EXCERPT
-    content: 'Long form content goes here...',          // -> ADD FULL CONTENT
-    imageUrl: 'https://example.com/image.jpg',          // -> CHANGE IMAGE
-    category: 'Technology',
-    readingTime: 5 // Optional fallback
-  }
-];
-```
+To synchronize fresh Prismic updates immediately to your users without triggering full project builds:
+1. Log into your Prismic Dashboard.
+2. Navigate to **Settings > Webhooks**.
+3. Create a new webhook pointing to:
+   ```
+   https://www.clickys.in/api/revalidate
+   ```
+4. Set the trigger event to **Document published** or **Document unpublished**. This route securely signals your deployment container to purge cached indices for that specific URI instantly!
 
 ---
 
-## ⚙️ 5. Prismic CMS Logic & Dynamic Content
+## 📧 7. Newsletter, Emails & Subscriptions
 
-This project uses **Prismic CMS** to allow easy, non-coder editing.
-Log into your Prismic Dashboard (at `theophelousmudhleyo@gmail.com`) to edit Custom Types:
-1.  **Product**
-2.  **Guide**
-3.  **Partner**
-4.  **Marketing Banner**
-
-The logic to fetch them is mostly inside `client.getAllByType("...")`.
-Example from Home Page (`/app/page.jsx`):
-
-```javascript
-// Fetch guides from Prismic:
-client.getAllByType("guide", {
-  orderings: { field: 'my.guide.date', direction: 'desc' },
-  limit: 3, // -> Increase this to show more guides on the homepage!
-})
-```
-
-### ⚡ On-Demand Revalidation (ISR)
-Instead of forcing a full site rebuild on Vercel every time you publish new content in Prismic, this site is configured to use **Incremental Static Regeneration (ISR)** via Next.js.
-When you publish a document in Prismic, a Webhook triggers the `/api/revalidate` endpoint.
-
-**Webhook URL:** `https://clickys.in/api/revalidate`
-**Action Triggered:** The system clears the cache only for the created/updated pages (e.g., `/products/[slug]`, `/deals`) automatically. This updates your live site rapidly without using Vercel build credits or causing site-wide downtime.
+1. **User Subscriptions**: Subscribing via the Footer saves emails to the `newsletter_subscribers` collection in Firebase Firestore.
+2. **Automated Campaign Dispatches**: When dynamic material lands on Prismic, the Resend API can dispatch notices using `/api/send-newsletter`. Let it default to the main categories (/products, /deals, /whats-new) if deep links are still propagating.
 
 ---
 
-## 📧 6. Newsletter, Emails & Subscriptions
+## 🚀 8. Actionable Maintenance Commands
 
-This app handles newsletter emails through external integrations. Depending on the setup you want (Firebase, Prismic, Resend), here's how to manage it:
+Run these terminal instructions inside your workspace during local staging:
 
-1. **Firebase Firestore (Data Storage):**
-   When a user submits the newsletter form (often in `<Footer>` or a `<NewsletterSubscription>` component), their email is saved to a Firebase collection (e.g., `newsletter_subscribers`).
-   To manage this, log into your Firebase Console. Under Firestore Database, look for the target collection, where you can view or download all subscribed emails.
-   
-2. **Resend.com (Transactional/Marketing Emails):**
-   Newsletters feature an automated alert whenever you publish a product, deal, or what's-new item on Prismic. The Prismic Webhook triggers the Next.js API route `/api/send-newsletter/route.js`.
-   
-   **Smart Routing:** When the newsletter sends to your users, it securely defaults the "Call to Action" links to your active main category hubs:
-   - Products -> `/products`
-   - Deals -> `/deals`
-   - What's New -> `/whats-new`
-   - Partners -> `/partners`
-   
-   *This strategic fallback design protects users from broken deep links (404s) and safely funnels them directly to your heavily optimized index lists.*
+```bash
+# 1. Install local dependencies
+npm install
 
-3. **Prismic (For Content/Body of the Emails):**
-   If you want to write standard newsletter content without editing code, you can create a "Newsletter Template" Custom Type in Prismic.
-   Fetch it in your API handler before passing the HTML to Resend!
+# 2. Run local development server
+npm run dev
 
----
+# 3. Format and lint source files
+npm run lint
 
-## 📫 7. Contact & FAQ Page
+# 4. Generate local static production sitemaps & build bundles
+npm run build
 
-To update the main contact details or FAQs, look in the Contact directory.
-
-### Edit Contact Details (`/app/contact/page.jsx`)
-```javascript
-// File: /app/contact/page.jsx
-const contactDetails = [
-  {
-    icon: <FiMail />,
-    title: 'Email Us',
-    value: 'support@clickys.in', // -> CHANGE EMAIL
-    link: 'mailto:support@clickys.in'
-  },
-  // Add phone numbers, address, etc.
-]
+# 5. Bootstrap local production server
+npm run start
 ```
-
-### Edit FAQs (`/app/contact/page.jsx` or similar nested FAQ component)
-```javascript
-const faqs = [
-  {
-    question: "How do you select your deals?",
-    answer: "We use a mix of API automation and hand-picked curation..." // -> Update text
-  }
-]
-```
-
----
-
-## 🚀 8. Deploying on Vercel with clickys.in
-
-### Step 1: Upload to GitHub
-1. Create a GitHub repository (e.g., `MyClickys`).
-2. Push your localized codebase up to GitHub.
-
-### Step 2: Import into Vercel
-1. Go to [Vercel.com](https://vercel.com) and log in.
-2. Click **"Add New Project"** and authorize GitHub if needed.
-3. Select your `MyClickys` repository from the list.
-4. Leave the Framework Preset as **Next.js**.
-
-### Step 3: Add Environment Variables
-Before you click Deploy, expand the **Environment Variables** section. Add all required secrets for your app to function properly:
-- `AMAZON_CREDENTIAL_ID` & `AMAZON_CREDENTIAL_SECRET` & `AMAZON_ASSOCIATE_TAG` (for the Amazon API)
-- `NEXT_PUBLIC_PRISMIC_ENVIRONMENT` (Your Prismic Repo Name)
-- `RESEND_API_KEY` (if using Resend)
-- Any Firebase credentials configured for your Newsletter logic.
-
-### Step 4: Deploy!
-Click **Deploy**. Vercel will build the `next build` command and launch your app onto a `.vercel.app` temporary URL.
-
-### Step 5: Add your Custom Domain (clickys.in)
-1. In your Vercel project dashboard, go to **Settings > Domains**.
-2. Type in `clickys.in` and `www.clickys.in` and click **Add**.
-3. Vercel will provide you with DNS Records (typically an A Record like `76.76.21.21` or a CNAME).
-4. Go to the domain registrar where you purchased `clickys.in` (e.g., GoDaddy, Namecheap).
-5. Open your DNS Settings there, and copy+paste the records Vercel provided.
-6. Once the DNS propagates, Vercel will secure `clickys.in` with an SSL certificate, and your site will be live!
 
 ---
 Happy Coding & Curating! 🚀

@@ -74,8 +74,8 @@ export default function PriceHistoryChart({ currentPrice }) {
         </div>
       </div>
       
-      <div className="h-64 w-full border border-red-500">
-        <ResponsiveContainer width="100%" height={256}>
+      <div className="h-64 w-full">
+        <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} margin={{ top: 15, right: 15, left: 25, bottom: 5 }}>
             <defs>
               <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
