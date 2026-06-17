@@ -12,5 +12,6 @@ export const components = {
   whatsnew: dynamic(() => import("./TheBigBurner")),
   the_shopping_grid: dynamic(() => import("./TheShoppingGrid")),
   the_moving_stripe: dynamic(() => import("./TheMovingStripe")),
+  pinterest_grid: dynamic(() => import("./PinterestGrid")),
   guide: dynamic(() => import("./Guide")),
 };

@@ -3,6 +3,7 @@ import DealsPage from "./DealsPage"
 import { products } from '../../components/flipkartProducts'
 import { createClient } from '../../prismicio';
 import PaginatedGuides from './PaginatedGuides';
+import { Suspense } from 'react';
 
 // Metadata for the Deals page
 
@@ -70,7 +71,9 @@ const page = async () => {
 
   return (
     <>
-      <DealsPage products={ products }/>
+      <Suspense fallback={<div>Loading deals...</div>}>
+        <DealsPage products={ products }/>
+      </Suspense>
       {allSlices.length > 0 && (
         <section className="w-full max-w-7xl mx-auto px-4 py-16 mt-8 border-t border-gray-100">
           <div className="text-center mb-12">
@@ -81,7 +84,9 @@ const page = async () => {
               Our latest insights and carefully curated selections.
             </p>
           </div>
-          <PaginatedGuides slices={allSlices} />
+          <Suspense fallback={<div>Loading highlights...</div>}>
+            <PaginatedGuides slices={allSlices} />
+          </Suspense>
         </section>
       )}
     </>

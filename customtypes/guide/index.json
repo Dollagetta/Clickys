@@ -236,7 +236,11 @@
         "type": "Slices",
         "fieldset": "Slice Zone",
         "config": {
-          "choices": {}
+          "choices": {
+            "pinterest_grid": {
+              "type": "SharedSlice"
+            }
+          }
         }
       }
     },

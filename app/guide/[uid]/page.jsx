@@ -1,8 +1,8 @@
 import { createClient } from "../../../prismicio";
-import { SliceZone } from "@prismicio/react";
+import { SliceZone, PrismicRichText } from "@prismicio/react";
 import { components } from "../../../slices";
 import Link from "next/link";
-import { PrismicRichText } from "@prismicio/react";
+import { Suspense } from "react";
 import { PrismicNextImage, PrismicNextLink } from "@prismicio/next";
 
 export async function generateMetadata({ params }) {
@@ -218,8 +218,12 @@ export default async function GuidePage({ params }) {
           );
         }
         
-        // If it's a different slice type, we can render it using the SliceZone or ignore
-        return null;
+        // If it's a different slice type, we can render it using the SliceZone
+        return (
+          <Suspense key={i} fallback={<div>Loading...</div>}>
+            <SliceZone slices={[slice]} components={components} />
+          </Suspense>
+        );
       })}
     </main>
   );

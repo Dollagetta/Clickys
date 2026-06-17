@@ -44,6 +44,15 @@ export async function GET() {
       else deducedPlatform = 'Store';
     }
     
+    const prismicAsText = (field) => {
+      if (!field) return "";
+      if (typeof field === 'string') return field;
+      if (Array.isArray(field)) {
+        return field.map(block => block.text || "").join(" ");
+      }
+      return "";
+    };
+    
     return {
       id: p.id,
       name: p.data.title,
@@ -51,7 +60,7 @@ export async function GET() {
       category: p.data.category || 'General',
       price: priceVal,
       launchDate: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-      description: "Trending product you might love.",
+      description: prismicAsText(p.data.description) || prismicAsText(p.data.short_description) || "Trending product you might love.",
       imageUrl: p.data.image?.url,
       link: p.data.link?.url,
       platform: deducedPlatform,

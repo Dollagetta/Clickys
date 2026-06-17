@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { createClient } from "../../prismicio";
 import WhatsNewGrid from './WhatsNewGrid';
 
@@ -32,7 +33,9 @@ export default async function WhatsNewListingPage() {
             </p>
           </header>
 
-          <WhatsNewGrid pages={pages} />
+          <Suspense fallback={<div className="h-96 flex items-center justify-center text-gray-400">Loading new content...</div>}>
+            <WhatsNewGrid pages={pages} />
+          </Suspense>
         </div>
       </div>
     </>

@@ -21,6 +21,7 @@ import HeroSlider from '../components/HeroSlider';
 import PriceTracker from '../components/PriceTracker';
 import ProductComparator from '../components/ProductComparator';
 import GiftFinder from '../components/GiftFinder';
+import { components } from "../slices";
 import styles from '../styles/Home.module.css';
 import { FiZap, FiShoppingCart, FiTrendingUp, FiGift, FiShield, FiThumbsUp, FiArrowRight, FiMessageSquare, FiAward, FiCheckCircle, FiClock } from 'react-icons/fi';
 import Image from 'next/image'; // For Buying Guides section images
@@ -33,7 +34,7 @@ import { createClient } from "../prismicio";
 import { asText } from "@prismicio/client";
 import * as prismic from '@prismicio/client';
 import { PrismicNextImage } from "@prismicio/next";
-import { PrismicRichText } from "@prismicio/react";
+import { SliceZone, PrismicRichText } from "@prismicio/react";
 
 export const metadata = {
   title: "Clickys.in | Trending Tech & Home Essentials in India",
@@ -97,7 +98,6 @@ export default async function HomePage() {
 
     const client = createClient();
     
-    // Parallelize all data fetching with a global timeout for safety
     console.log('[HomePage] Starting data fetch...');
     const fetchWithTimeout = (promise, ms = 15000) => 
       Promise.race([
@@ -107,20 +107,25 @@ export default async function HomePage() {
 
     const fetchData = async () => {
       try {
-        return await Promise.allSettled([
-          fetchWithTimeout(client.getAllByType("marketingbanner")),
-          fetchWithTimeout(client.getAllByType("partner")),
-          fetchWithTimeout(client.getAllByType('product', { limit: 8 })),
-          fetchWithTimeout(client.getAllByType('category'))
+        console.log('[HomePage] Fetching all data types...');
+        const results = await Promise.allSettled([
+          fetchWithTimeout(client.getAllByType("marketingbanner")).catch(() => []),
+          fetchWithTimeout(client.getAllByType("partner")).catch(() => []),
+          fetchWithTimeout(client.getAllByType('product', { limit: 12 })).catch(() => []),
+          fetchWithTimeout(client.getAllByType('category')).catch(() => []),
+          fetchWithTimeout(
+            client.getByUID('pinterestgrid', 'pinterestgrid')
+              .catch(async (e) => {
+                // Return fallback document if not found; muted to avoid noisy logs as fallback UI is available.
+                const all = await client.getAllByType('pinterestgrid', { limit: 1 }).catch(() => []);
+                return all[0] || null;
+              })
+          )
         ]);
+        return results;
       } catch (err) {
-        console.error('[HomePage] critical fetch error:', err);
-        return [
-          { status: 'rejected', reason: err },
-          { status: 'rejected', reason: err },
-          { status: 'rejected', reason: err },
-          { status: 'rejected', reason: err }
-        ];
+        console.error('[HomePage] Critical fetch wrap error:', err);
+        return Array(5).fill({ status: 'rejected', reason: err });
       }
     };
 
@@ -129,9 +134,12 @@ export default async function HomePage() {
       banner, 
       partnersResponseResult, 
       prismicProductsResResult,
-      categoriesResResult
+      categoriesResResult,
+      homePageDocResult
     ] = results;
     console.log('[HomePage] Data fetch completed');
+
+    const homePageData = homePageDocResult.status === 'fulfilled' ? homePageDocResult.value : null;
 
     const bannerData = banner.status === 'fulfilled' ? banner.value : [];
 
@@ -169,6 +177,12 @@ export default async function HomePage() {
           else deducedPlatform = 'Store';
         }
 
+        const prismicAsText = (field) => {
+          if (!field) return "";
+          if (typeof field === 'string') return field;
+          try { return asText(field); } catch (e) { return ""; }
+        };
+
         return {
           id: p.id,
           name: p.data.title,
@@ -180,6 +194,7 @@ export default async function HomePage() {
           rating: 0, 
           reviewCount: 0,
           discount: p.data.discount,
+          description: prismicAsText(p.data.description) || prismicAsText(p.data.short_description) || "",
         };
       });
     }
@@ -284,6 +299,10 @@ export default async function HomePage() {
       <PartnerSection partners={partners} />
 
       <PinterestGrid />
+
+      {homePageData && homePageData.data.slices && (
+        <SliceZone slices={homePageData.data.slices} components={components} />
+      )}
 
       {bannerData && bannerData.length > 0 && bannerData[0] ? (
         <PromotionBanner slice={bannerData[0]} />

@@ -251,7 +251,13 @@ function LaunchCard({ item }) {
                   </button>
                 </div>
               </div>
-              <p style={{ color: '#f97316', margin: '0 0 1rem 0', fontWeight: '700', fontSize: '1rem' }}>{item.price}</p>
+              <p style={{ color: '#f97316', margin: '0 0 1rem 0', fontWeight: '700', fontSize: '1.1rem' }}>{item.price}</p>
+              
+              {item.description && (
+                <div style={{ color: '#475569', fontSize: '13px', lineHeight: '1.5', marginBottom: '1.5rem', backgroundColor: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                  {item.description}
+                </div>
+              )}
               
               <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', marginBottom: '1.5rem' }}>
                 <a

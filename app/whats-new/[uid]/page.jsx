@@ -3,6 +3,7 @@ import { SliceZone } from "@prismicio/react";
 import { createClient } from "../../../prismicio";
 import { components } from "../../../slices";
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { FiArrowLeft } from 'react-icons/fi';
 import NewLaunchesSection from "../../../components/NewLaunchesSection";
 
@@ -81,11 +82,13 @@ export default async function WhatsNewPage({ params }) {
         
         <main>
           <NewLaunchesSection />
-          <SliceZone 
-            slices={page.data.slices} 
-            components={components} 
-            context={{ galleryImages: shoppingGridImages }}
-          />
+          <Suspense fallback={<div>Loading section...</div>}>
+            <SliceZone 
+              slices={page.data.slices} 
+              components={components} 
+              context={{ galleryImages: shoppingGridImages }}
+            />
+          </Suspense>
         </main>
       </div>
     </div>

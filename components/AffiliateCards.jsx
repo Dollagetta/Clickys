@@ -8,15 +8,18 @@ export default async function AffiliateCards() {
   try {
     const affiliatesResponse = await client.getAllByType("affiliate", {
       orderings: [{ field: 'document.first_publication_date', direction: 'desc' }]
+    }).catch(e => {
+      console.warn("Affiliate type mapping or type itself might be missing in Prismic:", e.message);
+      return [];
     });
     
-    affiliates = affiliatesResponse.map(doc => ({
+    affiliates = (affiliatesResponse || []).map(doc => ({
       id: doc.id,
-      name: doc.data.site_name,
+      name: doc.data?.site_name || 'Affiliate',
       slug: doc.uid,
-      logo: doc.data.logo,
-      color: doc.data.brand_colour || '#000000',
-      url: doc.data.affiliate_link?.url || null,
+      logo: doc.data?.logo,
+      color: doc.data?.brand_colour || '#000000',
+      url: doc.data?.affiliate_link?.url || null,
     }));
   } catch (err) {
     console.error('Failed to load affiliates', err);
