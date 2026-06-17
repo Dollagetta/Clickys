@@ -10,6 +10,7 @@ import { Suspense } from 'react';
 import CallToAction from '../components/CallToAction';
 import ProductCard from '../components/ProductCard';         // From nextjs_app_router_presentational_comps_v2
 import PartnerSection from '../components/PartnerSection';
+import PinterestGrid from '../components/PinterestGrid';
 import PromotionBanner from '../components/PromotionBanner'; // From nextjs_app_router_presentational_comps_v2
 import CategoryHighlight from '../components/CategoryHighlight'; // From nextjs_app_router_presentational_comps_v2
 import AffiliateCards from '../components/AffiliateCards';
@@ -281,6 +282,8 @@ export default async function HomePage() {
       </section>
       
       <PartnerSection partners={partners} />
+
+      <PinterestGrid />
 
       {bannerData && bannerData.length > 0 && bannerData[0] ? (
         <PromotionBanner slice={bannerData[0]} />
