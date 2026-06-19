@@ -113,14 +113,7 @@ export default async function HomePage() {
           fetchWithTimeout(client.getAllByType("partner")).catch(() => []),
           fetchWithTimeout(client.getAllByType('product', { limit: 12 })).catch(() => []),
           fetchWithTimeout(client.getAllByType('category')).catch(() => []),
-          fetchWithTimeout(
-            client.getByUID('pinterestgrid', 'pinterestgrid')
-              .catch(async (e) => {
-                // Return fallback document if not found; muted to avoid noisy logs as fallback UI is available.
-                const all = await client.getAllByType('pinterestgrid', { limit: 1 }).catch(() => []);
-                return all[0] || null;
-              })
-          )
+          fetchWithTimeout(client.getAllByType('pinterestgrid')).catch(() => [])
         ]);
         return results;
       } catch (err) {
@@ -298,9 +291,9 @@ export default async function HomePage() {
       
       <PartnerSection partners={partners} />
 
-      <PinterestGrid />
+      <PinterestGrid initialItems={Array.isArray(homePageData) ? homePageData : []} />
 
-      {homePageData && homePageData.data.slices && (
+      {homePageData && !Array.isArray(homePageData) && homePageData.data?.slices && (
         <SliceZone slices={homePageData.data.slices} components={components} />
       )}
 

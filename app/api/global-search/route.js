@@ -68,11 +68,11 @@ export async function GET(request) {
          name: typeof title === 'string' ? title : 
                (Array.isArray(title) && title[0]?.text) ? title[0].text : 'Item',
          category: p.data?.category || p.type,
-         price: p.data?.price || 0,
+         price: p.data?.price !== undefined && p.data?.price !== null ? p.data.price : '',
          imageUrl: image,
          amazonLink: link,
          platform: platform,
-         discount: p.data?.discount || 0,
+         discount: p.data?.discount !== undefined && p.data?.discount !== null ? p.data.discount : '',
          description: p.data?.description || p.data?.meta_description || p.data?.partner_description || '',
          data: p.data // raw data
        }

@@ -111,8 +111,20 @@ export default async function AffiliatePage({ params }) {
     })
     .map((doc) => {
       const price = doc?.data?.price?.toString() || "0";
-      const discount = doc?.data?.discount || 0;
-      const oldPrice = parseFloat(price.replace(/[^0-9.]/g, "")) + parseFloat(discount || 0);
+      const discount = doc?.data?.discount?.toString() || "";
+      
+      const parsedPrice = parseFloat(price.replace(/[^0-9.]/g, "")) || 0;
+      const parsedDiscount = parseFloat(discount.replace(/[^0-9.]/g, "")) || 0;
+      const oldPrice = parsedPrice + parsedDiscount;
+
+      const formatPrice = (p) => {
+        if (!p || String(p).trim() === '') return '';
+        let strClean = String(p).trim();
+        if (strClean.includes('₹')) return strClean;
+        if (/^[0-9]/.test(strClean)) return `₹${strClean}`;
+        return strClean;
+      };
+      const formattedPrice = formatPrice(price);
 
       const imageUrl = doc?.data?.image || "https://placehold.co/600x600/E5E7EB/475569?text=No+Image";
 
@@ -126,9 +138,9 @@ export default async function AffiliatePage({ params }) {
       return {
         id: doc.id,
         name: doc?.data?.title || doc?.data?.product_name || "Product",
-        price: `₹${price}`,
-        oldPrice: oldPrice > 0 ? `₹${oldPrice}` : null,
-        savings: discount > 0 ? `Save ₹${discount}` : null,
+        price: formattedPrice,
+        oldPrice: parsedDiscount > 0 && parsedPrice > 0 ? `₹${oldPrice}` : null,
+        savings: discount && parsedDiscount > 0 ? `Save ${discount.includes('%') || discount.includes('₹') ? discount : `₹${discount}`}` : null,
         category: doc?.data?.category || affiliate?.data?.site_name || "Products",
         platform: affiliate?.data?.site_name || "Affiliate",
         imageUrl,

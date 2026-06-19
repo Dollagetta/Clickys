@@ -2,14 +2,55 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import { Bookmark, ExternalLink, Share2, X, Play, Pause, Eye } from 'lucide-react';
+import { Bookmark, ExternalLink, Share2, X, Play, Pause, Eye, ChevronLeft } from 'lucide-react';
 
-export default function PinterestGrid() {
+export default function PinterestGrid({ initialItems }) {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isPaused, setIsPaused] = useState(false);
+  const [playingVideoId, setPlayingVideoId] = useState(null);
   const videoRef = useRef(null);
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get('q')?.toLowerCase() || '';
+
+  const [prismicItems, setPrismicItems] = useState(initialItems || []);
+  const [loading, setLoading] = useState(!initialItems);
+
+  useEffect(() => {
+    if (initialItems && initialItems.length > 0) {
+      setPrismicItems(initialItems);
+      setLoading(false);
+      return;
+    }
+
+    async function fetchPrismicGrid() {
+      try {
+        const { createClient } = await import('../prismicio');
+        const client = createClient();
+        const docs = await client.getAllByType('pinterestgrid');
+        if (docs && docs.length > 0) {
+          setPrismicItems(docs);
+        }
+      } catch (err) {
+        console.error("Error fetching Prismic PinterestGrid custom pages client-side:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPrismicGrid();
+  }, [initialItems]);
+
+  useEffect(() => {
+    if (selectedItem && selectedItem.type === 'video' && videoRef.current) {
+      videoRef.current.muted = false;
+      videoRef.current.play().catch(err => {
+        console.log("Autoplay with sound blocked, trying muted:", err);
+        if (videoRef.current) {
+          videoRef.current.muted = true;
+          videoRef.current.play();
+        }
+      });
+    }
+  }, [selectedItem]);
 
   // Placeholder data for the masonry grid
   const items = useMemo(() => [
@@ -120,15 +161,6 @@ export default function PinterestGrid() {
       site: 'via Flipkart',
       aspectRatio: 'aspect-[3/2]',
       link: 'https://fktr.in/8mAf4Vj'
-    },
-    {
-      id: 13,
-      image: 'https://images.unsplash.com/photo-1522314619421-4f1642875f56?q=80&w=1080',
-      title: 'Luxe Velvet Armchair',
-      description: 'Add a touch of regality to your living room. This plush velvet armchair combines comfort with mid-century modern design.',
-      site: 'via Ajio',
-      aspectRatio: 'aspect-[2/3]',
-      link: 'https://ajiio.in/ypU93JC'
     },
     {
       id: 14,
@@ -329,15 +361,6 @@ export default function PinterestGrid() {
       link: 'https://fktr.in/8mAf4Vj'
     },
     {
-      id: 36,
-      image: 'https://images.unsplash.com/photo-1594932224491-9941966bba7a?q=80&w=1080',
-      title: 'Velvet Evening Blazer',
-      description: 'Dazzle at your next event. This slim-cut velvet blazer features a satin lapel and a tailored fit for a sharp, sophisticated look.',
-      site: 'via Ajio',
-      aspectRatio: 'aspect-[2/3]',
-      link: 'https://ajiio.in/ypU93JC'
-    },
-    {
       id: 37,
       image: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=1080',
       title: 'Graphic Print Hoodie',
@@ -428,15 +451,6 @@ export default function PinterestGrid() {
       link: 'https://myntr.it/CXgM9Oa'
     },
     {
-      id: 47,
-      image: 'https://images.unsplash.com/photo-1620003263720-95b45a6035d5?q=80&w=1080',
-      title: 'Smart Garden Starter Kit',
-      description: 'Grow your own herbs indoor. This self-watering hydroponic system includes LED grow lights to ensure your plants thrive all year.',
-      site: 'via Flipkart',
-      aspectRatio: 'aspect-[3/4]',
-      link: 'https://fktr.in/8mAf4Vj'
-    },
-    {
       id: 48,
       image: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=1080',
       title: 'Polarized Wayfarer Shades',
@@ -444,15 +458,6 @@ export default function PinterestGrid() {
       site: 'via Ajio',
       aspectRatio: 'aspect-[3/2]',
       link: 'https://ajiio.in/ypU93JC'
-    },
-    {
-      id: 49,
-      image: 'https://images.unsplash.com/photo-1621339019692-06941837542d?q=80&w=1080',
-      title: 'Foldable Drone Pro Plus',
-      description: 'See the world from above. 4K camera with GPS auto-return and 30 minutes of flight time. Compact enough to take on any adventure.',
-      site: 'via Amazon',
-      aspectRatio: 'aspect-[4/3]',
-      link: 'https://www.amazon.in/shop/clickyse'
     },
     {
       id: 50,
@@ -465,13 +470,87 @@ export default function PinterestGrid() {
     }
   ], []);
 
+  const getAsString = (field) => {
+    if (!field) return '';
+    if (typeof field === 'string') return field;
+    if (Array.isArray(field)) {
+      try {
+        return field.map(node => node.text || '').join(' ');
+      } catch (e) {
+        return '';
+      }
+    }
+    return '';
+  };
+
+  const getAspectRatioClass = (ratio) => {
+    if (!ratio) return 'aspect-[3/4]';
+    const r = String(ratio).toLowerCase();
+    if (r.includes('square')) return 'aspect-square';
+    if (r.includes('portrait') || r.includes('3/4') || r.includes('3-4')) return 'aspect-[3/4]';
+    if (r.includes('tall') || r.includes('2/3') || r.includes('2-3')) return 'aspect-[2/3]';
+    if (r.includes('landscape') || r.includes('3/2') || r.includes('3-2')) return 'aspect-[3/2]';
+    if (r.includes('4/3') || r.includes('4-3')) return 'aspect-[4/3]';
+    if (r.includes('4/5') || r.includes('4-5')) return 'aspect-[4/5]';
+    if (r.includes('16/9') || r.includes('16-9')) return 'aspect-[16/9]';
+    return 'aspect-[3/4]';
+  };
+
+  const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1560343776-97e7d202ff0e?q=80&w=1080';
+
+  const mappedItems = useMemo(() => {
+    if (prismicItems && prismicItems.length > 0) {
+      return prismicItems.map((doc, idx) => {
+        const data = doc.data || {};
+        
+        const imageUrl = data.product_image?.url || FALLBACK_IMAGE;
+        const title = getAsString(data.heading);
+        const description = getAsString(data.description) || '';
+        const platform = getAsString(data.platform) || 'via Clickys';
+        const site = platform.toLowerCase().startsWith('via') ? platform : `via ${platform}`;
+        const link = data.affiliate_link?.url || (typeof data.affiliate_link === 'string' ? data.affiliate_link : '#');
+        const videoSrc = data.video?.url || (typeof data.video === 'string' ? data.video : '');
+        const isVideo = Boolean(data.is_video);
+        const aspect_ratio = data.aspect_ratio || 'portrait';
+        
+        return {
+          id: doc.id || `prismic-${idx}`,
+          uid: doc.uid,
+          image: imageUrl,
+          title: title,
+          description: description,
+          site: site,
+          aspectRatio: getAspectRatioClass(aspect_ratio),
+          link: link,
+          type: isVideo ? 'video' : 'image',
+          videoSrc: videoSrc,
+        };
+      }).filter(item => item.title !== 'Curated Product' && item.title !== 'Curated Style' && item.title !== '');
+    }
+    return items.filter(item => item.title !== 'Curated Product' && item.title !== 'Curated Style');
+  }, [prismicItems, items]);
+
   const filteredItems = useMemo(() => {
-    if (!searchQuery) return items;
-    return items.filter(item => 
+    if (!searchQuery) return mappedItems;
+    return mappedItems.filter(item => 
       item.title.toLowerCase().includes(searchQuery) || 
       item.description.toLowerCase().includes(searchQuery)
     );
-  }, [items, searchQuery]);
+  }, [mappedItems, searchQuery]);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 24;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+  
+  const paginatedItems = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredItems.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredItems, currentPage]);
 
   // If search query is present but no items match, we could show a message
   // For now, let's just render the filtered list.
@@ -488,75 +567,101 @@ export default function PinterestGrid() {
       </div>
       
       {/* Masonry Grid Container */}
-      <div className="columns-2 sm:columns-2 lg:columns-3 xl:columns-4 gap-3 md:gap-6 space-y-3 md:space-y-6">
-        {filteredItems.map((item) => (
-          <div key={item.id} className="break-inside-avoid relative group rounded-xl md:rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col cursor-pointer" onClick={() => setSelectedItem(item)}>
+      <div className="columns-2 sm:columns-2 lg:columns-3 xl:columns-4 gap-3 md:gap-6 w-full">
+        {paginatedItems.map((item) => (
+          <div key={item.id} className={`break-inside-avoid relative mb-3 md:mb-6 group rounded-xl md:rounded-2xl ${playingVideoId === item.id ? 'z-50 overflow-visible' : 'overflow-hidden'} bg-white shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col cursor-pointer`} onClick={() => setSelectedItem(item)}>
             
             {/* Media Container */}
-            <div className={`relative w-full ${item.aspectRatio} overflow-hidden bg-gray-50`}>
+            <div className={`relative w-full ${item.aspectRatio} ${playingVideoId !== item.id ? 'overflow-hidden' : ''} bg-gray-50 rounded-t-xl md:rounded-t-2xl`}>
               {item.type === 'video' ? (
-                <div className="relative w-full h-full group/video-container">
-                  <video 
-                    src={item.videoSrc}
-                    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700 ease-in-out"
-                    muted
-                    playsInline
-                    loop
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const video = e.currentTarget;
-                      if (video.paused) video.play();
-                      else video.pause();
-                    }}
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/10 transition-opacity">
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const video = e.currentTarget.closest('div').querySelector('video');
-                        if (video.paused) video.play();
-                        else video.pause();
-                      }}
-                      className="bg-white/20 backdrop-blur-md p-3 rounded-full text-white hover:bg-white/40 transition-all transform hover:scale-110"
-                    >
-                      <Play className="w-6 h-6 fill-current" />
-                    </button>
+                <>
+                  <div className="absolute inset-0 flex flex-row w-full h-full">
+                    <div className="relative w-1/2 h-full group/video-container border-r border-gray-100 bg-gray-100">
+                      <video 
+                        src={item.videoSrc}
+                        className="object-cover w-full h-full"
+                        autoPlay
+                        muted
+                        playsInline
+                        loop
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPlayingVideoId(item.id);
+                          }}
+                          className="bg-white/40 backdrop-blur-md p-2.5 md:p-3 rounded-full text-gray-900 border border-white/50 shadow-lg pointer-events-auto transition-transform transform hover:scale-110"
+                        >
+                          <Play className="w-4 h-4 md:w-5 md:h-5 fill-current pl-0.5" />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="relative w-1/2 h-full">
+                      <Image 
+                        src={item.image || FALLBACK_IMAGE} 
+                        alt={item.title} 
+                        fill 
+                        className="object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
+                        sizes="(max-width: 768px) 50vw, 25vw"
+                        referrerPolicy="no-referrer"
+                        loading="lazy"
+                      />
+                    </div>
                   </div>
-                </div>
+                  {playingVideoId === item.id && (
+                    <div className="absolute inset-[-12px] md:inset-[-20px] z-[60] bg-black rounded-2xl shadow-2xl overflow-hidden scale-105 transition-all outline outline-4 outline-white/20 flex flex-col">
+                      <video 
+                        src={item.videoSrc}
+                        className="w-full h-full object-contain bg-black"
+                        autoPlay
+                        controls
+                        playsInline
+                        loop
+                      />
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); setPlayingVideoId(null); }}
+                        className="absolute top-4 left-4 z-10 bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-full text-white text-xs font-bold flex items-center gap-1 hover:bg-black/70 transition-colors border border-white/10"
+                      >
+                        <ChevronLeft className="w-3 h-3" /> Back
+                      </button>
+                    </div>
+                  )}
+                </>
               ) : (
                 <Image 
-                  src={item.image} 
+                  src={item.image || FALLBACK_IMAGE} 
                   alt={item.title} 
                   fill 
                   className="object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
+                  sizes="(max-width: 768px) 50vw, 25vw"
                   referrerPolicy="no-referrer"
                   loading="lazy"
                 />
               )}
               
               {/* Site Badge overlay */}
-              <div className="absolute top-2 md:top-4 left-2 md:left-4 bg-white/95 backdrop-blur-md px-2 md:px-3 py-0.5 md:py-1 rounded-full shadow-sm text-[10px] md:text-xs font-bold text-gray-800 z-10 flex items-center gap-1 uppercase">
+              <div className="absolute top-2 left-2 bg-white/95 backdrop-blur-md px-2 py-0.5 rounded-full shadow-sm text-[10px] font-bold text-gray-800 z-10 flex items-center gap-1 uppercase">
                 {item.site.replace('via ', '')}
               </div>
             </div>
 
-            {/* Content Area */}
+            {/* Content Area - Minimal View for Grid */}
             <div className="p-3 md:p-4 flex flex-col bg-white">
-              <h3 className="font-bold text-gray-900 text-sm md:text-base leading-snug line-clamp-1 mb-3">
+              <h3 className="font-bold text-gray-900 text-sm md:text-base leading-snug line-clamp-2 md:mb-3 mb-2">
                 {item.title}
               </h3>
 
-              {/* Persistent Actions */}
-              <div className="flex items-center justify-between gap-2">
+              {/* Action Buttons */}
+              <div className="flex flex-col gap-2 mt-auto">
                  <button 
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelectedItem(item);
                   }}
-                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-900 text-[10px] md:text-xs font-bold py-2 md:py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5"
+                  className="w-full bg-gray-100 hover:bg-gray-200 text-gray-900 text-[10px] md:text-xs font-bold py-2 md:py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5"
                  >
-                   <Eye className="w-3 h-3 md:w-3.5 h-3.5" />
+                   <Eye className="w-3.5 h-3.5" />
                    Review
                  </button>
                  <a 
@@ -564,9 +669,9 @@ export default function PinterestGrid() {
                   onClick={(e) => e.stopPropagation()} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="flex-1 bg-orange-600 hover:bg-orange-700 text-white text-[10px] md:text-xs font-bold py-2 md:py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5"
+                  className="w-full bg-orange-600 hover:bg-orange-700 text-white text-[10px] md:text-xs font-bold py-2 md:py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5"
                 >
-                  Shop Now <ExternalLink className="w-3 h-3 md:w-3.5 h-3.5" />
+                  Shop Now <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               </div>
             </div>
@@ -574,6 +679,30 @@ export default function PinterestGrid() {
           </div>
         ))}
       </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="mt-12 flex justify-center items-center gap-4">
+          <button
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="px-6 py-2.5 bg-white border border-gray-200 rounded-full font-semibold text-gray-700 hover:bg-gray-50 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm flex items-center gap-2"
+          >
+            <ChevronLeft className="w-4 h-4" /> Previous Frame
+          </button>
+          <span className="font-medium text-sm text-gray-600 bg-gray-100 px-4 py-2 rounded-full">
+            Frame {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="px-6 py-2.5 bg-white border border-gray-200 rounded-full font-semibold text-gray-700 hover:bg-gray-50 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm flex items-center gap-2"
+          >
+            Next Frame <ChevronLeft className="w-4 h-4 rotate-180" />
+          </button>
+        </div>
+      )}
+
       {filteredItems.length === 0 && (
         <div className="text-center py-20">
           <p className="text-xl text-gray-500 font-medium">No results found for "{searchQuery}"</p>
@@ -590,93 +719,116 @@ export default function PinterestGrid() {
       {selectedItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setSelectedItem(null)}>
           <div 
-            className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col md:flex-row shadow-2xl relative"
+            className="bg-white rounded-2xl w-full max-w-xl max-h-[90vh] overflow-hidden flex flex-col md:flex-row shadow-2xl relative"
             onClick={(e) => e.stopPropagation()}
           >
-            <button 
-              className="absolute top-4 right-4 z-20 bg-white/80 backdrop-blur disabled:opacity-50 hover:bg-white p-2 rounded-full shadow-sm"
-              onClick={() => setSelectedItem(null)}
-            >
-              <X className="w-5 h-5 text-gray-900" />
-            </button>
+            {/* Modal Navigation */}
+            <div className="absolute top-3 left-3 right-3 z-20 flex justify-between">
+              <button 
+                className="bg-white/90 backdrop-blur hover:bg-white px-2 py-1 rounded-lg shadow-sm text-[10px] font-bold flex items-center gap-1 transition-all text-gray-900 border border-gray-100"
+                onClick={() => setSelectedItem(null)}
+              >
+                <ChevronLeft className="w-3 h-3" /> Back
+              </button>
+              <button 
+                className="bg-white/90 backdrop-blur hover:bg-white p-1.5 rounded-full shadow-sm transition-all border border-gray-100"
+                onClick={() => setSelectedItem(null)}
+              >
+                <X className="w-3.5 h-3.5 text-gray-900" />
+              </button>
+            </div>
             
             {/* Visual Side */}
-            <div className="w-full md:w-1/2 bg-gray-100 relative min-h-[300px] md:min-h-[500px] flex items-center justify-center group/modal-video">
+            <div className="w-full md:w-1/2 bg-gray-50 relative min-h-[300px] md:min-h-[450px] flex flex-row group/modal-video border-r border-gray-100">
               {selectedItem.type === 'video' ? (
-                <div className="relative w-full h-full">
-                  <video 
-                    ref={videoRef}
-                    src={selectedItem.videoSrc}
-                    className="w-full object-cover h-full"
-                    muted
-                    playsInline
-                    loop
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/modal-video:opacity-100 transition-opacity bg-black/20">
-                    <button 
-                      onClick={() => {
-                        if (videoRef.current) {
-                          if (videoRef.current.paused) {
-                            videoRef.current.play();
-                            setIsPaused(false);
-                          } else {
-                            videoRef.current.pause();
-                            setIsPaused(true);
+                <>
+                  <div className="relative w-1/2 h-full border-r border-gray-100">
+                    <video 
+                      ref={videoRef}
+                      src={selectedItem.videoSrc}
+                      className="w-full object-cover h-full"
+                      autoPlay
+                      playsInline
+                      loop
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/modal-video:opacity-100 transition-opacity bg-black/10">
+                      <button 
+                        onClick={() => {
+                          if (videoRef.current) {
+                            if (videoRef.current.paused) {
+                              videoRef.current.play();
+                              setIsPaused(false);
+                            } else {
+                              videoRef.current.pause();
+                              setIsPaused(true);
+                            }
                           }
-                        }
-                      }}
-                      className="p-4 bg-white/30 backdrop-blur-md rounded-full text-white hover:bg-white/50 transition-all transform hover:scale-110"
-                    >
-                      {isPaused ? <Play className="w-8 h-8 fill-current" /> : <Pause className="w-8 h-8 fill-current" />}
-                    </button>
+                        }}
+                        className="p-3 bg-white/30 backdrop-blur-md rounded-full text-white hover:bg-white/50 transition-all transform hover:scale-110"
+                      >
+                        {isPaused ? <Play className="w-6 h-6 fill-current" /> : <Pause className="w-6 h-6 fill-current" />}
+                      </button>
+                    </div>
                   </div>
-                </div>
+                  <div className="relative w-1/2 h-full">
+                    <Image 
+                      src={selectedItem.image || FALLBACK_IMAGE} 
+                      alt={selectedItem.title} 
+                      fill 
+                      className="object-cover"
+                      sizes="(max-width: 768px) 50vw, 25vw"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
+                </>
               ) : (
-                <Image 
-                  src={selectedItem.image} 
-                  alt={selectedItem.title} 
-                  fill 
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  referrerPolicy="no-referrer"
-                />
+                <div className="relative w-full h-full">
+                  <Image 
+                    src={selectedItem.image || FALLBACK_IMAGE} 
+                    alt={selectedItem.title} 
+                    fill 
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
               )}
             </div>
 
             {/* Content Side */}
-            <div className="w-full md:w-1/2 p-6 md:p-8 flex flex-col overflow-y-auto">
-              <div className="flex items-center justify-between mb-6">
-                <span className="bg-gray-100 text-gray-800 text-xs font-bold px-3 py-1 rounded-full">
-                  {selectedItem.site}
+            <div className="w-full md:w-1/2 p-6 md:p-8 flex flex-col overflow-y-auto pt-16 md:pt-8">
+              <div className="flex items-center justify-between mb-4 md:mb-6">
+                <span className="bg-gray-100 text-gray-800 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase">
+                  {selectedItem.site.replace('via ', '')}
                 </span>
                 <div className="flex gap-2">
-                  <button className="p-2 bg-gray-50 hover:bg-gray-100 rounded-full transition-colors">
-                    <Share2 className="w-5 h-5 text-gray-700" />
+                  <button className="p-1.5 bg-gray-50 hover:bg-gray-100 rounded-full transition-colors">
+                    <Share2 className="w-4 h-4 text-gray-700" />
                   </button>
-                  <button className="p-2 bg-red-50 hover:bg-red-100 rounded-full transition-colors text-red-600">
-                    <Bookmark className="w-5 h-5" />
+                  <button className="p-1.5 bg-red-50 hover:bg-red-100 rounded-full transition-colors text-red-600">
+                    <Bookmark className="w-4 h-4" />
                   </button>
                 </div>
               </div>
               
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">{selectedItem.title}</h2>
-              <div className="text-gray-600 mb-8 leading-relaxed">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-3 md:mb-4 leading-tight">{selectedItem.title}</h2>
+              <div className="text-sm text-gray-600 mb-6 leading-relaxed">
                 <p>{selectedItem.description || "No description available for this item."}</p>
-                <div className="mt-6 p-4 bg-orange-50 rounded-lg border border-orange-100">
-                  <p className="text-sm text-orange-800 font-medium italic">
+                <div className="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-100">
+                  <p className="text-xs text-orange-800 font-medium italic">
                     "Find this and more curated styles on my official curator page. Handpicked quality products for you."
                   </p>
                 </div>
               </div>
 
-              <div className="mt-auto pt-6 border-t border-gray-100">
+              <div className="mt-auto pt-4 border-t border-gray-100">
                 <a 
                   href={selectedItem.link} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="w-full block text-center bg-gray-900 hover:bg-gray-800 text-white font-semibold py-3.5 px-6 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2"
+                  className="w-full block text-center bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 px-6 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2 text-sm"
                 >
-                  Visit Site <ExternalLink className="w-4 h-4" />
+                  Shop Now <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               </div>
             </div>

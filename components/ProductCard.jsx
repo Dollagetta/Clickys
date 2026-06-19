@@ -220,7 +220,11 @@ const ProductCard = ({ product }) => {
           {featuredFind && <span className={styles.featuredBadge}>Featured Find</span>}
 
           <div className={`${styles.quickActions} ${isBankOffer ? styles.shiftedActions : ''}`}>
-            { (!isBankOffer && discount && discount > 0) && <button aria-label="Discount" className={styles.discountBadge}>{discount}% Off</button> }
+            { (!isBankOffer && discount && (typeof discount === 'string' ? (parseFloat(discount.replace(/[^0-9.]/g, '')) > 0) : discount > 0)) && (
+              <button aria-label="Discount" className={styles.discountBadge}>
+                {typeof discount === 'string' ? (discount.includes('%') || discount.toLowerCase().includes('off') ? discount : `${discount}% Off`) : `${discount}% Off`}
+              </button>
+            ) }
             <button 
               aria-label="Add to wishlist" 
               title="Add to wishlist"

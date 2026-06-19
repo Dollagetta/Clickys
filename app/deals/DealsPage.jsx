@@ -121,28 +121,13 @@ function DealsPageContent() {
           predicates.push(prismic.predicate.any('my.product.category', selectedCategories));
         }
 
-        // Advanced Filters
-        if (priceRange.min) {
-          predicates.push(prismic.predicate.number.greaterThan('my.product.price', Number(priceRange.min)));
-        }
-        if (priceRange.max) {
-          predicates.push(prismic.predicate.number.lessThan('my.product.price', Number(priceRange.max)));
-        }
-        if (minDiscount > 0) {
-          predicates.push(prismic.predicate.number.greaterThan('my.product.discount', minDiscount));
-        }
+        // Advanced Filters - Removed numeric predicates to avoid Prismic API failures with changed field types (now text)
         if (selectedPlatforms.length > 0) {
           predicates.push(prismic.predicate.any('my.product.platform', selectedPlatforms));
         }
 
         let orderings = [];
-        if (sortBy === 'price_asc') {
-          orderings.push({ field: 'my.product.price', direction: 'asc' });
-        } else if (sortBy === 'price_desc') {
-          orderings.push({ field: 'my.product.price', direction: 'desc' });
-        } else {
-          orderings.push({ field: 'document.first_publication_date', direction: 'desc' });
-        }
+        orderings.push({ field: 'document.first_publication_date', direction: 'desc' });
 
         const response = await client.get({
           predicates,
@@ -165,6 +150,33 @@ function DealsPageContent() {
             reviewCount: 0,
             discount: p.data.discount,
         }));
+
+        // Apply advanced price/discount filters client-side on the returned batch for accuracy with string data
+        if (priceRange.min || priceRange.max || minDiscount > 0) {
+          normalizedProducts = normalizedProducts.filter(p => {
+            const price = parseFloat(p.price?.toString().replace(/[^0-9.]/g, '') || '0');
+            const matchesPrice = (!priceRange.min || price >= parseFloat(priceRange.min)) &&
+                                 (!priceRange.max || price <= parseFloat(priceRange.max));
+            const discount = parseFloat(p.discount?.toString().replace(/[^0-9.]/g, '') || '0');
+            const matchesDiscount = discount >= minDiscount;
+            return matchesPrice && matchesDiscount;
+          });
+        }
+
+        // Apply sort option client-side for accuracy with string prices
+        if (sortBy === 'price_asc') {
+          normalizedProducts.sort((a, b) => {
+            const priceA = parseFloat(a.price?.toString().replace(/[^0-9.]/g, '') || '0');
+            const priceB = parseFloat(b.price?.toString().replace(/[^0-9.]/g, '') || '0');
+            return priceA - priceB;
+          });
+        } else if (sortBy === 'price_desc') {
+          normalizedProducts.sort((a, b) => {
+            const priceA = parseFloat(a.price?.toString().replace(/[^0-9.]/g, '') || '0');
+            const priceB = parseFloat(b.price?.toString().replace(/[^0-9.]/g, '') || '0');
+            return priceB - priceA;
+          });
+        }
       }
 
       setProducts(normalizedProducts);
