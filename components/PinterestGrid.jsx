@@ -597,12 +597,12 @@ export default function PinterestGrid({ initialItems }) {
                         </button>
                       </div>
                     </div>
-                    <div className="relative w-1/2 h-full">
+                    <div className="relative w-1/2 h-full bg-white">
                       <Image 
                         src={item.image || FALLBACK_IMAGE} 
                         alt={item.title} 
                         fill 
-                        className="object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
+                        className="object-contain p-4 group-hover:scale-105 transition-transform duration-700 ease-in-out"
                         sizes="(max-width: 768px) 50vw, 25vw"
                         referrerPolicy="no-referrer"
                         loading="lazy"
@@ -629,15 +629,17 @@ export default function PinterestGrid({ initialItems }) {
                   )}
                 </>
               ) : (
-                <Image 
-                  src={item.image || FALLBACK_IMAGE} 
-                  alt={item.title} 
-                  fill 
-                  className="object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
-                  sizes="(max-width: 768px) 50vw, 25vw"
-                  referrerPolicy="no-referrer"
-                  loading="lazy"
-                />
+                <div className="absolute inset-0 bg-white">
+                  <Image 
+                    src={item.image || FALLBACK_IMAGE} 
+                    alt={item.title} 
+                    fill 
+                    className="object-contain p-4 group-hover:scale-105 transition-transform duration-700 ease-in-out"
+                    sizes="(max-width: 768px) 50vw, 25vw"
+                    referrerPolicy="no-referrer"
+                    loading="lazy"
+                  />
+                </div>
               )}
               
               {/* Site Badge overlay */}

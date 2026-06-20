@@ -138,11 +138,11 @@ const PinterestGrid = ({ slice }) => {
                           </button>
                         </div>
                       </div>
-                      <div className="relative w-1/2 h-full">
+                      <div className="relative w-1/2 h-full bg-white">
                         <PrismicNextImage 
                           field={item.product_image?.url ? item.product_image : { url: FALLBACK_IMAGE, alt: item.product_title }} 
                           fill 
-                          className="object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
+                          className="object-contain p-4 group-hover:scale-105 transition-transform duration-700 ease-in-out"
                           sizes="(max-width: 768px) 50vw, 25vw"
                         />
                       </div>
@@ -167,12 +167,14 @@ const PinterestGrid = ({ slice }) => {
                     )}
                   </>
                 ) : (
-                  <PrismicNextImage 
-                    field={item.product_image?.url ? item.product_image : { url: FALLBACK_IMAGE, alt: item.product_title }} 
-                    fill 
-                    className="object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
-                    sizes="(max-width: 768px) 50vw, 25vw"
-                  />
+                  <div className="absolute inset-0 bg-white">
+                    <PrismicNextImage 
+                      field={item.product_image?.url ? item.product_image : { url: FALLBACK_IMAGE, alt: item.product_title }} 
+                      fill 
+                      className="object-contain p-4 group-hover:scale-105 transition-transform duration-700 ease-in-out"
+                      sizes="(max-width: 768px) 50vw, 25vw"
+                    />
+                  </div>
                 )}
                 
                 {/* Site Badge overlay */}
@@ -244,36 +246,36 @@ const PinterestGrid = ({ slice }) => {
 
       {/* Modal Overlay */}
       {selectedItem && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setSelectedItem(null)}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 md:p-6 bg-black/80 backdrop-blur-sm" onClick={() => setSelectedItem(null)}>
           <div 
-            className="bg-white rounded-2xl w-full max-w-xl max-h-[90vh] overflow-hidden flex flex-col md:flex-row shadow-2xl relative"
+            className="bg-white rounded-2xl w-full max-w-5xl h-[85vh] md:h-[80vh] flex flex-col md:flex-row shadow-2xl relative overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Navigation */}
-            <div className="absolute top-3 left-3 right-3 z-20 flex justify-between">
+            <div className="absolute top-4 left-4 right-4 z-[60] flex justify-between pointer-events-none">
               <button 
-                className="bg-white/90 backdrop-blur hover:bg-white px-2 py-1 rounded-lg shadow-sm text-[10px] font-bold flex items-center gap-1 transition-all text-gray-900 border border-gray-100"
+                className="bg-white/95 backdrop-blur hover:bg-white px-3 py-2 rounded-xl shadow-lg text-[11px] uppercase tracking-wider font-extrabold flex items-center gap-1.5 transition-all text-gray-900 border border-gray-200 pointer-events-auto active:scale-95"
                 onClick={() => setSelectedItem(null)}
               >
-                <ChevronLeft className="w-3 h-3" /> Back
+                <ChevronLeft className="w-4 h-4" /> Back
               </button>
               <button 
-                className="bg-white/90 backdrop-blur hover:bg-white p-1.5 rounded-full shadow-sm transition-all border border-gray-100"
+                className="bg-white/95 backdrop-blur hover:bg-white p-2.5 rounded-full shadow-lg transition-all border border-gray-200 pointer-events-auto active:scale-95"
                 onClick={() => setSelectedItem(null)}
               >
-                <X className="w-3.5 h-3.5 text-gray-900" />
+                <X className="w-4 h-4 text-gray-900" />
               </button>
             </div>
             
             {/* Visual Side */}
-            <div className="w-full md:w-1/2 bg-gray-50 relative min-h-[300px] md:min-h-[450px] flex flex-row group/modal-video border-r border-gray-100">
+            <div className="w-full md:w-1/2 bg-gray-50 relative h-1/2 md:h-full flex flex-row group/modal-video border-b md:border-b-0 md:border-r border-gray-200/50 shrink-0">
               {selectedItem.is_video ? (
                 <>
-                  <div className="relative w-1/2 h-full border-r border-gray-100">
+                  <div className="relative w-1/2 h-full border-r border-gray-200/50 bg-black/5">
                     <video 
                       ref={videoRef}
                       src={selectedItem.video_url?.url}
-                      className="w-full object-cover h-full"
+                      className="w-full h-full object-contain p-4 py-16 md:p-8"
                       autoPlay
                       playsInline
                       loop
@@ -291,7 +293,7 @@ const PinterestGrid = ({ slice }) => {
                             }
                           }
                         }}
-                        className="p-3 bg-white/30 backdrop-blur-md rounded-full text-white hover:bg-white/50 transition-all transform hover:scale-110"
+                        className="p-3 bg-white/50 backdrop-blur-md rounded-full text-gray-900 hover:bg-white transition-all transform hover:scale-110 shadow-lg"
                       >
                         {isPaused ? <Play className="w-6 h-6 fill-current" /> : <Pause className="w-6 h-6 fill-current" />}
                       </button>
@@ -301,7 +303,7 @@ const PinterestGrid = ({ slice }) => {
                     <PrismicNextImage 
                       field={selectedItem.product_image} 
                       fill 
-                      className="object-cover"
+                      className="object-contain p-4 py-16 md:p-8 md:pt-20"
                       sizes="(max-width: 768px) 50vw, 25vw"
                     />
                   </div>
@@ -311,7 +313,7 @@ const PinterestGrid = ({ slice }) => {
                   <PrismicNextImage 
                     field={selectedItem.product_image} 
                     fill 
-                    className="object-cover"
+                    className="object-contain p-8 py-16 md:p-12 md:pt-20"
                     sizes="(max-width: 768px) 100vw, 50vw"
                   />
                 </div>
@@ -319,32 +321,36 @@ const PinterestGrid = ({ slice }) => {
             </div>
 
             {/* Content Side */}
-            <div className="w-full md:w-1/2 p-6 md:p-8 flex flex-col overflow-y-auto pt-16 md:pt-8">
-              <div className="flex items-center justify-between mb-4 md:mb-6">
-                <span className="bg-gray-100 text-gray-800 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase">
-                  {selectedItem.site_name || 'via Clickys'}
-                </span>
-                <div className="flex gap-2">
-                  <button className="p-1.5 bg-gray-50 hover:bg-gray-100 rounded-full transition-colors">
-                    <Share2 className="w-4 h-4 text-gray-700" />
-                  </button>
-                  <button className="p-1.5 bg-red-50 hover:bg-red-100 rounded-full transition-colors text-red-600">
-                    <Bookmark className="w-4 h-4" />
-                  </button>
+            <div className="w-full md:w-1/2 flex flex-col h-1/2 md:h-full bg-white">
+              <div className="p-5 md:p-10 flex-grow overflow-y-auto">
+                <div className="flex items-center justify-between mb-4 md:mb-6 pt-2 md:pt-8">
+                  <span className="bg-orange-100 text-orange-800 text-[10px] md:text-xs font-black px-3 py-1.5 rounded-md uppercase tracking-widest shadow-sm">
+                    {selectedItem.site_name || 'via Clickys'}
+                  </span>
+                  <div className="flex gap-2">
+                    <button className="p-2 bg-gray-50 border border-gray-200 hover:bg-gray-100 rounded-full transition-colors shadow-sm active:scale-95">
+                      <Share2 className="w-4 h-4 text-gray-700" />
+                    </button>
+                    <button className="p-2 bg-red-50 border border-red-100 hover:bg-red-100 rounded-full transition-colors text-red-600 shadow-sm active:scale-95">
+                      <Bookmark className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+                
+                <h2 className="text-xl md:text-3xl font-extrabold text-gray-900 mb-3 md:mb-4 leading-tight tracking-tight">
+                  {selectedItem.product_title}
+                </h2>
+                <div className="text-gray-600 text-sm md:text-base leading-relaxed space-y-4">
+                  <PrismicRichText field={selectedItem.description} />
                 </div>
               </div>
-              
-              <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-3 md:mb-4 leading-tight">{selectedItem.product_title}</h2>
-              <div className="text-sm text-gray-600 mb-6 leading-relaxed">
-                <PrismicRichText field={selectedItem.description} />
-              </div>
 
-              <div className="mt-auto pt-4 border-t border-gray-100">
+              <div className="p-4 md:p-6 bg-gray-50 border-t border-gray-100 flex-shrink-0">
                 <PrismicNextLink 
                   field={selectedItem.affiliate_link} 
-                  className="w-full block text-center bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 px-6 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2 text-sm"
+                  className="w-full flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 md:py-4 px-8 rounded-xl transition-all shadow-md active:scale-[0.98] text-[14px] md:text-[15px] uppercase tracking-wide"
                 >
-                  Visit Site <ExternalLink className="w-3.5 h-3.5" />
+                  Shop Now <ExternalLink className="w-4 h-4" />
                 </PrismicNextLink>
               </div>
             </div>
