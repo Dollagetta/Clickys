@@ -630,17 +630,19 @@ export default function PinterestGrid({ initialItems }) {
                   )}
                 </>
               ) : (
-                <div className="absolute inset-0 bg-white">
-                  <Image 
-                    src={item.image || FALLBACK_IMAGE} 
-                    alt={item.title} 
-                    fill 
-                    className="object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    referrerPolicy="no-referrer"
-                    loading="lazy"
-                    quality={85}
-                  />
+                <div className="absolute inset-0 bg-white p-2">
+                  <div className="relative w-full h-full">
+                    <Image 
+                      src={item.image || FALLBACK_IMAGE} 
+                      alt={item.title} 
+                      fill 
+                      className="object-contain group-hover:scale-105 transition-transform duration-700 ease-in-out"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      referrerPolicy="no-referrer"
+                      loading="lazy"
+                      quality={85}
+                    />
+                  </div>
                 </div>
               )}
               
@@ -774,24 +776,24 @@ export default function PinterestGrid({ initialItems }) {
                       </button>
                     </div>
                   </div>
-                  <div className="relative w-1/2 h-full">
+                  <div className="relative w-1/2 h-full p-2 bg-white">
                     <Image 
                       src={selectedItem.image || FALLBACK_IMAGE} 
                       alt={selectedItem.title} 
                       fill 
-                      className="object-cover"
+                      className="object-contain"
                       sizes="(max-width: 768px) 50vw, 25vw"
                       referrerPolicy="no-referrer"
                     />
                   </div>
                 </>
               ) : (
-                <div className="relative w-full h-full">
+                <div className="relative w-full h-full p-4 bg-white">
                   <Image 
                     src={selectedItem.image || FALLBACK_IMAGE} 
                     alt={selectedItem.title} 
                     fill 
-                    className="object-cover"
+                    className="object-contain"
                     sizes="(max-width: 768px) 100vw, 50vw"
                     referrerPolicy="no-referrer"
                   />
