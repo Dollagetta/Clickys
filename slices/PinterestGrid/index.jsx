@@ -71,10 +71,10 @@ const PinterestGrid = ({ slice }) => {
   const getAspectRatioClass = (ratio) => {
     switch (ratio) {
       case 'square': return 'aspect-square';
-      case 'portrait': return 'aspect-[3/4]';
-      case 'tall': return 'aspect-[2/3]';
-      case 'landscape': return 'aspect-[3/2]';
-      default: return 'aspect-[3/4]';
+      case 'portrait': return 'aspect-[4/5]';
+      case 'tall': return 'aspect-[3/4]';
+      case 'landscape': return 'aspect-[4/3]';
+      default: return 'aspect-[4/5]';
     }
   };
 
@@ -113,7 +113,7 @@ const PinterestGrid = ({ slice }) => {
               onClick={() => setSelectedItem(item)}
             >
               {/* Media Container */}
-              <div className={`relative w-full ${aspectRatioClass} ${playingVideoId !== index ? 'overflow-hidden' : ''} bg-gray-50 flex-shrink-0 rounded-t-xl md:rounded-t-2xl`}>
+              <div className={`relative w-full ${aspectRatioClass} ${playingVideoId !== index ? 'overflow-hidden' : ''} bg-white flex-shrink-0 rounded-t-xl md:rounded-t-2xl`}>
                 {item.is_video ? (
                   <>
                     <div className="absolute inset-0 flex flex-row w-full h-full">
@@ -142,8 +142,9 @@ const PinterestGrid = ({ slice }) => {
                         <PrismicNextImage 
                           field={item.product_image?.url ? item.product_image : { url: FALLBACK_IMAGE, alt: item.product_title }} 
                           fill 
-                          className="object-contain p-4 group-hover:scale-105 transition-transform duration-700 ease-in-out"
+                          className="object-contain p-1 group-hover:scale-105 transition-transform duration-700 ease-in-out"
                           sizes="(max-width: 768px) 50vw, 25vw"
+                          quality={100}
                         />
                       </div>
                     </div>
@@ -171,8 +172,9 @@ const PinterestGrid = ({ slice }) => {
                     <PrismicNextImage 
                       field={item.product_image?.url ? item.product_image : { url: FALLBACK_IMAGE, alt: item.product_title }} 
                       fill 
-                      className="object-contain p-4 group-hover:scale-105 transition-transform duration-700 ease-in-out"
+                      className="object-contain p-1 group-hover:scale-105 transition-transform duration-700 ease-in-out"
                       sizes="(max-width: 768px) 50vw, 25vw"
+                      quality={100}
                     />
                   </div>
                 )}
@@ -275,7 +277,7 @@ const PinterestGrid = ({ slice }) => {
                     <video 
                       ref={videoRef}
                       src={selectedItem.video_url?.url}
-                      className="w-full h-full object-contain p-4 py-16 md:p-8"
+                      className="w-full h-full object-contain p-1"
                       autoPlay
                       playsInline
                       loop
@@ -303,8 +305,9 @@ const PinterestGrid = ({ slice }) => {
                     <PrismicNextImage 
                       field={selectedItem.product_image} 
                       fill 
-                      className="object-contain p-4 py-16 md:p-8 md:pt-20"
+                      className="object-contain p-2 md:p-6"
                       sizes="(max-width: 768px) 50vw, 25vw"
+                      quality={100}
                     />
                   </div>
                 </>
@@ -313,8 +316,9 @@ const PinterestGrid = ({ slice }) => {
                   <PrismicNextImage 
                     field={selectedItem.product_image} 
                     fill 
-                    className="object-contain p-8 py-16 md:p-12 md:pt-20"
+                    className="object-contain p-4 py-8 md:p-8"
                     sizes="(max-width: 768px) 100vw, 50vw"
+                    quality={100}
                   />
                 </div>
               )}
