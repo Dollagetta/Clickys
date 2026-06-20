@@ -567,9 +567,9 @@ export default function PinterestGrid({ initialItems }) {
       </div>
       
       {/* Masonry Grid Container */}
-      <div className="columns-2 sm:columns-2 lg:columns-3 xl:columns-4 gap-3 md:gap-6 w-full">
+      <div className="columns-2 sm:columns-3 lg:columns-4 xl:columns-5 gap-3 md:gap-4 w-full">
         {paginatedItems.map((item) => (
-          <div key={item.id} className={`break-inside-avoid relative mb-3 md:mb-6 group rounded-xl md:rounded-2xl ${playingVideoId === item.id ? 'z-50 overflow-visible' : 'overflow-hidden'} bg-white shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col cursor-pointer`} onClick={() => setSelectedItem(item)}>
+          <div key={item.id} className={`break-inside-avoid relative mb-3 md:mb-4 group rounded-xl md:rounded-2xl ${playingVideoId === item.id ? 'z-50 overflow-visible' : 'overflow-hidden'} bg-white shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col cursor-pointer`} onClick={() => setSelectedItem(item)}>
             
             {/* Media Container */}
             <div className={`relative w-full ${item.aspectRatio} ${playingVideoId !== item.id ? 'overflow-hidden' : ''} bg-gray-50 rounded-t-xl md:rounded-t-2xl`}>
@@ -602,10 +602,11 @@ export default function PinterestGrid({ initialItems }) {
                         src={item.image || FALLBACK_IMAGE} 
                         alt={item.title} 
                         fill 
-                        className="object-contain p-4 group-hover:scale-105 transition-transform duration-700 ease-in-out"
-                        sizes="(max-width: 768px) 50vw, 25vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                         referrerPolicy="no-referrer"
                         loading="lazy"
+                        quality={85}
                       />
                     </div>
                   </div>
@@ -634,10 +635,11 @@ export default function PinterestGrid({ initialItems }) {
                     src={item.image || FALLBACK_IMAGE} 
                     alt={item.title} 
                     fill 
-                    className="object-contain p-4 group-hover:scale-105 transition-transform duration-700 ease-in-out"
-                    sizes="(max-width: 768px) 50vw, 25vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     referrerPolicy="no-referrer"
                     loading="lazy"
+                    quality={85}
                   />
                 </div>
               )}

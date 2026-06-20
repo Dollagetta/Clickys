@@ -29,6 +29,7 @@ import Link from 'next/link'; // For guide card links
 import {products} from '../components/products';
 import NewLaunchesSection from '../components/NewLaunchesSection';
 import HomeSidebar from '../components/HomeSidebar';
+import SearchPinterestGrid from '../components/SearchPinterestGrid';
 
 import { createClient } from "../prismicio";
 import { asText } from "@prismicio/client";
@@ -237,6 +238,10 @@ export default async function HomePage() {
               </div>
             </div>
           </header>
+          
+          <Suspense fallback={null}>
+            <SearchPinterestGrid initialItems={Array.isArray(homePageData) ? homePageData : []} />
+          </Suspense>
           
           <NewLaunchesSection />
         </div>
