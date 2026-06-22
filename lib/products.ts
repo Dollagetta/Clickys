@@ -52,14 +52,14 @@ async function _fetchProductsFromSheet() {
       const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout for sheet fetch
 
       const response = await fetch(
-        `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/A:H`,
+        `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/A:I`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           },
           signal: controller.signal,
-          next: { revalidate: 3600 }
+          next: { revalidate: 60 } // Reduced to 60 seconds
         }
       );
       clearTimeout(timeoutId);
@@ -86,7 +86,7 @@ async function _fetchProductsFromSheet() {
             category: row[4] || 'Uncategorized',
             discount: row[5] || '',
             platform: row[6] || '',
-            description: row[7] || ''
+            description: row[7] || row[8] || ''
           }));
 
       return products;
@@ -103,7 +103,7 @@ let _productsCache: any[] | null = null;
 let _productsCacheTime = 0;
 
 export async function fetchProductsFromSheet(categoryQuery: string | null = null) {
-  if (_productsCache && (Date.now() - _productsCacheTime < 3600000)) {
+  if (_productsCache && (Date.now() - _productsCacheTime < 60000)) {
     let products = _productsCache;
     if (categoryQuery) {
       products = products.filter((p: any) => p.category.toLowerCase() === categoryQuery.toLowerCase());

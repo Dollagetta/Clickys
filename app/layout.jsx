@@ -36,12 +36,6 @@ export const metadata = {
   creator: "Pixel Crafte",
   publisher: siteName,
   
-  // Icons
-  icons: {
-    icon: '/favicon.svg',
-    apple: '/favicon.svg',
-  },
-  
   // Open Graph metadata
   openGraph: {
     type: "website",
