@@ -1,8 +1,8 @@
 import { createClient } from "../../../prismicio";
 import { notFound } from "next/navigation";
 import AffiliateProductsPage from "./AffiliateProductsPage";
-import { products as localProducts } from "../../../components/products";
-import { products as flipkartProducts } from "../../../components/flipkartProducts";
+import { products as localProducts } from "../../../components/products.js";
+import { products as flipkartProducts } from "../../../components/flipkartProducts.js";
 import { fetchProductsFromSheet } from "../../../lib/products";
 
 export const revalidate = 60;
@@ -128,12 +128,7 @@ export default async function AffiliatePage({ params }) {
 
       const imageUrl = doc?.data?.image || "https://placehold.co/600x600/E5E7EB/475569?text=No+Image";
 
-      let description = "";
-      if (typeof doc?.data?.description === "string") {
-        description = doc.data.description;
-      } else if (Array.isArray(doc?.data?.description) && doc.data.description[0]?.text) {
-        description = doc.data.description[0].text;
-      }
+      let description = doc?.data?.description;
 
       return {
         id: doc.id,

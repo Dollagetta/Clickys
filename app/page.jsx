@@ -1,7 +1,7 @@
 import NewsletterSubscription from '../components/NewsletterSubscription';
 
-export const revalidate = 86400; // Cache for 24 hours to maximize speed and minimize API cost
-export const dynamic = 'force-dynamic';
+export const revalidate = 14400; // Cache for 4 hours to align with deal refresh cycles
+// export const dynamic = 'force-dynamic'; // Removed to allow caching and improve "heaviness"
 
 // app/page.js (Homepage)
 // This is a Server Component by default.
@@ -26,10 +26,11 @@ import styles from '../styles/Home.module.css';
 import { FiZap, FiShoppingCart, FiTrendingUp, FiGift, FiShield, FiThumbsUp, FiArrowRight, FiMessageSquare, FiAward, FiCheckCircle, FiClock } from 'react-icons/fi';
 import Image from 'next/image'; // For Buying Guides section images
 import Link from 'next/link'; // For guide card links
-import {products} from '../components/products';
+import { products } from '../components/products.js';
 import NewLaunchesSection from '../components/NewLaunchesSection';
 import HomeSidebar from '../components/HomeSidebar';
 import SearchPinterestGrid from '../components/SearchPinterestGrid';
+import FeaturedFrames from '../components/FeaturedFrames';
 
 import { createClient } from "../prismicio";
 import { asText } from "@prismicio/client";
@@ -114,12 +115,13 @@ export default async function HomePage() {
           fetchWithTimeout(client.getAllByType("partner")).catch(() => []),
           fetchWithTimeout(client.getAllByType('product', { limit: 12 })).catch(() => []),
           fetchWithTimeout(client.getAllByType('category')).catch(() => []),
-          fetchWithTimeout(client.getAllByType('pinterestgrid')).catch(() => [])
+          fetchWithTimeout(client.getAllByType('pinterestgrid')).catch(() => []),
+          fetchWithTimeout(import('../lib/products').then(m => m.fetchProductsFromSheet())).catch(() => [])
         ]);
         return results;
       } catch (err) {
         console.error('[HomePage] Critical fetch wrap error:', err);
-        return Array(5).fill({ status: 'rejected', reason: err });
+        return Array(6).fill({ status: 'rejected', reason: err });
       }
     };
 
@@ -129,8 +131,34 @@ export default async function HomePage() {
       partnersResponseResult, 
       prismicProductsResResult,
       categoriesResResult,
-      homePageDocResult
+      homePageDocResult,
+      sheetProductsResult
     ] = results;
+
+    const sheetProducts = sheetProductsResult.status === 'fulfilled' ? sheetProductsResult.value : [];
+
+    // Filter deals for LimitedTimeDeals component
+    const fourHourIndex = Math.floor(new Date().getTime() / (1000 * 60 * 60 * 4));
+    const getPlatformDeals = (platform, count = 4) => {
+      const platformProducts = sheetProducts.filter(p => 
+        p.platform?.toLowerCase().includes(platform.toLowerCase())
+      );
+      if (platformProducts.length === 0) return [];
+      const startIndex = (fourHourIndex * count) % platformProducts.length;
+      const result = [];
+      for (let i = 0; i < count; i++) {
+          result.push(platformProducts[(startIndex + i) % platformProducts.length]);
+      }
+      return result;
+    };
+
+    const productsByPlatform = {
+      myntra: getPlatformDeals('myntra', 12),
+      amazon: getPlatformDeals('amazon', 24),
+      flipkart: getPlatformDeals('flipkart', 12),
+      ajio: getPlatformDeals('ajio', 12)
+    };
+
     console.log('[HomePage] Data fetch completed');
 
     const homePageData = homePageDocResult.status === 'fulfilled' ? homePageDocResult.value : null;
@@ -242,6 +270,12 @@ export default async function HomePage() {
           <Suspense fallback={null}>
             <SearchPinterestGrid initialItems={Array.isArray(homePageData) ? homePageData : []} />
           </Suspense>
+
+          <FeaturedFrames 
+            pinterestItems={Array.isArray(homePageData) ? homePageData : []}
+            localProducts={products}
+            sheetProducts={sheetProducts}
+          />
           
           <NewLaunchesSection />
         </div>
@@ -274,29 +308,11 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Featured Products Section */}
-      <section className={`${styles.section} ${styles.featuredProductsSection}`} style={{ borderColor: '#d49e32', borderStyle: 'solid', borderWidth: '1px' }}>
-        <div className="container" style={{ backgroundColor: '#ffffff', borderColor: '#d48408', borderWidth: '5px', borderStyle: 'solid', borderRadius: '34px' }}>
-          <h2 className={styles.sectionTitle} data-aos="fade-up">
-            <FiTrendingUp className={styles.titleIcon} /> Featured Finds
-          </h2>
-          <p className={styles.sectionSubtitle} data-aos="fade-up" data-aos-delay="100" style={{ color: '#0c0d0e' }}>
-            Handpicked selections that our experts and community love right now.
-          </p>
-          <div className={styles.productGrid}>
-            {placeholderProducts.slice(0, 4).map((product) => (
-              <ProductCard key={product.id} product={product} isDeal={false} />
-            ))}
-          </div>
-          <div className={styles.viewMoreLink} data-aos="fade-up" data-aos-delay="200">
-            <CallToAction text="See All Featured Products" link="/products" type="outline-dark" icon={<FiArrowRight />} style={{ backgroundColor: '#e28021', color: '#ffffff', borderRadius: '999px' }} />
-          </div>
-        </div>
-      </section>
-      
       <PartnerSection partners={partners} />
-
-      <PinterestGrid initialItems={Array.isArray(homePageData) ? homePageData : []} />
+      
+      <Suspense fallback={null}>
+        <PinterestGrid initialItems={Array.isArray(homePageData) ? homePageData : []} />
+      </Suspense>
 
       {homePageData && !Array.isArray(homePageData) && homePageData.data?.slices && (
         <SliceZone slices={homePageData.data.slices} components={components} />

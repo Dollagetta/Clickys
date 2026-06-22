@@ -20,7 +20,7 @@ export async function GET(request) {
       }
     }
 
-    // 1. Fetch from Prismic (Products only)
+    // 1. Fetch data in parallel
     const client = createClient();
     let prismicPromise;
     if (isBroad) {
@@ -39,12 +39,23 @@ export async function GET(request) {
       });
     }
 
-    prismicPromise = prismicPromise.catch(e => {
-      console.error("Prismic global search error:", e);
-      return { results: [] };
-    });
+    const sheetPromise = fetchProductsFromSheet().catch(() => []);
 
-    const prismicRes = await prismicPromise;
+    // 15 seconds overall timeout for external fetches
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Search Timeout')), 15000)
+    );
+
+    const [prismicRes, rawSheetProducts] = await Promise.race([
+      Promise.all([
+        prismicPromise.catch(e => {
+          console.error("Prismic global search error:", e);
+          return { results: [] };
+        }),
+        sheetPromise
+      ]),
+      timeoutPromise.catch(() => [{ results: [] }, []])
+    ]);
 
     const mappedPrismic = (prismicRes.results || []).map(p => {
        // Helper to extract a usable title/image/link
@@ -74,16 +85,14 @@ export async function GET(request) {
          platform: platform,
          discount: p.data?.discount !== undefined && p.data?.discount !== null ? p.data.discount : '',
          description: p.data?.description || p.data?.meta_description || p.data?.partner_description || '',
-         data: p.data // raw data
        }
     });
 
     const lowerQuery = (queryParam || '').toLowerCase();
 
-    // 2. Fetch from Google Sheet (Daily Deals)
+    // 2. Filter Google Sheet Products (Already fetched in parallel)
     let sheetProducts = [];
     try {
-      const rawSheetProducts = await fetchProductsFromSheet().catch(() => []);
       sheetProducts = rawSheetProducts
         .filter(p => {
           if (isBroad) return true;

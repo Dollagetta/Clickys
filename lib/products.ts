@@ -33,18 +33,24 @@ async function _fetchProductsFromSheet() {
         scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
       });
 
-      // Use a promise race to timeout the authentication step itself
-      const getAccessTokenWithTimeout = Promise.race([
-        auth.getAccessToken(),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Auth Timeout')), 5000))
-      ]);
-
       let accessToken;
-      const tokenResult: any = await getAccessTokenWithTimeout;
-      accessToken = tokenResult.token || tokenResult;
-      console.log('[Products] Got access token');
+      try {
+        const tokenResult: any = await Promise.race([
+          auth.getAccessToken(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Auth Timeout')), 10000))
+        ]);
+        accessToken = typeof tokenResult === 'string' ? tokenResult : tokenResult.token;
+        console.log('[Products] Got access token');
+      } catch (tokenError) {
+        console.error('[Products] Access token error:', tokenError);
+        throw tokenError;
+      }
 
       console.log(`[Products] Fetching sheet: ${sheetId}`);
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout for sheet fetch
+
       const response = await fetch(
         `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/A:H`,
         {
@@ -52,9 +58,11 @@ async function _fetchProductsFromSheet() {
             Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           },
-          cache: 'no-store'
+          signal: controller.signal,
+          next: { revalidate: 3600 }
         }
       );
+      clearTimeout(timeoutId);
 
       console.log(`[Products] Response: ${response.status}`);
       if (!response.ok) {
@@ -68,7 +76,7 @@ async function _fetchProductsFromSheet() {
     
       // Map rows to structured objects (ensure we filter out empty rows/headers)
       let products = rows
-          .filter((row: any[]) => row && row[0] && row[0] !== 'Title')
+          .filter((row: any[]) => row && row[0] && row[0].toLowerCase() !== 'title')
           .reverse()
           .map((row: any[]) => ({
             title: row[0] || '',
@@ -88,14 +96,7 @@ async function _fetchProductsFromSheet() {
     }
   })();
 
-  const timeoutPromise = new Promise<any[]>((resolve) => {
-    setTimeout(() => {
-      console.warn('[Products] Fetch operation timed out after 12s');
-      resolve([]);
-    }, 12000);
-  });
-
-  return Promise.race([fetchPromise, timeoutPromise]);
+  return fetchPromise;
 }
 
 let _productsCache: any[] | null = null;

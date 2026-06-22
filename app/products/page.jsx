@@ -1,43 +1,11 @@
 import ProductsPage from './ProductsPage';
-import {products} from '../../components/products'
+import { products } from '../../components/products.js';
 import { Suspense } from 'react';
 import { ProductGridSkeleton } from '../../components/ProductGridSkeleton';
 import { createClient } from '../../prismicio';
 import { SliceZone } from '@prismicio/react';
 import { components } from '../../slices';
-
-/*export const metadata = {
-  title: "Amazon Products | Best Deals on Clickys.in",
-  description: "Explore top Amazon deals on smartwatches, trimmers, kitchen tools, and wellness products. Shop curated combos at Clickys.in for the best prices in India!",
-  keywords: [
-    "boat smartwatch with heart rate monitor",
-    "Amazon trimmer cordless rechargeable",
-    "camera for kids and hobby photography",
-    "cooking set Amazon India top seller",
-    "BPA-free water bottles Amazon India",
-    "herbal body lotions Amazon brand",
-    "energy booster supplements Amazon India",
-    "Amazon kitchen tools combo offer",
-    "travel-size dry iron Amazon portable",
-    "grooming electronics on Amazon deals",
-    "Amazon daily use kitchen items",
-    "smart wearable offers Amazon",
-    "body care essentials Amazon only"
-  ],
-  openGraph: {
-    title: "Amazon Deals on Clickys.in | Smartwatches, Kitchen & More",
-    description: "Find the best Amazon products like smartwatches, trimmers, and kitchen essentials at Clickys.in. Shop now for exclusive deals!",
-    url: "https://www.clickys.in/products",
-    siteName: "Clickys.in",
-    type: "website",
-    locale: "en_IN"
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Amazon Products | Clickys.in Deals",
-    description: "Discover Amazon’s top smartwatches, grooming kits, and kitchen tools at Clickys.in. Shop now for exclusive offers!"
-  }
-};*/
+import { fetchProductsFromSheet } from '../../lib/products';
 
 export const metadata = {
   title: 'Clickys – Amazon Products | Top Deals & Reviews',
@@ -48,11 +16,70 @@ export const metadata = {
   },
 };
 
-const page = () => {
+const page = async () => {
+    const rawSheetProductsResult = await fetchProductsFromSheet().catch(() => []);
+    const rawSheetProducts = rawSheetProductsResult || [];
+    
+    // Add fallback to local products if sheet is empty
+    const sourceProducts = rawSheetProducts.length > 0 ? rawSheetProducts : (products || []);
+    
+    // Standardize sourceProducts for ProductCard and LimitedTimeDeals
+    const standardizedSheetProducts = (sourceProducts || []).map((p, idx) => ({
+      id: p.id || `sheet-${idx}`,
+      name: p.title || p.name || 'Product',
+      title: p.title || p.name || 'Product', // Alias for component compatibility
+      category: p.category || 'General',
+      price: p.price || '',
+      imageUrl: p.image || p.imageUrl || '',
+      image: p.image || p.imageUrl || '', // Alias for component compatibility
+      link: p.link || p.amazonLink || '',  // Alias for component compatibility
+      amazonLink: p.link || p.amazonLink || '',
+      platform: p.platform || 'Direct',
+      discount: p.discount || '',
+      description: p.description || ''
+    }));
+    
+    // Calculate productsByPlatform here
+    const fourHourIndex = Math.floor(new Date().getTime() / (1000 * 60 * 60 * 4));
+    const getPlatformDeals = (platform, count = 12) => {
+      let platformProducts = standardizedSheetProducts.filter(p => {
+        const link = (p.link || p.amazonLink || '').toLowerCase();
+        const pPlatform = (p.platform || '').toLowerCase();
+        
+        if (platform === 'amazon') {
+          return pPlatform.includes('amazon') || link.includes('amazon') || link.includes('amzn');
+        }
+        return pPlatform.includes(platform.toLowerCase()) || link.includes(platform.toLowerCase());
+      });
+      
+      // If we don't have enough platform specific products, use generic products and fake the platform for display
+      if (platformProducts.length === 0) {
+         platformProducts = standardizedSheetProducts.map(p => ({
+             ...p,
+             platform: p.platform || platform.charAt(0).toUpperCase() + platform.slice(1)
+         }));
+      }
+
+      if (platformProducts.length === 0) return [];
+      const startIndex = (fourHourIndex * count) % platformProducts.length;
+      const result = [];
+      for (let i = 0; i < count; i++) {
+          result.push(platformProducts[(startIndex + i) % platformProducts.length]);
+      }
+      return result;
+    };
+
+    const productsByPlatform = {
+      myntra: getPlatformDeals('myntra', 12),
+      amazon: getPlatformDeals('amazon', 24),
+      flipkart: getPlatformDeals('flipkart', 12),
+      ajio: getPlatformDeals('ajio', 12)
+    };
+
   return (
     <div className="container py-12">
       <Suspense fallback={<ProductGridSkeleton count={8} />}>
-        <ProductsPage products={products} />
+        <ProductsPage products={standardizedSheetProducts} productsByPlatform={productsByPlatform} />
       </Suspense>
     </div>
   )

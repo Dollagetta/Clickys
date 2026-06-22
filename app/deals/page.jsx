@@ -1,5 +1,5 @@
 import DealsPage from "./DealsPage"
-//import { products } from '../../components/products'
+//import { products } from '../../components/products.js'
 import { products } from '../../components/flipkartProducts'
 import { createClient } from '../../prismicio';
 import PaginatedGuides from './PaginatedGuides';

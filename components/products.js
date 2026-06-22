@@ -427,29 +427,107 @@ const products = [
         price:0,
         oldPrice:0,
         imageUrl:"https://m.media-amazon.com/images/I/513AevNAVuL._SY450_.jpg",
-        galleryImages:[
-            "https://m.media-amazon.com/images/I/51qpEOtixrL._SY450_.jpg",
-            "https://m.media-amazon.com/images/I/51vJisx7WvL._SY450_.jpg",
-            "https://m.media-amazon.com/images/I/51O-FC208IL._SY450_.jpg"
-        ],
         amazonLink:"https://amzn.to/442T2QN",
         rating:3.8,
         reviewCount:47,
         onPromotion: true,
-        shortDescription:"Purexa Antioxidant Mouthwash 150ml (Pack of 1) | Alcohol-Free Liquid Mouth Wash | Made with Tea Tree Oil, Myrrh, Aloe Vera and CoQ10 | Suitable for Daily use for Men and Women |",
-        longDescription:"<p>Purexa Antioxidant Mouthwash is a premium mouthrinse designed to promote oral health and hygiene. This alcohol-free mouthwash is enriched with natural ingredients like tea tree oil, myrrh, aloe vera, and CoQ10, which work together to provide a refreshing and soothing experience. The antioxidant properties help to neutralize harmful bacteria in the mouth, while the gentle formula is suitable for daily use by both men and women.</p><h3>Key Features:</h3><ul><li><strong>Alcohol-Free:</strong> Gentle on the mouth</li><li><strong>Natural Ingredients:</strong> Tea Tree Oil, Myrrh, Aloe Vera, CoQ10</li><li><strong>Daily Use:</strong> Suitable for everyone</li></ul>",
-        features: [
-            "Alcohol-Free Formula",
-            "Natural Ingredients",
-            "Suitable for Daily Use"
-        ],
-        specs: {
-            "Volume": "150 ml",
-            "Brand": "Purexa",
-            "Formulation": "Liquid Mouthwash",
-            "Scent": "Mint"
-        },
-        relatedProductSlugs: ['',''],
+        isDeal: true
+    },
+    {
+        id: "prd014",
+        slug: "iPhone-15-Pro-Max-Titanium",
+        name: "iPhone 15 Pro Max (Titanium)",
+        category: "Mobiles",
+        price: '₹1,59,900',
+        oldPrice: '₹1,69,900',
+        imageUrl: "https://m.media-amazon.com/images/I/81+GIkwqLIL._SX679_.jpg",
+        amazonLink: "https://amzn.to/3W9M9X9",
+        rating: 4.8,
+        reviewCount: 4500,
+        discount: '6%',
+        isDeal: true
+    },
+    {
+        id: "prd015",
+        slug: "MacBook-Air-M3-Chip",
+        name: "MacBook Air M3 Chip (13-inch)",
+        category: "Laptops",
+        price: '114900',
+        oldPrice: '124900',
+        imageUrl: "https://m.media-amazon.com/images/I/71f5Eu5lJSL._SX679_.jpg",
+        amazonLink: "https://amzn.to/4bcM9X9",
+        rating: 4.7,
+        reviewCount: 1200,
+        discount: 8,
+        isDeal: true
+    },
+    {
+        id: "prd016",
+        slug: "Personalized-Explosion-Gift-Box",
+        name: "Personalized Explosion Gift Box",
+        category: "Gifts",
+        price: '499',
+        oldPrice: '999',
+        imageUrl: "https://m.media-amazon.com/images/I/71Yy8v9vS6L._SX679_.jpg",
+        amazonLink: "https://amzn.to/3UcM9X9",
+        rating: 4.5,
+        reviewCount: 300,
+        discount: 50,
+        isDeal: true
+    },
+    {
+        id: "prd017",
+        slug: "Pet-Safe-Automatic-Waterer",
+        name: "Pet Safe Automatic Water Fountain",
+        category: "Pet Supplies",
+        price: '3499',
+        discount: '30',
+        imageUrl: "https://m.media-amazon.com/images/I/71lM9X9X9XL._SX679_.jpg",
+        amazonLink: "#",
+        isDeal: true
+    },
+    {
+        id: "prd018",
+        slug: "Portable-Car-Vacuum-Cleaner",
+        name: "High Power Portable Car Vacuum",
+        category: "Automotive",
+        price: '1299',
+        discount: 40,
+        imageUrl: "https://m.media-amazon.com/images/I/61M9X9X9XL._SX679_.jpg",
+        amazonLink: "#",
+        isDeal: true
+    },
+    {
+        id: "prd019",
+        slug: "Ergonomic-Office-Chair",
+        name: "Ergonomic High-Back Office Chair",
+        category: "Office",
+        price: '8999',
+        discount: '25',
+        imageUrl: "https://m.media-amazon.com/images/I/71O9X9X9XL._SX679_.jpg",
+        amazonLink: "#",
+        isDeal: true
+    },
+    {
+        id: "prd020",
+        slug: "Electric-Coffee-Grinder",
+        name: "Stainless Steel Electric Coffee Grinder",
+        category: "Kitchen",
+        price: '1599',
+        discount: 15,
+        imageUrl: "https://m.media-amazon.com/images/I/61K9X9X9XL._SX679_.jpg",
+        amazonLink: "#",
+        isDeal: true
+    },
+    {
+        id: "prd021",
+        slug: "Gaming-Mechanical-Keyboard",
+        name: "RGB Mechanical Gaming Keyboard",
+        category: "Games",
+        price: '2499',
+        discount: 50,
+        imageUrl: "https://m.media-amazon.com/images/I/71G9X9X9XL._SX679_.jpg",
+        amazonLink: "#",
         isDeal: true
     }
 ]

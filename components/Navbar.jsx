@@ -35,7 +35,7 @@ const Navbar = () => {
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/guides", label: "Guides" },
-    { href: "/daily-deals", label: "All Products" },
+    { href: "/products", label: "All Products" },
     { href: "/deals", label: "Daily Deals" },
     { href: "/compare", label: "Compare" },
     { href: "/tracker", label: "Price Tracker" },

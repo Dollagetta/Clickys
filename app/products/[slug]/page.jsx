@@ -11,19 +11,67 @@ import styles from '../../../styles/ProductDetailPage.module.css'; // Create thi
 import { FiShoppingCart, FiTag, FiStar, FiCheckSquare, FiInfo, FiArrowLeft, FiChevronsRight, FiShare2 } from 'react-icons/fi';
 import MoreInfo from './MoreInfo';
 import PriceHistoryChart from '../../../components/PriceHistoryChart'; // Price History Chart
-import {products} from '../../../components/products'; // Adjust path to your products data
+import RecentlyViewed from '../../../components/RecentlyViewed'; // Recently Viewed Tracker
+import {products} from '../../../components/products.js'; // Adjust path to your products data
 // Placeholder data - In a real app, this would be fetched from Prismic based on the slug
 
+
+import { fetchProductsFromSheet } from '../../../lib/products';
+import { createClient } from '../../../prismicio';
 
 // Function to fetch product data (simulated)
 async function getProductData(slug) {
   return products.find(product => product.slug === slug);
 }
 
-async function getRelatedProducts(slugs, slug) {
-    if (!slugs || slugs.length === 0) return [];
-    // In a real app, you'd fetch these products. Here, we filter from products.
-    return products.filter(product => slugs.includes(product.slug) && product.slug !== slug).slice(0, 3); // Avoid self-relation, limit to 3
+async function getRelatedProducts(slugs, currentSlug, currentCategory) {
+  let combined = [];
+
+  // 1. Get from local products
+  const localRelated = products.filter(p => p.category === currentCategory && p.slug !== currentSlug);
+  combined = [...combined, ...localRelated];
+
+  // 2. Get from Google Sheet
+  try {
+    const rawSheet = await fetchProductsFromSheet().catch(() => []);
+    const sheetProducts = rawSheet.filter(p => p.category === currentCategory).map((p, idx) => ({
+      id: `sheet-${idx}-${p.title}`,
+      name: p.title,
+      price: p.price,
+      category: p.category || "Deals",
+      imageUrl: p.image,
+      description: p.description || p.title,
+      amazonLink: p.link || "#",
+      rating: 4.2,
+      reviewCount: 30,
+    }));
+    combined = [...combined, ...sheetProducts];
+  } catch (e) {
+    console.error("Related sheet error", e);
+  }
+
+  // 3. Get from Prismic
+  try {
+    const client = createClient();
+    const prismicDocs = await client.getAllByType("product");
+    const prismicProducts = prismicDocs
+      .filter(doc => doc?.data?.category === currentCategory)
+      .map(doc => ({
+        id: doc.id,
+        name: doc?.data?.title || doc?.data?.product_name || "Product",
+        price: doc?.data?.price || "On Sale",
+        category: doc?.data?.category || "Products",
+        imageUrl: doc?.data?.image || "https://placehold.co/600x600/E5E7EB/475569?text=No+Image",
+        description: doc?.data?.description,
+        amazonLink: doc?.data?.link?.url || "#",
+      }));
+    combined = [...combined, ...prismicProducts];
+  } catch (e) {
+    console.error("Related prismic error", e);
+  }
+
+  // Shuffle and pick 3
+  return combined.sort(() => 0.5 - Math.random()).slice(0, 3);
 }
 
 
@@ -86,7 +134,7 @@ const ThumbnailImages = ({ images, current, productName }) => (
 export default async function ProductDetailPage({ params }) {
   const { slug } = await params;
   const product = await getProductData(slug);
-  const relatedProducts = product ? await getRelatedProducts(product.relatedProductSlugs, slug) : [];
+  const relatedProducts = product ? await getRelatedProducts(product.relatedProductSlugs, slug, product.category) : [];
 
 
   if (!product) {
@@ -164,11 +212,13 @@ export default async function ProductDetailPage({ params }) {
             <h2 className={styles.sectionTitle}>You Might Also Like</h2>
             <div className={styles.relatedGrid}>
               {relatedProducts.map(relatedProd => (
-                <ProductCard key={relatedProd.id} product={relatedProd} />
+                <ProductCard key={relatedProd.id || Math.random()} product={relatedProd} />
               ))}
             </div>
           </section>
         )}
+
+        <RecentlyViewed currentProduct={product} />
 
         <div className="container" style={{ textAlign: 'center', marginTop: '3rem' }}>
           <CallToAction text="Back to All Products" link="/products" type="outline-dark" icon={<FiArrowLeft />} iconPosition="left" />

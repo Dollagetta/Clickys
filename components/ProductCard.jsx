@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import styles from '../styles/ProductCard.module.css';
 import { FiShoppingCart, FiHeart, FiStar, FiShare2, FiEye, FiX, FiTrash2 } from 'react-icons/fi';
 import { PrismicNextImage } from "@prismicio/next";
+import { PrismicRichText } from "@prismicio/react";
 import { useWishlist } from './WishlistContext';
 import { useCompare } from './CompareContext';
 import { FiCheckSquare, FiSquare } from 'react-icons/fi';
@@ -201,10 +202,9 @@ const ProductCard = ({ product }) => {
           {!isPrismicImage && imageUrl && <Image
             src={imageUrl}
             alt={name}
-            width={isPartner ? 400 : 200}
-            height={isPartner ? 300 : 150}
+            width={isPartner ? 600 : 400}
+            height={isPartner ? 450 : 300}
             style={{ objectFit: isPartner ? 'cover' : 'contain' }}
-            unoptimized={true}
             className={styles.productImage}
             onError={() => setImgError(true)}
           />}
@@ -222,7 +222,11 @@ const ProductCard = ({ product }) => {
           <div className={`${styles.quickActions} ${isBankOffer ? styles.shiftedActions : ''}`}>
             { (!isBankOffer && discount && (typeof discount === 'string' ? (parseFloat(discount.replace(/[^0-9.]/g, '')) > 0) : discount > 0)) && (
               <button aria-label="Discount" className={styles.discountBadge}>
-                {typeof discount === 'string' ? (discount.includes('%') || discount.toLowerCase().includes('off') ? discount : `${discount}% Off`) : `${discount}% Off`}
+                {(() => {
+                  const d = String(discount);
+                  if (/^\d+(\.\d+)?$/.test(d)) return `${d}% OFF`;
+                  return d.includes('%') || d.toLowerCase().includes('off') ? d : `${d}% OFF`;
+                })()}
               </button>
             ) }
             <button 
@@ -375,7 +379,6 @@ const ProductCard = ({ product }) => {
                     width={300}
                     height={250}
                     style={{ objectFit: 'contain', margin: '0 auto', display: 'block' }}
-                    unoptimized={true}
                     onError={() => setImgError(true)}
                   />}
                   {isPrismicImage && imageUrl && <PrismicNextImage field={imageUrl} style={{ objectFit: 'contain', width: '100%', height: 'auto', maxHeight: '250px' }} />}
@@ -386,25 +389,24 @@ const ProductCard = ({ product }) => {
                   <p style={{ color: '#64748b', marginBottom: '1rem', fontWeight: '500' }}>{formattedPrice}</p>
                   
                   {(() => {
-                    let descNodes = null;
                     const descField = product.description || product.product_description || product.shortDescription;
                     
+                    if (!descField) return null;
+
                     if (typeof descField === 'string' && descField.trim() !== '') {
-                      descNodes = <p>{descField}</p>;
-                    } else if (Array.isArray(descField) && descField.length > 0) {
-                      const hasText = descField.some(d => d.text && d.text.trim() !== '');
-                      if (hasText) {
-                        descNodes = descField.map((block, i) => <p key={i} style={{ marginBottom: '0.5rem' }}>{block.text}</p>);
-                      }
-                    }
-                    
-                    if (descNodes) {
                       return (
-                        <div style={{ color: '#334155', lineHeight: '1.6', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
-                          {descNodes}
+                        <div style={{ color: '#334155', lineHeight: '1.6', marginBottom: '1.5rem', fontSize: '0.95rem' }} className="rich-text-content">
+                          <p>{descField}</p>
+                        </div>
+                      );
+                    } else if (Array.isArray(descField) && descField.length > 0) {
+                      return (
+                        <div style={{ color: '#334155', lineHeight: '1.6', marginBottom: '1.5rem', fontSize: '0.95rem' }} className="rich-text-content">
+                          <PrismicRichText field={descField} />
                         </div>
                       );
                     }
+                    
                     return null;
                   })()}
 
