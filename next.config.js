@@ -42,6 +42,8 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
+    loader: 'custom',
+    loaderFile: './imagekitLoader.js',
     dangerouslyAllowSVG: true,
     remotePatterns: [
       {
