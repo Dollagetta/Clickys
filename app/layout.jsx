@@ -38,8 +38,8 @@ export const metadata = {
   
   // Icons
   icons: {
-    icon: '/images/logosvg.svg',
-    apple: '/images/logosvg.svg',
+    icon: '/favicon.svg',
+    apple: '/favicon.svg',
   },
   
   // Open Graph metadata
@@ -52,7 +52,7 @@ export const metadata = {
     description: "Your ultimate guide to the best products, exclusive deals, and honest reviews for Amazon shopping.",
     images: [
       {
-        url: `${siteUrl}/images/logosvg.svg`,
+        url: `${siteUrl}/favicon.svg`,
         width: 1200,
         height: 630,
         alt: "Clickys - Your Trusted Guide to Amazon's Best Finds",
@@ -65,7 +65,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "Clickys - Top Amazon Picks, Deals, and Reviews",
     description: "Your ultimate guide to the best products, exclusive deals, and honest reviews for Amazon shopping.",
-    images: [`${siteUrl}/images/logosvg.svg`],
+    images: [`${siteUrl}/favicon.svg`],
     creator: "@clickys25",
   },
   

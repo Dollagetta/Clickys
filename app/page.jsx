@@ -39,8 +39,8 @@ import { PrismicNextImage } from "@prismicio/next";
 import { SliceZone, PrismicRichText } from "@prismicio/react";
 
 export const metadata = {
-  title: "Clickys.in | Trending Tech & Home Essentials in India",
-  description: "Discover the best Amazon and Flipkart deals on tech, home essentials, and grooming products. Shop curated combos, smartwatches, kitchen tools, and more at Clickys.in!",
+  title: "Clickys | Explore Product Reviews, Price Tracking & Comparisons",
+  description: "Compare products, track price history, discover deals, and read expert reviews and buying guides to make smarter shopping decisions.",
   alternates: {
     canonical: '/',
   },
@@ -60,8 +60,8 @@ export const metadata = {
     "online store for wellness and style"
   ].join(', '),
   openGraph: {
-    title: "Clickys.in | Trending Tech & Home Essentials in India",
-    description: "Discover the best Amazon and Flipkart deals on tech, home essentials, and grooming products. Shop curated combos, smartwatches, kitchen tools, and more at Clickys.in!",
+    title: "Clickys | Product Reviews, Price Tracking & Comparisons",
+    description: "Compare products, track price history, discover deals, and read expert reviews and buying guides to make smarter shopping decisions",
     url: "https://www.clickys.in/",
     siteName: "Clickys.in",
     type: "website",
@@ -69,8 +69,8 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Clickys.in | Trending Tech & Home Deals",
-    description: "Explore curated Amazon and Flipkart deals on smartwatches, kitchen tools, and grooming essentials at Clickys.in!"
+    title: "Clickys | Product Reviews, Price Tracking & Comparisons",
+    description: "Compare products, monitor price changes, and explore expert reviews with Clickys to make smarter buying decisions."
   }
 };
 
