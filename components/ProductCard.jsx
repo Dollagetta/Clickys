@@ -115,8 +115,19 @@ const ProductCard = ({ product }) => {
 
   const formattedPrice = formatPrice(rawPrice);
 
-  const initialImageUrl = product.imageUrl || `https://placehold.co/600x400/2ECC71/1A1A1A?text=${encodeURIComponent(name)}&font=Inter`;
-  const imageUrl = imgError ? `https://placehold.co/600x400/CCCCCC/1A1A1A?text=Image+Error&font=Inter` : initialImageUrl;
+  const rawImageUrl = product.imageUrl || product.image || `https://placehold.co/600x400/2ECC71/1A1A1A?text=${encodeURIComponent(name)}&font=Inter`;
+  
+  // Robust image URL sanitization: Force HTTPS to prevent mixed content errors
+  let sanitizedImageUrl = rawImageUrl;
+  if (typeof sanitizedImageUrl === 'string') {
+      if (sanitizedImageUrl.startsWith('http://')) {
+          sanitizedImageUrl = sanitizedImageUrl.replace('http://', 'https://');
+      } else if (sanitizedImageUrl.startsWith('//')) {
+          sanitizedImageUrl = 'https:' + sanitizedImageUrl;
+      }
+  }
+
+  const imageUrl = imgError ? `https://placehold.co/600x400/CCCCCC/1A1A1A?text=Image+Error&font=Inter` : sanitizedImageUrl;
 
   const isBankOffer = typeof discount === 'string' && discount.toLowerCase().includes('bank offer');
   const isDailyDeal = product.platform === 'Daily Deals' || isBankOffer || (product.id && (String(product.id).startsWith('daily-deal-') || String(product.id).startsWith('sheet-')));
@@ -157,7 +168,8 @@ const ProductCard = ({ product }) => {
 
   const isComparing = compareItems.some(p => p.id === (product.id || id) || (p.asin && p.asin === product.asin));
 
-  const isPrismicImage = typeof imageUrl === 'object' && imageUrl !== null && imageUrl.url;
+  const isPrismicImage = typeof imageUrl === 'object' && imageUrl !== null && !!imageUrl.url;
+  const isStringImage = typeof imageUrl === 'string' && imageUrl.trim().length > 0;
 
   const cardVariants = {
     rest: { y: 0, boxShadow: "var(--shadow-md)" },
@@ -199,7 +211,7 @@ const ProductCard = ({ product }) => {
     >
       <div className={styles.cardLinkWrapper}>
         <motion.div className={isPartner ? `${styles.imageWrapper} ${styles.partnerImageWrapper}` : styles.imageWrapper} variants={imageVariants}>
-          {!isPrismicImage && imageUrl && <Image
+          {isStringImage && <Image
             src={imageUrl}
             alt={name}
             width={isPartner ? 600 : 400}
@@ -209,7 +221,24 @@ const ProductCard = ({ product }) => {
             onError={() => setImgError(true)}
             referrerPolicy="no-referrer"
           />}
-          {isPrismicImage && imageUrl && <PrismicNextImage field={imageUrl} className={styles.productImage} style={{ objectFit: isPartner ? 'cover' : 'contain' }} />}
+          {isPrismicImage && <PrismicNextImage 
+            field={imageUrl} 
+            className={styles.productImage} 
+            style={{ objectFit: isPartner ? 'cover' : 'contain' }}
+            onError={() => setImgError(true)}
+          />}
+          
+          {!isStringImage && !isPrismicImage && (
+            <Image
+              src={`https://placehold.co/600x400/CCCCCC/1A1A1A?text=No+Image&font=Inter`}
+              alt={name}
+              width={isPartner ? 600 : 400}
+              height={isPartner ? 450 : 300}
+              style={{ objectFit: isPartner ? 'cover' : 'contain' }}
+              className={styles.productImage}
+              referrerPolicy="no-referrer"
+            />
+          )}
           
           {isDailyDeal && displayPlatform ? (
             <span className={styles.platformBadge}>{displayPlatform}</span>
@@ -374,7 +403,7 @@ const ProductCard = ({ product }) => {
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                 <div style={{ textAlign: 'center' }}>
-                  {!isPrismicImage && imageUrl && <Image
+                  {isStringImage && <Image
                     src={imageUrl}
                     alt={name}
                     width={300}
@@ -383,7 +412,21 @@ const ProductCard = ({ product }) => {
                     onError={() => setImgError(true)}
                     referrerPolicy="no-referrer"
                   />}
-                  {isPrismicImage && imageUrl && <PrismicNextImage field={imageUrl} style={{ objectFit: 'contain', width: '100%', height: 'auto', maxHeight: '250px' }} />}
+                  {isPrismicImage && <PrismicNextImage 
+                    field={imageUrl} 
+                    style={{ objectFit: 'contain', width: '100%', height: 'auto', maxHeight: '250px' }} 
+                    onError={() => setImgError(true)}
+                  />}
+                  {!isStringImage && !isPrismicImage && (
+                    <Image
+                      src={`https://placehold.co/600x400/CCCCCC/1A1A1A?text=No+Image&font=Inter`}
+                      alt={name}
+                      width={300}
+                      height={250}
+                      style={{ objectFit: 'contain', margin: '0 auto', display: 'block' }}
+                      referrerPolicy="no-referrer"
+                    />
+                  )}
                 </div>
 
                 <div>

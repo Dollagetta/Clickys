@@ -63,7 +63,7 @@ const Footer = () => {
                     <span className="text-[#f9c616] transition-colors duration-300 group-hover:text-orange-400 text-3xl">ys</span>
                   </Link>
                 </motion.div>
-                <p className={styles.footerTagline}>Your trusted guide to Amazon's best finds.</p>
+                <p className={styles.footerTagline}>Your trusted destination for product reviews, comparisons, and price tracking.</p>
                 <p className={styles.disclosure}>
                   As an Amazon Affiliate we may earn from qualifying purchases.
                 </p>
@@ -74,16 +74,16 @@ const Footer = () => {
                     <FiBookOpen className={styles.featuredIcon} />
                     <div>
                         <Link href="/products" className={styles.featuredLink}>
-                            Our Amazing Amazon Products
+                            All our amazing Products
                         </Link>
-                        <p className={styles.featuredDescription}>Buy from Amazon today with fast shipping and secure checkout!</p>
+                        <p className={styles.featuredDescription}>Buy from trusted partners today with fast shipping and secure checkout!</p>
                     </div>
                 </div>
                 <div className={styles.featuredItem}>
                     <FiZap className={styles.featuredIcon} />
                     <div>
                         <Link href="/deals" className={styles.featuredLink}>
-                            Browse all our expertly chosen products.
+                            Browse Todays's Deals.
                         </Link>
                         <p className={styles.featuredDescription}>Grab expert product picks and limited stock with exclusive deals!</p>
                     </div>
@@ -108,7 +108,7 @@ const Footer = () => {
 
         <div className={styles.footerBottom}>
           <p className={styles.copyright}>&copy; {currentYear} Clickys. All Rights Reserved.
-                           Made with ❤️ by <Link href="https://www.pixelcrafte.co.zw/">PixelCrafte</Link></p>
+                            <Link href="https://www.pixelcrafte.co.zw/">PixelCrafte</Link></p>
           <div className={styles.socialIcons}>
             {socialLinks.map(social => (
               <motion.a

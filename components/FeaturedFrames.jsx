@@ -7,6 +7,22 @@ import Link from 'next/link';
 
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1560343776-97e7d202ff0e?q=80&w=1080';
 
+const FrameImage = ({ src, alt }) => {
+  const [error, setError] = React.useState(false);
+  const imageSrc = error ? FALLBACK_IMAGE : (src || FALLBACK_IMAGE);
+
+  return (
+    <Image 
+      src={imageSrc} 
+      alt={alt}
+      fill
+      className="object-contain group-hover:scale-110 transition-transform duration-500"
+      referrerPolicy="no-referrer"
+      onError={() => setError(true)}
+    />
+  );
+};
+
 export default function FeaturedFrames({ pinterestItems = [], localProducts = [], sheetProducts = [] }) {
   // 12-hour rotation logic for Pinterest items
   const rotatedPinterestItems = useMemo(() => {
@@ -133,12 +149,9 @@ export default function FeaturedFrames({ pinterestItems = [], localProducts = []
                      <div key={idx} className="flex flex-col group cursor-pointer">
                        <a href={item.link} target="_blank" rel="noopener noreferrer" className="relative aspect-square w-full bg-gray-50 rounded-lg overflow-hidden border border-gray-100 p-2 block">
                          <div className="relative w-full h-full">
-                           <Image 
+                           <FrameImage 
                              src={item.image} 
                              alt={item.title}
-                             fill
-                             className="object-contain group-hover:scale-110 transition-transform duration-500"
-                             referrerPolicy="no-referrer"
                            />
                          </div>
                        </a>
