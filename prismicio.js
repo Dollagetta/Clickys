@@ -1,6 +1,6 @@
 import { createClient as baseCreateClient } from "@prismicio/client";
 import { enableAutoPreviews } from "@prismicio/next";
-import sm from "./slicemachine.config.json";
+import sm from "./slicemachine.config.json" with { type: "json" };
 
 /**
  * The project's Prismic repository name.

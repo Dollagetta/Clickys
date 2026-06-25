@@ -38,6 +38,7 @@ async function fetchGuidesFromSheet() {
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
+        cache: 'no-store'
       }
     );
 

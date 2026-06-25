@@ -34,6 +34,7 @@ export default function HeroSlider() {
               priority={isActive || index === (currentIndex + 1) % heroImages.length}
               sizes="100vw"
               className="object-cover"
+              referrerPolicy="no-referrer"
             />
           </div>
         );

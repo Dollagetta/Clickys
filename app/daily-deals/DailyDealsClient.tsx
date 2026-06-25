@@ -1,20 +1,64 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import ProductCard from '@/components/ProductCard';
-import { FiSearch, FiFilter, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiSearch, FiFilter, FiChevronLeft, FiChevronRight, FiAlertCircle, FiRefreshCw } from 'react-icons/fi';
 
-export default function DailyDealsClient({ initialProducts }: { initialProducts: any[] }) {
+export default function DailyDealsClient({ initialProducts = [] }: { initialProducts?: any[] }) {
   const searchParams = useSearchParams();
   const initialCategory = searchParams?.get('category') || 'All';
   const initialPlatform = searchParams?.get('platform') || 'All';
   
+  const [products, setProducts] = useState<any[]>(initialProducts);
+  const [isLoading, setIsLoading] = useState(initialProducts.length === 0);
+  const [error, setError] = useState<string | null>(null);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [selectedPlatform, setSelectedPlatform] = useState(initialPlatform);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(12);
+
+  // Fetch products from API
+  const fetchProducts = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/products');
+      if (!res.ok) {
+        throw new Error(`Failed to fetch products: ${res.statusText}`);
+      }
+      const data = await res.json();
+      
+      // Map to ProductCard structure
+      const mapped = (data || []).map((product: any, idx: number) => ({
+        id: `daily-deal-${idx}`,
+        name: product.title || '',
+        category: product.category || 'Uncategorized',
+        price: product.price || '0',
+        amazonLink: product.link || '#',
+        imageUrl: product.image || '',
+        discount: product.discount || '',
+        platform: product.platform || '',
+        description: product.description || '',
+        shortDescription: product.description || '',
+      }));
+      setProducts(mapped);
+    } catch (err: any) {
+      console.error('[DailyDealsClient] Fetch error:', err);
+      setError(err.message || 'Unable to retrieve products. Please verify your connection and try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Fetch on mount if no initial products
+  useEffect(() => {
+    if (products.length === 0) {
+      fetchProducts();
+    }
+  }, [fetchProducts, products.length]);
 
   // Update selected states if query params change
   useEffect(() => {
@@ -44,18 +88,18 @@ export default function DailyDealsClient({ initialProducts }: { initialProducts:
 
   // Extract unique categories and platforms for filters
   const categories = useMemo(() => {
-    const cats = new Set<string>(initialProducts.map(p => p.category).filter(Boolean));
+    const cats = new Set<string>(products.map(p => p.category).filter(Boolean));
     return ['All', ...Array.from(cats)];
-  }, [initialProducts]);
+  }, [products]);
 
   const platforms = useMemo(() => {
-    const plats = new Set<string>(initialProducts.map(p => p.platform).filter(Boolean));
+    const plats = new Set<string>(products.map(p => p.platform).filter(Boolean));
     return ['All', ...Array.from(plats)];
-  }, [initialProducts]);
+  }, [products]);
 
   // Filter products based on search and dropdowns
   const filteredProducts = useMemo(() => {
-    return initialProducts.filter(product => {
+    return products.filter(product => {
       const matchesSearch = 
         product.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
         product.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -65,16 +109,16 @@ export default function DailyDealsClient({ initialProducts }: { initialProducts:
       const matchesPlatform = selectedPlatform === 'All' || product.platform === selectedPlatform;
       return matchesSearch && matchesCategory && matchesPlatform;
     });
-  }, [initialProducts, searchTerm, selectedCategory, selectedPlatform]);
+  }, [products, searchTerm, selectedCategory, selectedPlatform]);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const currentProducts = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
     return filteredProducts.slice(start, start + itemsPerPage);
-  }, [filteredProducts, currentPage]);
+  }, [filteredProducts, currentPage, itemsPerPage]);
 
-  const handlePageChange = (newPage) => {
+  const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -82,9 +126,7 @@ export default function DailyDealsClient({ initialProducts }: { initialProducts:
   };
 
   return (
-    <div className="w-full" style={{ backgroundColor: '#b43939' }}>
-      {/* Back button */}
-
+    <div className="w-full">
       {/* Advanced Filter / Search Bar */}
       <div className="bg-white p-5 md:p-8 rounded-3xl shadow-sm border border-gray-100 mb-10 space-y-6">
         <div className="relative">
@@ -157,8 +199,38 @@ export default function DailyDealsClient({ initialProducts }: { initialProducts:
         </div>
       </div>
 
-      {/* Grid */}
-      {filteredProducts.length === 0 ? (
+      {/* Grid / Skeletons / Errors */}
+      {isLoading ? (
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 animate-pulse">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <div key={`skeleton-${index}`} className="bg-white rounded-3xl p-4 shadow-sm border border-gray-100 space-y-4">
+              <div className="bg-gray-100 h-48 w-full rounded-2xl"></div>
+              <div className="space-y-2">
+                <div className="bg-gray-100 h-4 w-3/4 rounded"></div>
+                <div className="bg-gray-100 h-3 w-1/2 rounded"></div>
+              </div>
+              <div className="flex justify-between items-center pt-2">
+                <div className="bg-gray-100 h-6 w-1/4 rounded"></div>
+                <div className="bg-gray-100 h-8 w-1/3 rounded-xl"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : error ? (
+        <div className="bg-white border border-red-100 p-8 rounded-3xl shadow-sm text-center max-w-lg mx-auto space-y-4 my-8">
+          <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto text-red-500">
+            <FiAlertCircle size={32} />
+          </div>
+          <h3 className="text-xl font-bold text-gray-800">Connection Interrupted</h3>
+          <p className="text-gray-500 text-sm leading-relaxed">{error}</p>
+          <button 
+            onClick={fetchProducts}
+            className="px-6 py-3 bg-[#1ca231] text-white rounded-xl text-sm font-bold hover:bg-[#158025] transition-all flex items-center gap-2 mx-auto shadow-sm"
+          >
+            <FiRefreshCw size={16} /> Retry Fetching
+          </button>
+        </div>
+      ) : filteredProducts.length === 0 ? (
         <div className="bg-gray-50 border border-dashed border-gray-300 flex flex-col items-center justify-center p-12 rounded-xl text-center">
              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4 text-gray-400">
                  <FiSearch size={24} />
@@ -175,7 +247,7 @@ export default function DailyDealsClient({ initialProducts }: { initialProducts:
       )}
 
       {/* Pagination Controls */}
-      {totalPages > 1 && (
+      {!isLoading && !error && totalPages > 1 && (
         <div className="mt-12 flex flex-col md:flex-row justify-between items-center gap-6 pb-4">
           <div className="flex w-full md:w-auto items-center overflow-x-auto no-scrollbar pb-2 px-1 snap-x gap-2">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (

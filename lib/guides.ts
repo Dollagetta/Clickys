@@ -61,7 +61,7 @@ async function _fetchGuidesFromSheet(fullRange = true) {
             Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           },
-          next: { revalidate: 3600 }
+          cache: 'no-store'
         }
       );
 

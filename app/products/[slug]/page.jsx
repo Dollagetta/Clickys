@@ -116,7 +116,7 @@ const MainImage = ({ src, alt }) => {
   const actualSrc = src || `https://placehold.co/600x400/2ECC71/1A1A1A?text=${encodeURIComponent(alt)}&font=Inter`;
   return (
   <div className={styles.mainImageContainer} data-aos="fade-right">
-    <Image src={actualSrc} alt={alt} width={700} height={525} style={{ objectFit: 'contain', borderRadius: 'var(--rounded-lg)' }} priority />
+    <Image src={actualSrc} alt={alt} width={700} height={525} style={{ objectFit: 'contain', borderRadius: 'var(--rounded-lg)' }} priority referrerPolicy="no-referrer" />
   </div>
   );
 };
@@ -125,7 +125,7 @@ const ThumbnailImages = ({ images, current, productName }) => (
   <div className={styles.thumbnailContainer} data-aos="fade-right" data-aos-delay="100">
     {images && images.map((imgSrc, index) => (
       <div key={index} className={`${styles.thumbnail} ${imgSrc === current ? styles.activeThumbnail : ''}`}>
-        <Image src={imgSrc} alt={`${productName} thumbnail ${index + 1}`} width={100} height={75} style={{ objectFit: 'cover', borderRadius: 'var(--rounded-md)' }} />
+        <Image src={imgSrc} alt={`${productName} thumbnail ${index + 1}`} width={100} height={75} style={{ objectFit: 'cover', borderRadius: 'var(--rounded-md)' }} referrerPolicy="no-referrer" />
       </div>
     ))}
   </div>

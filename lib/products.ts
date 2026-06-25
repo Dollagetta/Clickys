@@ -2,8 +2,8 @@ import { GoogleAuth } from 'google-auth-library';
 import { unstable_cache } from 'next/cache';
 
 async function _fetchProductsFromSheet() {
-  const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
-  const privateKey = process.env.GOOGLE_PRIVATE_KEY;
+  let clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
+  let privateKey = process.env.GOOGLE_PRIVATE_KEY;
   let sheetId = process.env.PRODUCT_SHEET_ID;
   
   if (sheetId && sheetId.includes('docs.google.com/spreadsheets/d/')) {
@@ -13,8 +13,23 @@ async function _fetchProductsFromSheet() {
     }
   }
 
+  // Robust Fallback: If GOOGLE credentials are not set directly, check FIREBASE_SERVICE_ACCOUNT_KEY
   if (!clientEmail || !privateKey) {
-    throw new Error('Missing Google Auth environment variables (GOOGLE_CLIENT_EMAIL or GOOGLE_PRIVATE_KEY).');
+    const serviceAccountKeyStr = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+    if (serviceAccountKeyStr) {
+      try {
+        const sa = JSON.parse(serviceAccountKeyStr);
+        if (sa.client_email) clientEmail = sa.client_email;
+        if (sa.private_key) privateKey = sa.private_key;
+        console.log('[Products] Successfully extracted Google credentials from FIREBASE_SERVICE_ACCOUNT_KEY');
+      } catch (e) {
+        console.error("[Products] Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY for Google Sheets authentication:", e);
+      }
+    }
+  }
+
+  if (!clientEmail || !privateKey) {
+    throw new Error('Missing Google Auth environment variables (GOOGLE_CLIENT_EMAIL/GOOGLE_PRIVATE_KEY or FIREBASE_SERVICE_ACCOUNT_KEY).');
   }
 
   if (!sheetId) {
@@ -59,7 +74,7 @@ async function _fetchProductsFromSheet() {
             'Content-Type': 'application/json',
           },
           signal: controller.signal,
-          next: { revalidate: 60 } // Reduced to 60 seconds
+          cache: 'no-store'
         }
       );
       clearTimeout(timeoutId);
@@ -103,21 +118,40 @@ let _productsCache: any[] | null = null;
 let _productsCacheTime = 0;
 
 export async function fetchProductsFromSheet(categoryQuery: string | null = null) {
-  if (_productsCache && (Date.now() - _productsCacheTime < 60000)) {
+  const cacheAge = Date.now() - _productsCacheTime;
+  // Use cache if it exists and is less than 10 minutes old
+  if (_productsCache && _productsCache.length > 0 && cacheAge < 600000) {
     let products = _productsCache;
     if (categoryQuery) {
-      products = products.filter((p: any) => p.category.toLowerCase() === categoryQuery.toLowerCase());
+      products = products.filter((p: any) => p.category && p.category.toLowerCase() === categoryQuery.toLowerCase());
     }
     return products;
   }
 
-  let products = await _fetchProductsFromSheet();
-  _productsCache = products;
-  _productsCacheTime = Date.now();
-
-  if (categoryQuery) {
-    products = products.filter((p: any) => p.category.toLowerCase() === categoryQuery.toLowerCase());
+  try {
+    let products = await _fetchProductsFromSheet();
+    if (products && products.length > 0) {
+      _productsCache = products;
+      _productsCacheTime = Date.now();
+    } else if (_productsCache && _productsCache.length > 0) {
+      // Graceful fallback to stale cache if current fetch fails or returns empty rows
+      console.warn('[Products] Fetch returned empty, falling back to stale cache');
+      products = _productsCache;
+    }
+    
+    if (categoryQuery) {
+      products = products.filter((p: any) => p.category && p.category.toLowerCase() === categoryQuery.toLowerCase());
+    }
+    return products;
+  } catch (error) {
+    console.error('[Products] Error fetching products, attempting stale cache fallback:', error);
+    if (_productsCache && _productsCache.length > 0) {
+      let products = _productsCache;
+      if (categoryQuery) {
+        products = products.filter((p: any) => p.category && p.category.toLowerCase() === categoryQuery.toLowerCase());
+      }
+      return products;
+    }
+    return [];
   }
-
-  return products;
 }

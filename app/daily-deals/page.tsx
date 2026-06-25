@@ -55,10 +55,6 @@ export default async function DealsPage() {
             </a>
           </div>
         </div>
-      ) : mappedProducts.length === 0 ? (
-        <div className="bg-orange-50 text-orange-800 p-4 rounded-xl mb-6">
-          No products found matching your criteria.
-        </div>
       ) : (
         <Suspense fallback={<div>Loading deals...</div>}>
           <DailyDealsClient initialProducts={mappedProducts} />

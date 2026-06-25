@@ -207,6 +207,7 @@ const ProductCard = ({ product }) => {
             style={{ objectFit: isPartner ? 'cover' : 'contain' }}
             className={styles.productImage}
             onError={() => setImgError(true)}
+            referrerPolicy="no-referrer"
           />}
           {isPrismicImage && imageUrl && <PrismicNextImage field={imageUrl} className={styles.productImage} style={{ objectFit: isPartner ? 'cover' : 'contain' }} />}
           
@@ -380,6 +381,7 @@ const ProductCard = ({ product }) => {
                     height={250}
                     style={{ objectFit: 'contain', margin: '0 auto', display: 'block' }}
                     onError={() => setImgError(true)}
+                    referrerPolicy="no-referrer"
                   />}
                   {isPrismicImage && imageUrl && <PrismicNextImage field={imageUrl} style={{ objectFit: 'contain', width: '100%', height: 'auto', maxHeight: '250px' }} />}
                 </div>

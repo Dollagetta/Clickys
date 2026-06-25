@@ -28,7 +28,7 @@ import {
 } from 'react-icons/fi';
 
 // To avoid useSearchParams causing a build error in page.js, DealsPage Content will be inside a Suspense Wrapper
-function DealsPageContent() {
+function DealsPageContent({ initialProducts = [] }) {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q');
   const initialCategory = searchParams.get('category');
@@ -83,34 +83,75 @@ function DealsPageContent() {
                throw new Error("Received HTML instead of JSON from server");
             }
             normalizedProducts = data.results || [];
-            
-            // Apply local advanced filters on the global results
-            if (selectedCategories.length > 0) {
-              normalizedProducts = normalizedProducts.filter(p => selectedCategories.includes(p.category));
-            }
-            if (priceRange.min) {
-              normalizedProducts = normalizedProducts.filter(p => p.price >= Number(priceRange.min));
-            }
-            if (priceRange.max) {
-              normalizedProducts = normalizedProducts.filter(p => p.price <= Number(priceRange.max));
-            }
-            if (minDiscount > 0) {
-              normalizedProducts = normalizedProducts.filter(p => p.discount >= minDiscount);
-            }
-            if (selectedPlatforms.length > 0) {
-              normalizedProducts = normalizedProducts.filter(p => selectedPlatforms.includes(p.platform));
-            }
-
-            // Client-side sort
-            if (sortBy === 'price_asc') {
-              normalizedProducts.sort((a, b) => a.price - b.price);
-            } else if (sortBy === 'price_desc') {
-              normalizedProducts.sort((a, b) => b.price - a.price);
-            }
           }
         } catch (err) {
           console.error("Global search failed on deals page", err);
         }
+
+        // Client-side search fallback in initialProducts if global-search has no results or failed
+        if (normalizedProducts.length === 0 && initialProducts && initialProducts.length > 0) {
+          normalizedProducts = initialProducts.filter(p => 
+            (p.name || p.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (p.category || '').toLowerCase().includes(searchTerm.toLowerCase())
+          ).map((p, index) => ({
+            id: p.id || `flipkart-${index}`,
+            name: p.name || p.title || '',
+            category: p.category || 'Deals',
+            price: p.price || '',
+            imageUrl: p.imageUrl || p.image || '',
+            amazonLink: p.amazonLink || p.link || '#',
+            platform: p.platform || 'Flipkart',
+            rating: p.rating || 0,
+            reviewCount: p.reviewCount || 0,
+            discount: p.discount || '',
+          }));
+        }
+        
+        // Apply local advanced filters on the global results
+        if (selectedCategories.length > 0) {
+          normalizedProducts = normalizedProducts.filter(p => selectedCategories.includes(p.category));
+        }
+        if (priceRange.min) {
+          normalizedProducts = normalizedProducts.filter(p => {
+            const pr = parseFloat(p.price?.toString().replace(/[^0-9.]/g, '') || '0');
+            return pr >= Number(priceRange.min);
+          });
+        }
+        if (priceRange.max) {
+          normalizedProducts = normalizedProducts.filter(p => {
+            const pr = parseFloat(p.price?.toString().replace(/[^0-9.]/g, '') || '0');
+            return pr <= Number(priceRange.max);
+          });
+        }
+        if (minDiscount > 0) {
+          normalizedProducts = normalizedProducts.filter(p => {
+            const disc = parseFloat(p.discount?.toString().replace(/[^0-9.]/g, '') || '0');
+            return disc >= minDiscount;
+          });
+        }
+        if (selectedPlatforms.length > 0) {
+          normalizedProducts = normalizedProducts.filter(p => selectedPlatforms.includes(p.platform));
+        }
+
+        // Client-side sort
+        if (sortBy === 'price_asc') {
+          normalizedProducts.sort((a, b) => {
+            const priceA = parseFloat(a.price?.toString().replace(/[^0-9.]/g, '') || '0');
+            const priceB = parseFloat(b.price?.toString().replace(/[^0-9.]/g, '') || '0');
+            return priceA - priceB;
+          });
+        } else if (sortBy === 'price_desc') {
+          normalizedProducts.sort((a, b) => {
+            const priceA = parseFloat(a.price?.toString().replace(/[^0-9.]/g, '') || '0');
+            const priceB = parseFloat(b.price?.toString().replace(/[^0-9.]/g, '') || '0');
+            return priceB - priceA;
+          });
+        }
+
+        // Apply pagination locally for local results
+        total_pages = Math.ceil(normalizedProducts.length / itemsPerPage);
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        normalizedProducts = normalizedProducts.slice(startIndex, startIndex + itemsPerPage);
       } else {
         // Standard Prismic filtered search without a strict searchTerm
         const predicates = [
@@ -129,29 +170,98 @@ function DealsPageContent() {
         let orderings = [];
         orderings.push({ field: 'document.first_publication_date', direction: 'desc' });
 
-        const response = await client.get({
-          predicates,
-          orderings,
-          page: currentPage,
-          pageSize: itemsPerPage,
-        });
+        try {
+          const queryPromise = client.get({
+            predicates,
+            orderings,
+            page: currentPage,
+            pageSize: itemsPerPage,
+          });
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Prismic query timeout')), 5000)
+          );
+          const response = await Promise.race([queryPromise, timeoutPromise]);
 
-        total_pages = response.total_pages;
+          total_pages = response.total_pages;
 
-        normalizedProducts = response.results.map(p => ({
-            id: p.id,
-            name: p.data.title,
-            category: p.data.category,
-            price: p.data.price,
-            imageUrl: p.data.image,
-            amazonLink: p.data.link?.url,
-            platform: p.data.platform,
-            rating: 0, 
-            reviewCount: 0,
-            discount: p.data.discount,
-        }));
+          normalizedProducts = response.results.map(p => ({
+              id: p.id,
+              name: p.data.title,
+              category: p.data.category,
+              price: p.data.price,
+              imageUrl: p.data.image,
+              amazonLink: p.data.link?.url,
+              platform: p.data.platform,
+              rating: 0, 
+              reviewCount: 0,
+              discount: p.data.discount,
+          }));
+        } catch (prismicErr) {
+          console.error("Prismic fetch failed, falling back to initial products", prismicErr);
+        }
 
-        // Apply advanced price/discount filters client-side on the returned batch for accuracy with string data
+        // Fallback to initialProducts if Prismic results are empty (e.g. no products published)
+        if (normalizedProducts.length === 0 && initialProducts && initialProducts.length > 0) {
+          normalizedProducts = initialProducts.map((p, index) => ({
+            id: p.id || `flipkart-${index}`,
+            name: p.name || p.title || '',
+            category: p.category || 'Deals',
+            price: p.price || '',
+            imageUrl: p.imageUrl || p.image || '',
+            amazonLink: p.amazonLink || p.link || '#',
+            platform: p.platform || 'Flipkart',
+            rating: p.rating || 0,
+            reviewCount: p.reviewCount || 0,
+            discount: p.discount || '',
+          }));
+
+          // Apply local filtering for categories
+          if (selectedCategories.length > 0) {
+            normalizedProducts = normalizedProducts.filter(p => selectedCategories.includes(p.category));
+          }
+          if (priceRange.min) {
+            normalizedProducts = normalizedProducts.filter(p => {
+              const pr = parseFloat(p.price?.toString().replace(/[^0-9.]/g, '') || '0');
+              return pr >= Number(priceRange.min);
+            });
+          }
+          if (priceRange.max) {
+            normalizedProducts = normalizedProducts.filter(p => {
+              const pr = parseFloat(p.price?.toString().replace(/[^0-9.]/g, '') || '0');
+              return pr <= Number(priceRange.max);
+            });
+          }
+          if (minDiscount > 0) {
+            normalizedProducts = normalizedProducts.filter(p => {
+              const disc = parseFloat(p.discount?.toString().replace(/[^0-9.]/g, '') || '0');
+              return disc >= minDiscount;
+            });
+          }
+          if (selectedPlatforms.length > 0) {
+            normalizedProducts = normalizedProducts.filter(p => selectedPlatforms.includes(p.platform));
+          }
+
+          // Apply local sort option client-side
+          if (sortBy === 'price_asc') {
+            normalizedProducts.sort((a, b) => {
+              const priceA = parseFloat(a.price?.toString().replace(/[^0-9.]/g, '') || '0');
+              const priceB = parseFloat(b.price?.toString().replace(/[^0-9.]/g, '') || '0');
+              return priceA - priceB;
+            });
+          } else if (sortBy === 'price_desc') {
+            normalizedProducts.sort((a, b) => {
+              const priceA = parseFloat(a.price?.toString().replace(/[^0-9.]/g, '') || '0');
+              const priceB = parseFloat(b.price?.toString().replace(/[^0-9.]/g, '') || '0');
+              return priceB - priceA;
+            });
+          }
+
+          total_pages = Math.ceil(normalizedProducts.length / itemsPerPage);
+          const startIndex = (currentPage - 1) * itemsPerPage;
+          normalizedProducts = normalizedProducts.slice(startIndex, startIndex + itemsPerPage);
+        }
+
+        // Apply advanced price/discount filters client-side on the returned batch for accuracy with string data (only if loaded from Prismic)
         if (priceRange.min || priceRange.max || minDiscount > 0) {
           normalizedProducts = normalizedProducts.filter(p => {
             const price = parseFloat(p.price?.toString().replace(/[^0-9.]/g, '') || '0');
@@ -163,7 +273,7 @@ function DealsPageContent() {
           });
         }
 
-        // Apply sort option client-side for accuracy with string prices
+        // Apply sort option client-side for accuracy with string prices (only if loaded from Prismic)
         if (sortBy === 'price_asc') {
           normalizedProducts.sort((a, b) => {
             const priceA = parseFloat(a.price?.toString().replace(/[^0-9.]/g, '') || '0');
@@ -183,12 +293,32 @@ function DealsPageContent() {
       setTotalPages(total_pages);
 
     } catch (err) {
-      setError("We couldn't load the deals right now. Please try again later.");
-      setProducts([]);
+      console.error("fetchProducts encountered error:", err);
+      // Fallback in catch block to ensure users never get stuck loading
+      if (initialProducts && initialProducts.length > 0) {
+        let normalizedProducts = initialProducts.map((p, index) => ({
+          id: p.id || `flipkart-${index}`,
+          name: p.name || p.title || '',
+          category: p.category || 'Deals',
+          price: p.price || '',
+          imageUrl: p.imageUrl || p.image || '',
+          amazonLink: p.amazonLink || p.link || '#',
+          platform: p.platform || 'Flipkart',
+          rating: p.rating || 0,
+          reviewCount: p.reviewCount || 0,
+          discount: p.discount || '',
+        }));
+        
+        setProducts(normalizedProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage));
+        setTotalPages(Math.ceil(normalizedProducts.length / itemsPerPage));
+      } else {
+        setError("We couldn't load the deals right now. Please try again later.");
+        setProducts([]);
+      }
     } finally {
       setIsLoading(false);
     }
-  }, [searchTerm, selectedCategories, sortBy, currentPage, priceRange, minDiscount, selectedPlatforms]);
+  }, [searchTerm, selectedCategories, sortBy, currentPage, priceRange, minDiscount, selectedPlatforms, initialProducts]);
 
   // Effect to fetch products when dependencies change
   useEffect(() => {
@@ -197,27 +327,47 @@ function DealsPageContent() {
 
   // OPTIMIZED: Effect to fetch only the 'category' field to build the filter list
   useEffect(() => {
+    let active = true;
     const fetchCategories = async () => {
       const client = createClient();
       try {
-        // This is much more performant as it only fetches the category field, not the whole document
-        const allProductDocs = await client.getAllByType('product', {
+        // Implement 5-second timeout for the Prismic query
+        const queryPromise = client.getAllByType('product', {
             fetch: 'product.category'
         });
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Prismic timeout')), 5000)
+        );
+        const allProductDocs = await Promise.race([queryPromise, timeoutPromise]);
+        
+        if (!active) return;
+        
         const categories = new Set(allProductDocs.map(p => p.data.category).filter(Boolean)); // .filter(Boolean) removes any null/undefined categories
-        setAllCategories(Array.from(categories));
-        if (initialCategory && initialCategory !== 'All' && categories.has(initialCategory)) {
-          setSelectedCategories([initialCategory]);
-        } else if (!initialCategory) {
-          setSelectedCategories(Array.from(categories)); // Initially select all
+        if (categories.size > 0) {
+          setAllCategories(Array.from(categories));
+          if (initialCategory && initialCategory !== 'All' && categories.has(initialCategory)) {
+            setSelectedCategories([initialCategory]);
+          } else if (!initialCategory) {
+            setSelectedCategories(Array.from(categories)); // Initially select all
+          }
+        } else {
+          const fallbackCats = new Set(initialProducts.map(p => p.category).filter(Boolean));
+          setAllCategories(Array.from(fallbackCats));
+          setSelectedCategories(Array.from(fallbackCats));
         }
       } catch (err) {
         console.error("Failed to fetch categories:", err);
-        // Handle error if needed
+        if (!active) return;
+        const fallbackCats = new Set(initialProducts.map(p => p.category).filter(Boolean));
+        setAllCategories(Array.from(fallbackCats));
+        setSelectedCategories(Array.from(fallbackCats));
       }
     };
     fetchCategories();
-  }, []);
+    return () => {
+      active = false;
+    };
+  }, [initialProducts, initialCategory]);
 
   // Fetch Affiliates
   useEffect(() => {
@@ -527,10 +677,10 @@ function DealsPageContent() {
   );
 }
 
-export default function DealsPage() {
+export default function DealsPage({ products: initialProducts }) {
   return (
     <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Loading products...</div>}>
-      <DealsPageContent />
+      <DealsPageContent initialProducts={initialProducts} />
     </Suspense>
   )
 }
