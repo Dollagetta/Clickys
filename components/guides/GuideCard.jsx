@@ -35,6 +35,11 @@ export default function GuideCard({ guide }) {
   const normalizedPlatform = platform.charAt(0).toUpperCase() + platform.slice(1).toLowerCase();
   const platformColor = affiliateColors[normalizedPlatform] || affiliateColors['Amazon'];
 
+  let descriptionText = guide.description;
+  if (Array.isArray(guide.description)) {
+    descriptionText = guide.description[0]?.text || '';
+  }
+
   return (
     <div 
       className="bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col h-full group border border-gray-100"
@@ -90,7 +95,7 @@ export default function GuideCard({ guide }) {
         </div>
 
         <p className="text-gray-500 text-sm line-clamp-3 mb-6 flex-grow leading-relaxed">
-          {guide.description}
+          {descriptionText}
         </p>
 
         <Link

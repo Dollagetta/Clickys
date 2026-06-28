@@ -1,5 +1,6 @@
 import { GoogleAuth } from 'google-auth-library';
 import { unstable_cache } from 'next/cache';
+import { createClient } from '../prismicio';
 
 function slugify(text) {
   if (!text) return '';
@@ -7,11 +8,59 @@ function slugify(text) {
     .toString()
     .toLowerCase()
     .trim()
-    .replace(/\s+/g, '-')     // Replace spaces with -
-    .replace(/[^\w-]+/g, '')     // Remove all non-word chars
-    .replace(/--+/g, '-')       // Replace multiple - with single -
-    .replace(/^-+/, '')           // Trim - from start of text
-    .replace(/-+$/, '');          // Trim - from end of text
+    .replace(/\s+/g, '-')
+    .replace(/[^\w-]+/g, '')
+    .replace(/--+/g, '-')
+    .replace(/^-+/, '')
+    .replace(/-+$/, '');
+}
+
+async function _fetchGuidesFromPrismic() {
+  try {
+    const client = createClient();
+    const [guides, products] = await Promise.all([
+      client.getAllByType('guide', {
+        orderings: {
+          field: 'document.first_publication_date',
+          direction: 'desc',
+        },
+      }).catch(() => []),
+      client.getAllByType('product', {
+        orderings: {
+          field: 'document.first_publication_date',
+          direction: 'desc',
+        },
+      }).catch(() => [])
+    ]);
+
+    const prismicGuides = [...guides, ...products].map((doc) => {
+      return {
+        isPrismic: true,
+        id: doc.id,
+        uid: doc.uid,
+        title: doc.data.title || doc.data.name || '',
+        price: doc.data.price || '',
+        discount: doc.data.discount || '',
+        platform: doc.data.platform || '',
+        category: doc.data.category || '',
+        link: doc.data.link?.url || '',
+        image: doc.data.image?.url || doc.data.hero_image?.url || '',
+        description: doc.data.description || [],
+        pros: doc.data.pros || [],
+        cons: doc.data.cons || [],
+        features: doc.data.features || [],
+        alternatives: doc.data.alternatives || [],
+        faq: doc.data.faq || [],
+        slug: doc.uid, // Use UID as slug
+      };
+    });
+    
+    // Sort combined Prismic items by publication date if possible, but for now just return them
+    return prismicGuides;
+  } catch (error) {
+    console.error('[Guides] Error fetching from Prismic:', error);
+    return [];
+  }
 }
 
 async function _fetchGuidesFromSheet(fullRange = true) {
@@ -43,12 +92,7 @@ async function _fetchGuidesFromSheet(fullRange = true) {
         scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
       });
 
-      const getAccessTokenWithTimeout = Promise.race([
-        auth.getAccessToken(),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Auth Timeout')), 5000))
-      ]);
-
-      const accessTokenObject: any = await getAccessTokenWithTimeout;
+      const accessTokenObject: any = await auth.getAccessToken();
       console.log('[Guides] Got access token');
       const accessToken = typeof accessTokenObject === 'string' ? accessTokenObject : accessTokenObject.token;
 
@@ -80,14 +124,17 @@ async function _fetchGuidesFromSheet(fullRange = true) {
     }
   })();
 
+  let timeoutId;
   const timeoutPromise = new Promise((resolve) => {
-    setTimeout(() => {
+    timeoutId = setTimeout(() => {
       console.warn('[Guides] Fetch operation timed out after 12s');
       resolve([]);
     }, 12000);
   });
 
-  return Promise.race([fetchPromise, timeoutPromise]);
+  return Promise.race([fetchPromise, timeoutPromise]).finally(() => {
+    clearTimeout(timeoutId);
+  });
 }
 
 let _guidesCacheFull: any[] | null = null;
@@ -96,19 +143,27 @@ let _guidesCacheMinimal: any[] | null = null;
 let _guidesCacheMinimalTime = 0;
 
 /**
- * Fetches guides from the Google Sheet.
+ * Fetches guides from the Google Sheet and Prismic.
  * @param {boolean} fullRange Whether to fetch the full range (A:L) or just the minimal range (A:H) for listings.
  */
 export const fetchGuidesFromSheet = async (fullRange = true) => {
   if (fullRange) {
     if (_guidesCacheFull && (Date.now() - _guidesCacheFullTime < 3600000)) return _guidesCacheFull;
-    let guides = await _fetchGuidesFromSheet(true);
+    const [sheetGuides, prismicGuides] = await Promise.all([
+      _fetchGuidesFromSheet(true),
+      _fetchGuidesFromPrismic()
+    ]);
+    const guides = [...prismicGuides, ...sheetGuides]; // Combine both
     _guidesCacheFull = guides;
     _guidesCacheFullTime = Date.now();
     return guides;
   } else {
     if (_guidesCacheMinimal && (Date.now() - _guidesCacheMinimalTime < 3600000)) return _guidesCacheMinimal;
-    let guides = await _fetchGuidesFromSheet(false);
+    const [sheetGuides, prismicGuides] = await Promise.all([
+      _fetchGuidesFromSheet(false),
+      _fetchGuidesFromPrismic()
+    ]);
+    const guides = [...prismicGuides, ...sheetGuides];
     _guidesCacheMinimal = guides;
     _guidesCacheMinimalTime = Date.now();
     return guides;
@@ -138,6 +193,7 @@ function processRows(rows: any[], fullRange: boolean) {
       seenSlugs.add(slug);
 
       return {
+        isPrismic: false,
         title: row[0] || '',
         price: row[1] || '',
         link: row[2] || '',
@@ -150,12 +206,14 @@ function processRows(rows: any[], fullRange: boolean) {
         pros: fullRange ? (row[9] || '') : '',
         cons: fullRange ? (row[10] || '') : '',
         alternatives: fullRange ? (row[11] || '') : '',
+        faq: '', // Empty for sheets
         slug: slug
       };
     });
 }
 
 export async function getGuideBySlug(slug) {
-  const guides = await fetchGuidesFromSheet();
-  return guides.find(g => g.slug === slug);
+  const guides = await fetchGuidesFromSheet(true);
+  return guides.find((g: any) => g.slug === slug);
 }
+

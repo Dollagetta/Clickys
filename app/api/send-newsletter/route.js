@@ -108,6 +108,19 @@ export async function POST(req) {
        }
     }
 
+    // Optimize the product image for email if it's from Prismic (Imgix)
+    if (productImage && (productImage.includes('prismic.io') || productImage.includes('imgix.net'))) {
+       try {
+         const urlObj = new URL(productImage);
+         urlObj.searchParams.set('w', '600');
+         urlObj.searchParams.set('auto', 'compress');
+         urlObj.searchParams.set('fm', 'jpg'); // Force jpg for maximum email client compatibility
+         productImage = urlObj.toString();
+       } catch (e) {
+         // Ignore
+       }
+    }
+
     // Extract excerpt
     let productExcerpt = extractText(latestDoc.data?.description) || extractText(latestDoc.data?.short_paragraph) || extractText(latestDoc.data?.meta_description) || '';
     if (!productExcerpt && latestDoc.data?.slices) {
@@ -161,12 +174,12 @@ export async function POST(req) {
         "@context": "http://schema.org/",
         "@type": "Organization",
         "name": "Clickys",
-        "logo": "https://www.clickys.in/images/logosvg.svg"
+        "logo": "https://www.clickys.in/favicon.svg"
       },
       {
         "@context": "http://schema.org/",
         "@type": "DiscountOffer",
-        "description": "${docTitle.replace(/"/g, '')}",
+        "description": "${customHeader.replace(/"/g, '')} - ${finalSubject.replace(/"/g, '')}",
         "availabilityStarts": "${new Date().toISOString()}",
         "availabilityEnds": "${new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()}",
         "url": "${productUrl}"
@@ -174,7 +187,7 @@ export async function POST(req) {
       {
         "@context": "http://schema.org/",
         "@type": "PromotionCard",
-        "image": "${productImage || 'https://www.clickys.in/images/logosvg.svg'}"
+        "image": "${productImage || 'https://www.clickys.in/favicon.svg'}"
       }]
       </script>
     `;
@@ -198,14 +211,16 @@ export async function POST(req) {
         <body>
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;">
             <div style="background-color: #ffffff; padding: 20px; text-align: center; border-bottom: 1px solid #f0f0f0;">
-              <img src="https://www.clickys.in/images/logosvg.svg" alt="Clickys Logo" style="height: 60px; display: block; margin: 0 auto;" />
+              <img src="https://www.clickys.in/favicon.svg" alt="Clickys Logo" style="height: 60px; display: block; margin: 0 auto;" />
             </div>
             <div style="background-color: #f97316; padding: 20px; text-align: center;">
-              <h1 style="color: white; margin: 0;">${customHeader}</h1>
+              <h1 style="color: white; margin: 0; font-size: 24px;">${customHeader}</h1>
             </div>
             <div style="padding: 30px;">
-              <h2 style="color: #333;">${docTitle}</h2>
+              <h2 style="color: #333; margin-top: 0; margin-bottom: 10px; font-size: 22px;">${finalSubject}</h2>
+              <h3 style="color: #666; margin-top: 0; margin-bottom: 20px; font-size: 18px; font-weight: normal;">${docTitle}</h3>
               ${productImage ? `<div style="text-align: center; margin-bottom: 20px;"><img src="${productImage}" alt="Product Image" width="600" style="display: inline-block; width: 100%; max-width: 600px; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(249, 115, 22, 0.25); border: 2px solid #f97316;" /></div>` : ''}
+              ${productExcerpt ? `<p style="color: #444; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">${productExcerpt}</p>` : ''}
               <div style="text-align: center; margin-top: 30px;">
                 <a href="${productUrl}" style="background-color: #f97316; color: white; padding: 14px 30px; font-size: 16px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block;">
                   View on Clickys

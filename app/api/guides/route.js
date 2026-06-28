@@ -26,10 +26,20 @@ export async function GET(request) {
 
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      guides = guides.filter(g => 
-        (g.title && g.title.toLowerCase().includes(q)) || 
-        (g.description && g.description.toLowerCase().includes(q))
-      );
+      guides = guides.filter(g => {
+        let descText = g.description;
+        if (Array.isArray(g.description)) {
+          descText = g.description.map(d => d.text || '').join(' ');
+        }
+        let titleText = g.title;
+        if (Array.isArray(g.title)) {
+          titleText = g.title.map(t => t.text || '').join(' ');
+        }
+        return (
+          (titleText && typeof titleText === 'string' && titleText.toLowerCase().includes(q)) || 
+          (descText && typeof descText === 'string' && descText.toLowerCase().includes(q))
+        );
+      });
     }
 
     // Sorting (simplified for Sheets data)

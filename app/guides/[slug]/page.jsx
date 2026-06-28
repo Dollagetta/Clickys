@@ -2,6 +2,7 @@ import { getGuideBySlug } from '../../../lib/guides';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { PrismicRichText } from '@prismicio/react';
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -9,19 +10,49 @@ export async function generateMetadata({ params }) {
 
   if (!guide) return { title: 'Guide Not Found' };
 
+  let descriptionText = typeof guide.description === 'string' 
+    ? guide.description 
+    : (guide.description?.[0]?.text || 'Check out our latest buying guide, tips, and recommendations on Clickys.');
+
   return {
     title: guide.title,
-    description: guide.description,
+    description: descriptionText,
     alternates: {
       canonical: `/guides/${slug}`,
     },
     openGraph: {
       title: guide.title,
-      description: guide.description,
+      description: descriptionText,
       images: [guide.image],
     },
   };
 }
+
+const richTextComponents = {
+  heading1: ({ children }) => <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-8 mt-12 leading-tight tracking-tight">{children}</h1>,
+  heading2: ({ children }) => <h2 className="text-3xl font-black text-gray-900 mb-6 mt-10 pb-2 border-b-4 border-green-500 inline-block">{children}</h2>,
+  heading3: ({ children }) => <h3 className="text-2xl font-bold text-gray-800 mb-4 mt-8">{children}</h3>,
+  heading4: ({ children }) => <h4 className="text-xl font-bold text-gray-800 mb-3 mt-6">{children}</h4>,
+  heading5: ({ children }) => <h5 className="text-lg font-bold text-gray-800 mb-2 mt-4">{children}</h5>,
+  heading6: ({ children }) => <h6 className="text-base font-bold text-gray-800 mb-2 mt-4">{children}</h6>,
+  paragraph: ({ children }) => <p className="text-xl text-gray-700 leading-relaxed mb-6">{children}</p>,
+  list: ({ children }) => <ul className="list-disc pl-6 space-y-3 mb-8">{children}</ul>,
+  listItem: ({ children }) => <li className="text-lg text-gray-700">{children}</li>,
+  oList: ({ children }) => <ol className="list-decimal pl-6 space-y-3 mb-8">{children}</ol>,
+  oListItem: ({ children }) => <li className="text-lg text-gray-700">{children}</li>,
+  hyperlink: ({ children, node }) => (
+    <a href={node.data.url} target={node.data.target} className="text-blue-600 font-bold hover:underline">
+      {children}
+    </a>
+  ),
+  strong: ({ children }) => <strong className="font-extrabold text-gray-900">{children}</strong>,
+  image: ({ node }) => (
+    <div className="my-10 max-w-3xl mx-auto overflow-hidden rounded-2xl shadow-md border border-gray-100">
+      <img src={node.url} alt={node.alt || ''} className="w-full h-auto object-contain" />
+      {node.alt && <p className="text-center text-sm text-gray-500 mt-2 p-2">{node.alt}</p>}
+    </div>
+  ),
+};
 
 export default async function GuideDetailPage({ params }) {
   const { slug } = await params;
@@ -32,7 +63,7 @@ export default async function GuideDetailPage({ params }) {
   }
 
   const splitItems = (text) => {
-    if (!text) return [];
+    if (!text || typeof text !== 'string') return [];
     return text.split('\n').filter(item => item.trim() !== '');
   };
 
@@ -41,15 +72,25 @@ export default async function GuideDetailPage({ params }) {
   const cons = splitItems(guide.cons);
   const alternatives = splitItems(guide.alternatives);
 
+  const hasFeatures = guide.isPrismic ? guide.features?.length > 0 : features.length > 0;
+  const hasPros = guide.isPrismic ? guide.pros?.length > 0 : pros.length > 0;
+  const hasCons = guide.isPrismic ? guide.cons?.length > 0 : cons.length > 0;
+  const hasAlternatives = guide.isPrismic ? guide.alternatives?.length > 0 : alternatives.length > 0;
+  const hasFaq = guide.isPrismic && guide.faq?.length > 0;
+
   const priceString = guide.price ? guide.price.toString().replace(/[^0-9.]/g, '') : '';
   const brandName = guide.title.split(' ')[0] || 'Generic';
+  
+  let descriptionText = typeof guide.description === 'string' 
+    ? guide.description 
+    : (guide.description?.[0]?.text || `Buy the best ${guide.title} on ${guide.platform || 'Amazon'}. High quality and reliable features.`);
 
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: guide.title.length > 100 ? guide.title.substring(0, 97) + '...' : guide.title,
     image: guide.image,
-    description: guide.description || `Buy the best ${guide.title} on ${guide.platform || 'Amazon'}. High quality and reliable features.`,
+    description: descriptionText,
     sku: guide.slug,
     brand: {
       '@type': 'Brand',
@@ -183,80 +224,136 @@ export default async function GuideDetailPage({ params }) {
         
         {/* H2: Product Overview */}
         <section className="mb-12">
-          <h2 className="text-3xl font-black text-gray-900 mb-6 pb-2 border-b-4 border-green-500 inline-block">
-            Product Overview
-          </h2>
-          <p className="text-xl text-gray-700 leading-relaxed">
-            {guide.description}
-          </p>
+          {guide.isPrismic ? (
+            <div className="prismic-content bg-white p-8 md:p-10 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300">
+              <PrismicRichText field={guide.description} components={richTextComponents} />
+            </div>
+          ) : (
+            <div className="bg-white p-8 md:p-10 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300">
+              <h2 className="text-3xl font-black text-gray-900 mb-6 pb-2 border-b-4 border-green-500 inline-block">
+                Product Overview
+              </h2>
+              <div className="text-xl text-gray-700 leading-relaxed font-medium">
+                {guide.description}
+              </div>
+            </div>
+          )}
         </section>
 
         {/* H2: Features */}
-        {features.length > 0 && (
+        {hasFeatures && (
           <section className="mb-14">
-            <h2 className="text-3xl font-black text-gray-900 mb-8 inline-block relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-1.5 after:bg-blue-500 after:rounded-full">Features</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              {features.map((feature, i) => (
-                <div key={i} className="flex items-start bg-white p-5 rounded-2xl shadow-sm border border-gray-100 ring-1 ring-black/[0.03] hover:shadow-md transition-shadow">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-4 mt-0.5">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-800 leading-tight">{feature}</h3>
+            {guide.isPrismic ? (
+              <div className="prismic-content bg-white p-8 md:p-10 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <PrismicRichText field={guide.features} components={richTextComponents} />
+              </div>
+            ) : (
+              <div className="bg-white p-8 md:p-10 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <h2 className="text-3xl font-black text-gray-900 mb-8 inline-block relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-1.5 after:bg-blue-500 after:rounded-full">Key Features</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  {features.map((feature, i) => (
+                    <div key={i} className="flex items-start bg-gray-50/80 p-5 rounded-2xl border border-gray-100 hover:border-blue-300 hover:bg-blue-50/30 hover:shadow-sm transition-all duration-300 cursor-default">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-4 mt-0.5">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
+                      </div>
+                      <h3 className="text-lg font-bold text-gray-800 leading-tight">{feature}</h3>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
           </section>
         )}
 
         {/* Pros & Cons */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-14">
-          {/* H2: Pros */}
-          <section className="bg-gray-50/80 rounded-[24px] p-8 border border-gray-100 hover:border-green-200 transition-colors">
-            <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-bold text-xl">
-                ✓
-              </div>
-              What we love
-            </h2>
-            <ul className="space-y-4">
-              {pros.map((pro, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <span className="text-green-500 mt-1 font-bold text-lg">•</span>
-                  <h3 className="text-base font-semibold text-gray-700 leading-snug m-0">{pro}</h3>
-                </li>
-              ))}
-            </ul>
-          </section>
+        {(hasPros || hasCons) && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-14">
+            {/* H2: Pros */}
+            {hasPros && (
+              <section className="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm hover:shadow-md hover:border-green-200 transition-all duration-300 group cursor-default">
+                {guide.isPrismic ? (
+                  <div className="prismic-content group-hover:bg-green-50/30 transition-colors rounded-xl p-2 -m-2">
+                    <PrismicRichText field={guide.pros} components={richTextComponents} />
+                  </div>
+                ) : (
+                  <div className="group-hover:bg-green-50/30 transition-colors rounded-xl p-2 -m-2">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-bold text-xl">
+                        ✓
+                      </div>
+                      What we love
+                    </h2>
+                    <ul className="space-y-4">
+                      {pros.map((pro, i) => (
+                        <li key={i} className="flex items-start gap-3">
+                          <span className="text-green-500 mt-1 font-bold text-lg">•</span>
+                          <h3 className="text-base font-semibold text-gray-700 leading-snug m-0">{pro}</h3>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </section>
+            )}
 
-          {/* H2: Cons */}
-          <section className="bg-gray-50/80 rounded-[24px] p-8 border border-gray-100 hover:border-red-200 transition-colors">
-            <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold text-xl">
-                ×
-              </div>
-              Things to consider
-            </h2>
-            <ul className="space-y-4">
-              {cons.map((con, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <span className="text-red-400 mt-1 font-bold text-lg">•</span>
-                  <h3 className="text-base font-semibold text-gray-700 leading-snug m-0">{con}</h3>
-                </li>
-              ))}
-            </ul>
-          </section>
-        </div>
+            {/* H2: Cons */}
+            {hasCons && (
+              <section className="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm hover:shadow-md hover:border-red-200 transition-all duration-300 group cursor-default">
+                {guide.isPrismic ? (
+                  <div className="prismic-content group-hover:bg-red-50/30 transition-colors rounded-xl p-2 -m-2">
+                    <PrismicRichText field={guide.cons} components={richTextComponents} />
+                  </div>
+                ) : (
+                  <div className="group-hover:bg-red-50/30 transition-colors rounded-xl p-2 -m-2">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold text-xl">
+                        ×
+                      </div>
+                      Things to consider
+                    </h2>
+                    <ul className="space-y-4">
+                      {cons.map((con, i) => (
+                        <li key={i} className="flex items-start gap-3">
+                          <span className="text-red-400 mt-1 font-bold text-lg">•</span>
+                          <h3 className="text-base font-semibold text-gray-700 leading-snug m-0">{con}</h3>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </section>
+            )}
+          </div>
+        )}
 
         {/* H2: Alternatives */}
-        {alternatives.length > 0 && (
+        {hasAlternatives && (
           <section className="mb-14">
-            <h2 className="text-2xl font-black text-gray-900 mb-6">Alternatives Considered</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {alternatives.map((alt, i) => (
-                <div key={i} className="bg-white px-6 py-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-center text-center">
-                  <h3 className="text-sm font-semibold text-gray-800 m-0">{alt}</h3>
+            {guide.isPrismic ? (
+              <div className="prismic-content bg-white p-8 md:p-10 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <PrismicRichText field={guide.alternatives} components={richTextComponents} />
+              </div>
+            ) : (
+              <div className="bg-white p-8 md:p-10 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <h2 className="text-3xl font-black text-gray-900 mb-8 pb-2 border-b-4 border-indigo-500 inline-block">Alternatives Considered</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {alternatives.map((alt, i) => (
+                    <div key={i} className="bg-gray-50/80 px-6 py-4 rounded-xl border border-gray-100 hover:border-indigo-300 hover:bg-indigo-50/30 hover:shadow-sm transition-all duration-300 flex items-center justify-center text-center cursor-default">
+                      <h3 className="text-sm font-semibold text-gray-800 m-0">{alt}</h3>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* FAQ (Prismic Only) */}
+        {hasFaq && (
+          <section className="mb-14">
+            <div className="prismic-content bg-white p-8 md:p-10 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300">
+              <h2 className="text-3xl font-black text-gray-900 mb-6 pb-2 border-b-4 border-purple-500 inline-block">Frequently Asked Questions</h2>
+              <PrismicRichText field={guide.faq} components={richTextComponents} />
             </div>
           </section>
         )}
@@ -305,7 +402,7 @@ export default async function GuideDetailPage({ params }) {
         <section>
           <h2 className="text-3xl font-black text-gray-900 mb-6">Conclusion</h2>
           <p className="text-xl text-gray-700 leading-relaxed italic border-l-4 border-green-500 pl-6 py-2 bg-gray-50 rounded-r-xl">
-            Overall, {guide.title} offers {guide.features ? 'a robust set of features' : 'great value'} for its price point. It's a solid choice if you're looking for quality and reliability.
+            Overall, {guide.title} offers {hasFeatures ? 'a robust set of features' : 'great value'} for its price point. It's a solid choice if you're looking for quality and reliability.
           </p>
         </section>
       </div>

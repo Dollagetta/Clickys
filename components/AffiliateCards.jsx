@@ -9,7 +9,9 @@ export default async function AffiliateCards() {
     const affiliatesResponse = await client.getAllByType("affiliate", {
       orderings: [{ field: 'document.first_publication_date', direction: 'desc' }]
     }).catch(e => {
-      console.warn("Affiliate type mapping or type itself might be missing in Prismic:", e.message);
+      if (e && e.message && !e.message.includes('Unknown type')) {
+        console.warn("Affiliate type mapping or type itself might be missing in Prismic:", e.message);
+      }
       return [];
     });
     

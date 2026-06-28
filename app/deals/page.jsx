@@ -66,7 +66,9 @@ const page = async () => {
       }));
     });
   } catch (error) {
-    console.error("Failed to fetch sliceguide1:", error);
+    if (error && error.message && !error.message.includes('Unknown type')) {
+      console.error("Failed to fetch sliceguide1:", error);
+    }
   }
 
   return (

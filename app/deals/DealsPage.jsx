@@ -384,7 +384,9 @@ function DealsPageContent({ initialProducts = [] }) {
         }));
         setAffiliates(formattedAffiliates);
       } catch (err) {
-        console.error("Failed to fetch affiliates:", err);
+        if (err && err.message && !err.message.includes('Unknown type')) {
+          console.error("Failed to fetch affiliates:", err);
+        }
       }
     };
     fetchAffiliates();

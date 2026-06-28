@@ -16,13 +16,14 @@ export const repositoryName =
 // TODO: Update the routes array to match your project's route structure.
 const routes = [
   { type: "pinterestgrid", path: "/:uid" },
-  { type: "sliceguide1", path: "/guide/:uid" },
   { type: "whatsnew", path: "/whats-new/:uid" },
   { type: "product", path: "/products/:uid" },
   { type: "category", path: "/categories/:uid" },
-  { type: "affiliate", path: "/affiliate/:uid" },
   { type: "partner", path: "/partners/:uid" },
   { type: "marketingbanner", path: "/marketing/:uid" },
+  { type: "sliceguide1", path: "/guides/:uid" },
+  { type: "guide", path: "/guides/:uid" },
+  { type: "affiliate", path: "/affiliates/:uid" }
 ];
 
 /**
