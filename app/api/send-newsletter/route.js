@@ -79,8 +79,8 @@ export async function POST(req) {
        }
     }
 
-    const finalSubject = customSubject ? customSubject : `New Arrival on Clickys: ${docTitle}`;
-    customHeader = customHeader || 'Clickys New Arrival!';
+    const finalSubject = customSubject ? customSubject : 'Handpicked Products Just for You';
+    customHeader = customHeader || 'Find this trending deal on clickys';
     
     // Dynamically determine the URL based on the document type
     let productUrl = 'https://www.clickys.in/products';
@@ -112,9 +112,8 @@ export async function POST(req) {
     if (productImage && (productImage.includes('prismic.io') || productImage.includes('imgix.net'))) {
        try {
          const urlObj = new URL(productImage);
-         urlObj.searchParams.set('w', '600');
-         urlObj.searchParams.set('auto', 'compress');
-         urlObj.searchParams.set('fm', 'jpg'); // Force jpg for maximum email client compatibility
+         urlObj.searchParams.set('w', '1200'); // Higher quality
+         urlObj.searchParams.set('auto', 'compress,format'); // Better optimization
          productImage = urlObj.toString();
        } catch (e) {
          // Ignore
@@ -211,16 +210,14 @@ export async function POST(req) {
         <body>
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;">
             <div style="background-color: #ffffff; padding: 20px; text-align: center; border-bottom: 1px solid #f0f0f0;">
-              <img src="https://www.clickys.in/favicon.svg" alt="Clickys Logo" style="height: 60px; display: block; margin: 0 auto;" />
+              <div style="font-size: 32px; font-weight: bold;">
+                <span style="color: #00a859;">click</span><span style="color: #f97316;">ys</span>
+              </div>
             </div>
-            <div style="background-color: #f97316; padding: 20px; text-align: center;">
-              <h1 style="color: white; margin: 0; font-size: 24px;">${customHeader}</h1>
-            </div>
+            ${productImage ? `<div style="text-align: center;"><img src="${productImage}" alt="${docTitle}" width="600" style="display: block; width: 100%; max-width: 100%; height: auto;" /></div>` : ''}
             <div style="padding: 30px;">
-              <h2 style="color: #333; margin-top: 0; margin-bottom: 10px; font-size: 22px;">${finalSubject}</h2>
-              <h3 style="color: #666; margin-top: 0; margin-bottom: 20px; font-size: 18px; font-weight: normal;">${docTitle}</h3>
-              ${productImage ? `<div style="text-align: center; margin-bottom: 20px;"><img src="${productImage}" alt="Product Image" width="600" style="display: inline-block; width: 100%; max-width: 600px; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(249, 115, 22, 0.25); border: 2px solid #f97316;" /></div>` : ''}
-              ${productExcerpt ? `<p style="color: #444; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">${productExcerpt}</p>` : ''}
+              <h1 style="color: #333; margin: 0 0 10px 0; font-size: 24px;">${docTitle}</h1>
+              <h2 style="color: #666; margin: 0 0 20px 0; font-size: 18px; font-weight: normal;">${finalSubject}</h2>
               <div style="text-align: center; margin-top: 30px;">
                 <a href="${productUrl}" style="background-color: #f97316; color: white; padding: 14px 30px; font-size: 16px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block;">
                   View on Clickys
