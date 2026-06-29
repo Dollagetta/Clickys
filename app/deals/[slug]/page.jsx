@@ -9,7 +9,7 @@ import { FiArrowLeft, FiTag } from 'react-icons/fi';
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const client = createClient();
-  const page = await client.getByUID("deal", slug).catch(() => notFound());
+  const page = await client.getByUID("sliceguide1", slug).catch(() => notFound());
 
   const title = `${page.data.meta_title || page.data.title || "Exclusive Deal"} | Clickys`;
   const description = page.data.meta_description || "Check out this amazing deal on Clickys! Limited time offer.";
@@ -39,7 +39,7 @@ export async function generateMetadata({ params }) {
 export default async function DealDetailPage({ params }) {
   const { slug } = await params;
   const client = createClient();
-  const page = await client.getByUID("deal", slug).catch(() => notFound());
+  const page = await client.getByUID("sliceguide1", slug).catch(() => notFound());
 
   return (
     <div className="bg-white min-h-screen">
@@ -96,7 +96,7 @@ export async function generateStaticParams() {
   const client = createClient();
   let pages = [];
   try {
-    pages = await client.getAllByType("deal");
+    pages = await client.getAllByType("sliceguide1");
   } catch (error) {
     console.warn("Could not fetch deal documents for static params:", error.message);
   }

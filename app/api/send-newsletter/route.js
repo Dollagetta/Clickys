@@ -39,7 +39,7 @@ export async function POST(req) {
         const updatedDocs = await client.getAllByIDs(body.documents);
         // We look for any of these document types
         latestDoc = updatedDocs.find(doc => 
-          ['product', 'whatsnew', 'deal', 'deals', 'partner', 'partners', 'guide', 'sliceguide1'].includes(doc.type)
+          ['product', 'whatsnew', 'partner', 'partners', 'guide', 'sliceguide1'].includes(doc.type)
         );
       } catch (err) {
         console.error('Failed to fetch updated documents from Prismic', err);
@@ -67,15 +67,15 @@ export async function POST(req) {
     const docTitle = extractText(rawTitle) || 'New Arrival';
 
     // Extract custom email attributes
-    let customSubject = extractText(latestDoc.data?.newsletter_subject) || extractText(latestDoc.data?.email_subject);
-    let customHeader = extractText(latestDoc.data?.newsletter_header) || extractText(latestDoc.data?.email_header);
+    let customSubject = extractText(latestDoc.data?.email_subject) || extractText(latestDoc.data?.newsletter_subject);
+    let customHeader = extractText(latestDoc.data?.email_header) || extractText(latestDoc.data?.newsletter_header);
 
     if (latestDoc.data?.slices) {
        for (const s of latestDoc.data.slices) {
-         if (!customSubject && s.primary?.newsletter_subject) customSubject = extractText(s.primary.newsletter_subject);
          if (!customSubject && s.primary?.email_subject) customSubject = extractText(s.primary.email_subject);
-         if (!customHeader && s.primary?.newsletter_header) customHeader = extractText(s.primary.newsletter_header);
+         if (!customSubject && s.primary?.newsletter_subject) customSubject = extractText(s.primary.newsletter_subject);
          if (!customHeader && s.primary?.email_header) customHeader = extractText(s.primary.email_header);
+         if (!customHeader && s.primary?.newsletter_header) customHeader = extractText(s.primary.newsletter_header);
        }
     }
 
@@ -86,8 +86,6 @@ export async function POST(req) {
     let productUrl = 'https://clickys.in/products';
     if (latestDoc.type.includes('whatsnew') || latestDoc.type.includes('whats-new')) {
       productUrl = `https://clickys.in/whats-new/${latestDoc.uid}`;
-    } else if (latestDoc.type.includes('deal')) {
-      productUrl = `https://clickys.in/deals/${latestDoc.uid}`;
     } else if (latestDoc.type.includes('guide') || latestDoc.type.includes('sliceguide1')) {
       productUrl = `https://clickys.in/guide/${latestDoc.uid}`;
     } else if (latestDoc.type.includes('partner')) {
@@ -217,7 +215,8 @@ export async function POST(req) {
             </div>
             ${productImage ? `<div style="text-align: center;"><img src="${productImage}" alt="${docTitle}" width="600" style="display: block; width: 100%; max-width: 100%; height: auto;" /></div>` : ''}
             <div style="padding: 30px;">
-              <h2 style="color: #666; margin: 0 0 20px 0; font-size: 18px; font-weight: normal;">${finalSubject}</h2>
+              <h2 style="color: #111; margin: 0 0 10px 0; font-size: 22px; font-weight: bold;">${customHeader}</h2>
+              <p style="color: #666; margin: 0 0 20px 0; font-size: 16px; line-height: 1.5;">${finalSubject}</p>
               <div style="text-align: center; margin-top: 30px;">
                 <a href="${productUrl}" style="background-color: #f97316; color: white; padding: 14px 30px; font-size: 16px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block;">
                   View on Clickys
@@ -252,7 +251,7 @@ export async function POST(req) {
       dataList.push(data);
     }
 
-    return NextResponse.json({ message: 'Notifications sent successfully', data: dataList }, { status: 200 });
+    return NextResponse.json({ message: 'Notifications sent successfully' }, { status: 200 });
 
   } catch (error) {
     console.error('Webhook processing failed:', error);

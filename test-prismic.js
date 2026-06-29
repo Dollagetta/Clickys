@@ -11,8 +11,7 @@ const types = [
   "affiliate",
   "partner",
   "marketingbanner",
-  "page",
-  "deal"
+  "page"
 ];
 
 async function run() {

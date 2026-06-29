@@ -18,7 +18,8 @@ function slugify(text) {
 async function _fetchGuidesFromPrismic() {
   try {
     const client = createClient();
-    const [guides, products] = await Promise.all([
+    console.log('[Guides] Fetching from Prismic...');
+    const [guides, products, sliceGuides] = await Promise.all([
       client.getAllByType('guide', {
         orderings: {
           field: 'document.first_publication_date',
@@ -30,22 +31,33 @@ async function _fetchGuidesFromPrismic() {
           field: 'document.first_publication_date',
           direction: 'desc',
         },
+      }).catch(() => []),
+      client.getAllByType('sliceguide1', {
+        orderings: {
+          field: 'document.first_publication_date',
+          direction: 'desc',
+        },
       }).catch(() => [])
     ]);
 
-    const prismicGuides = [...guides, ...products].map((doc) => {
+    console.log(`[Guides] Prismic counts - Guides: ${guides.length}, Products: ${products.length}, SliceGuides: ${sliceGuides.length}`);
+
+    const prismicGuides = [...guides, ...products, ...sliceGuides].map((doc) => {
+      // For sliceguide1, we might need to extract data from slices
+      const firstGuideSlice = doc.data.slices?.find(s => s.slice_type === 'guide');
+      
       return {
         isPrismic: true,
         id: doc.id,
         uid: doc.uid,
-        title: doc.data.title || doc.data.name || '',
-        price: doc.data.price || '',
+        title: doc.data.title || doc.data.name || firstGuideSlice?.primary?.title || '',
+        price: doc.data.price || sliceGuidePrice(doc) || '',
         discount: doc.data.discount || '',
         platform: doc.data.platform || '',
         category: doc.data.category || '',
-        link: doc.data.link?.url || '',
-        image: doc.data.image?.url || doc.data.hero_image?.url || '',
-        description: doc.data.description || [],
+        link: doc.data.link?.url || firstGuideSlice?.primary?.link?.url || '',
+        image: doc.data.image?.url || doc.data.hero_image?.url || firstGuideSlice?.primary?.image?.url || '',
+        description: doc.data.description || firstGuideSlice?.primary?.description || [],
         pros: doc.data.pros || [],
         cons: doc.data.cons || [],
         features: doc.data.features || [],
@@ -55,12 +67,16 @@ async function _fetchGuidesFromPrismic() {
       };
     });
     
-    // Sort combined Prismic items by publication date if possible, but for now just return them
     return prismicGuides;
   } catch (error) {
     console.error('[Guides] Error fetching from Prismic:', error);
     return [];
   }
+}
+
+function sliceGuidePrice(doc) {
+  const guideSlice = doc.data.slices?.find(s => s.slice_type === 'guide');
+  return guideSlice?.primary?.price || '';
 }
 
 async function _fetchGuidesFromSheet(fullRange = true) {

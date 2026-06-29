@@ -129,7 +129,7 @@ export default {
       const results = await Promise.allSettled([
         client.getAllByType("product"),
         client.getAllByType("whatsnew"),
-        client.getAllByType("deal"),
+        client.getAllByType("sliceguide1"),
         client.getAllByType("partner")
       ]);
       
@@ -195,7 +195,7 @@ export default {
         routePrefix = '/products';
       } else if (doc.type === 'whatsnew') {
         routePrefix = '/whats-new';
-      } else if (doc.type === 'deal') {
+      } else if (doc.type === 'sliceguide1') {
         routePrefix = '/deals';
       } else if (doc.type === 'partner') {
         routePrefix = '/partners';

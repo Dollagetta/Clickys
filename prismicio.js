@@ -23,8 +23,7 @@ const routes = [
   { type: "marketingbanner", path: "/marketing/:uid" },
   { type: "sliceguide1", path: "/guide/:uid" },
   { type: "guide", path: "/guide/:uid" },
-  { type: "affiliate", path: "/affiliates/:uid" },
-  { type: "deal", path: "/deals/:uid" }
+  { type: "affiliate", path: "/affiliates/:uid" }
 ];
 
 /**
