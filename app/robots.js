@@ -3,8 +3,8 @@ export default function robots() {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/api/'],
+      disallow: ['/api/', '/admin/'],
     },
-    sitemap: `${process.env.SITE_URL || 'https://www.clickys.in'}/sitemap.xml`,
+    sitemap: 'https://www.clickys.in/sitemap.xml',
   }
 }

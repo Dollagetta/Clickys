@@ -80,6 +80,28 @@ export default async function GuidePage({ params }) {
 
   return (
     <main className="container mx-auto py-12 px-4 max-w-4xl min-h-screen">
+      {/* Article JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": guide.data.slices.find(s => s.slice_type === 'guide')?.primary?.title || "Buying Guide",
+            "image": [
+              guide.data.slices.find(s => s.slice_type === 'guide')?.primary?.image?.url || "https://www.clickys.in/images/clickysbg.png"
+            ],
+            "datePublished": guide.first_publication_date,
+            "dateModified": guide.last_publication_date,
+            "author": [{
+              "@type": "Organization",
+              "name": "Clickys",
+              "url": "https://www.clickys.in"
+            }]
+          })
+        }}
+      />
+      
       <Link href="/deals" className="inline-flex items-center text-orange-600 hover:text-orange-800 font-bold mb-10 group bg-orange-50 px-4 py-2 rounded-full transition-all duration-300">
         <svg className="w-4 h-4 mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
         Back to Deals

@@ -36,6 +36,9 @@ export const metadata = {
   referrer: "origin-when-cross-origin",
   creator: "Pixel Crafte",
   publisher: siteName,
+  alternates: {
+    canonical: siteUrl,
+  },
   
   // Open Graph metadata
   openGraph: {

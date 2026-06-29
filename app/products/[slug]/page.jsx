@@ -186,9 +186,74 @@ export default async function ProductDetailPage({ params }) {
 
   return (
     <div className={styles.productDetailPageContainer}>
+      {/* Product JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org/",
+            "@type": "Product",
+            "name": product.name,
+            "image": product.imageUrl,
+            "description": product.shortDescription,
+            "brand": {
+              "@type": "Brand",
+              "name": "Clickys"
+            },
+            "offers": {
+              "@type": "Offer",
+              "url": `https://www.clickys.in/products/${slug}`,
+              "priceCurrency": "INR",
+              "price": product.price.replace(/[^0-9.]/g, '') || "0",
+              "availability": "https://schema.org/InStock"
+            },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": product.rating,
+              "reviewCount": product.reviewCount
+            }
+          })
+        }}
+      />
+      
       <div className={`container ${styles.productDetailLayout}`}>
-        {/* Breadcrumbs */}
+        {/* Breadcrumbs with Structured Data */}
         <nav aria-label="breadcrumb" className={styles.breadcrumbs} data-aos="fade-in">
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify({
+                  "@context": "https://schema.org",
+                  "@type": "BreadcrumbList",
+                  "itemListElement": [
+                    {
+                      "@type": "ListItem",
+                      "position": 1,
+                      "name": "Home",
+                      "item": "https://www.clickys.in"
+                    },
+                    {
+                      "@type": "ListItem",
+                      "position": 2,
+                      "name": "Products",
+                      "item": "https://www.clickys.in/products"
+                    },
+                    {
+                      "@type": "ListItem",
+                      "position": 3,
+                      "name": product.category,
+                      "item": `https://www.clickys.in/categories/${product.category.toLowerCase().replace(/\s+/g, '-')}`
+                    },
+                    {
+                      "@type": "ListItem",
+                      "position": 4,
+                      "name": product.name,
+                      "item": `https://www.clickys.in/products/${slug}`
+                    }
+                  ]
+                })
+              }}
+            />
             <Link href="/">Home</Link> <FiChevronsRight size={12} />
             <Link href="/products">Products</Link> <FiChevronsRight size={12} />
             {product.category && (<><Link href={`/categories/${product.category.toLowerCase().replace(/\s+/g, '-')}`}>{product.category}</Link><FiChevronsRight size={12} /></>)}

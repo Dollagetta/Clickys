@@ -1,4 +1,5 @@
 import { fetchGuidesFromSheet } from '../lib/guides';
+import { createClient } from '../prismicio';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,6 +20,50 @@ export default async function sitemap() {
     priority: 0.8,
   }));
 
+  // Fetch Prismic Documents
+  let prismicPaths = [];
+  try {
+    const client = createClient();
+    const [products, whatsnews, sliceguides, partners] = await Promise.all([
+      client.getAllByType('product'),
+      client.getAllByType('whatsnew'),
+      client.getAllByType('sliceguide1'),
+      client.getAllByType('partner'),
+    ]);
+
+    const productPaths = products.map(p => ({
+      url: `${baseUrl}/products/${p.uid}`,
+      lastModified: p.last_publication_date,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    }));
+
+    const wnPaths = whatsnews.map(p => ({
+      url: `${baseUrl}/whats-new/${p.uid}`,
+      lastModified: p.last_publication_date,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    }));
+
+    const sgPaths = sliceguides.map(p => ({
+      url: `${baseUrl}/guide/${p.uid}`,
+      lastModified: p.last_publication_date,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    }));
+
+    const pPaths = partners.map(p => ({
+      url: `${baseUrl}/partners/${p.uid}`,
+      lastModified: p.last_publication_date,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    }));
+
+    prismicPaths = [...productPaths, ...wnPaths, ...sgPaths, ...pPaths];
+  } catch (err) {
+    console.error('Prismic sitemap fetch failed', err);
+  }
+
   return [
     {
       url: baseUrl,
@@ -26,6 +71,7 @@ export default async function sitemap() {
       changeFrequency: 'daily',
       priority: 1,
     },
+    // ... rest of the static pages ...
     {
       url: `${baseUrl}/guides`,
       lastModified: new Date().toISOString(),
@@ -105,5 +151,6 @@ export default async function sitemap() {
       priority: 0.6,
     },
     ...guidePaths,
+    ...prismicPaths,
   ];
 }
