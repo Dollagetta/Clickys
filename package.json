@@ -17,6 +17,7 @@
     "@prismicio/next": "^2.0.1",
     "@prismicio/react": "^3.2.1",
     "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "aos": "^2.3.4",
     "es-toolkit": "^1.47.0",
     "firebase": "^12.14.0",

@@ -83,17 +83,17 @@ export async function POST(req) {
     customHeader = customHeader || 'Find this trending deal on clickys';
     
     // Dynamically determine the URL based on the document type
-    let productUrl = 'https://www.clickys.in/products';
+    let productUrl = 'https://clickys.in/products';
     if (latestDoc.type.includes('whatsnew') || latestDoc.type.includes('whats-new')) {
-      productUrl = `https://www.clickys.in/whats-new/${latestDoc.uid}`;
+      productUrl = `https://clickys.in/whats-new/${latestDoc.uid}`;
     } else if (latestDoc.type.includes('deal')) {
-      productUrl = `https://www.clickys.in/deals/${latestDoc.uid}`;
+      productUrl = `https://clickys.in/deals/${latestDoc.uid}`;
     } else if (latestDoc.type.includes('guide') || latestDoc.type.includes('sliceguide1')) {
-      productUrl = `https://www.clickys.in/guide/${latestDoc.uid}`;
+      productUrl = `https://clickys.in/guide/${latestDoc.uid}`;
     } else if (latestDoc.type.includes('partner')) {
-      productUrl = `https://www.clickys.in`;
+      productUrl = `https://clickys.in`;
     } else if (latestDoc.type.includes('product')) {
-      productUrl = `https://www.clickys.in/products/${latestDoc.uid}`;
+      productUrl = `https://clickys.in/products/${latestDoc.uid}`;
     }
 
     console.log("Analyzing document type:", latestDoc.type);
@@ -112,8 +112,9 @@ export async function POST(req) {
     if (productImage && (productImage.includes('prismic.io') || productImage.includes('imgix.net'))) {
        try {
          const urlObj = new URL(productImage);
-         urlObj.searchParams.set('w', '1200'); // Higher quality
-         urlObj.searchParams.set('auto', 'compress,format'); // Better optimization
+         urlObj.searchParams.set('w', '1600'); // Higher HD quality
+         urlObj.searchParams.set('auto', 'format'); // Better optimization, removed compress for higher fidelity
+         urlObj.searchParams.set('q', '100'); // Maximum quality
          productImage = urlObj.toString();
        } catch (e) {
          // Ignore
@@ -216,7 +217,6 @@ export async function POST(req) {
             </div>
             ${productImage ? `<div style="text-align: center;"><img src="${productImage}" alt="${docTitle}" width="600" style="display: block; width: 100%; max-width: 100%; height: auto;" /></div>` : ''}
             <div style="padding: 30px;">
-              <h1 style="color: #333; margin: 0 0 10px 0; font-size: 24px;">${docTitle}</h1>
               <h2 style="color: #666; margin: 0 0 20px 0; font-size: 18px; font-weight: normal;">${finalSubject}</h2>
               <div style="text-align: center; margin-top: 30px;">
                 <a href="${productUrl}" style="background-color: #f97316; color: white; padding: 14px 30px; font-size: 16px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block;">

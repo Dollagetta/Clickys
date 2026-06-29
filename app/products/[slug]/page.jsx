@@ -19,9 +19,46 @@ import {products} from '../../../components/products.js'; // Adjust path to your
 import { fetchProductsFromSheet } from '../../../lib/products';
 import { createClient } from '../../../prismicio';
 
-// Function to fetch product data (simulated)
+// Function to fetch product data from multiple sources
 async function getProductData(slug) {
-  return products.find(product => product.slug === slug);
+  // 1. Check local static data first
+  const localProduct = products.find(product => product.slug === slug);
+  if (localProduct) return localProduct;
+
+  // 2. Fallback to Prismic if not found locally
+  try {
+    const client = createClient();
+    const doc = await client.getByUID("product", slug);
+    
+    if (doc) {
+      // Helper to extract text from Prismic rich text or string
+      const extractText = (field) => {
+        if (!field) return '';
+        if (typeof field === 'string') return field;
+        if (Array.isArray(field) && field[0] && field[0].text) return field[0].text;
+        return '';
+      };
+
+      return {
+        id: doc.id,
+        name: extractText(doc.data.title) || extractText(doc.data.product_name) || "Product",
+        slug: doc.uid,
+        price: doc.data.price || "On Sale",
+        category: doc.data.category || "Products",
+        imageUrl: doc.data.image?.url || doc.data.featured_image?.url || doc.data.cover_image?.url || "https://placehold.co/600x600/E5E7EB/475569?text=No+Image",
+        shortDescription: extractText(doc.data.description) || extractText(doc.data.short_description) || extractText(doc.data.meta_description) || "",
+        amazonLink: doc.data.link?.url || doc.data.amazon_link?.url || doc.data.affiliate_link?.url || "#",
+        rating: Number(doc.data.rating) || 4.5,
+        reviewCount: Number(doc.data.review_count) || 25,
+        galleryImages: (doc.data.gallery || []).map(item => item.image?.url).filter(Boolean),
+        isDeal: doc.data.is_deal || false
+      };
+    }
+  } catch (error) {
+    console.warn(`[Products] Prismic fetch failed for slug: ${slug}`, error.message);
+  }
+
+  return null;
 }
 
 async function getRelatedProducts(slugs, currentSlug, currentCategory) {
