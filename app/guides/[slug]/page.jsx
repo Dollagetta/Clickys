@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation';
 import { PrismicRichText } from '@prismicio/react';
 import Link from 'next/link';
 
-import AIShopperInsight from '../../../components/AIShopperInsight';
 import { fetchProductsFromSheet } from '../../../lib/products';
 import ProductCard from '../../../components/ProductCard';
 
@@ -44,12 +43,6 @@ export default async function GuidePage({ params }) {
       </Link>
       <h1 className="text-4xl font-bold mb-4">{guide.title}</h1>
       
-      <AIShopperInsight 
-        productTitle={guide.title} 
-        description={guide.description} 
-        category={guide.category} 
-      />
-
       <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm transition-all duration-300 hover:shadow-md hover:border-gray-300 mb-8 mt-8">
         <h2 className="text-2xl font-bold mb-4">Description</h2>
         <div className="prose">

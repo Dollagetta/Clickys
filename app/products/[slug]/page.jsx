@@ -10,7 +10,6 @@ import ProductCard from '../../../components/ProductCard'; // For related produc
 import styles from '../../../styles/ProductDetailPage.module.css'; // Create this CSS Module
 import { FiShoppingCart, FiTag, FiStar, FiCheckSquare, FiInfo, FiArrowLeft, FiChevronsRight, FiShare2 } from 'react-icons/fi';
 import MoreInfo from './MoreInfo';
-import AIShopperInsight from '../../../components/AIShopperInsight';
 import PriceHistoryChart from '../../../components/PriceHistoryChart'; // Price History Chart
 import RecentlyViewed from '../../../components/RecentlyViewed'; // Recently Viewed Tracker
 import {products} from '../../../components/products.js'; // Adjust path to your products data
@@ -285,12 +284,6 @@ export default async function ProductDetailPage({ params }) {
             </div>
 
             <p className={styles.shortDescription}>{product.shortDescription}</p>
-
-            <AIShopperInsight 
-              productTitle={product.name} 
-              description={product.shortDescription} 
-              category={product.category} 
-            />
 
             <CallToAction
               text="View on Amazon"

@@ -4,7 +4,6 @@ import { PrismicNextImage, PrismicNextLink } from '@prismicio/next';
 import { PrismicRichText, PrismicText } from '@prismicio/react';
 import { useSearchParams } from 'next/navigation';
 import { Bookmark, ExternalLink, Share2, X, Play, Pause, Eye, ChevronLeft } from 'lucide-react';
-import AIShopperInsight from '../../components/AIShopperInsight';
 
 /**
  * @typedef {import("@prismicio/client").Content.PinterestGridSlice} PinterestGridSlice
@@ -345,12 +344,6 @@ const PinterestGrid = ({ slice }) => {
                 <h2 className="text-xl md:text-3xl font-extrabold text-gray-900 mb-3 md:mb-4 leading-tight tracking-tight">
                   {selectedItem.product_title}
                 </h2>
-
-                <AIShopperInsight 
-                  productTitle={selectedItem.product_title}
-                  description={selectedItem.description}
-                  category={selectedItem.category || "Products"}
-                />
 
                 <div className="text-gray-600 text-sm md:text-base leading-relaxed space-y-4">
                   <PrismicRichText field={selectedItem.description} />
