@@ -114,24 +114,19 @@ async function _fetchGuidesFromSheet(fullRange = true) {
 
       const range = fullRange ? 'A:L' : 'A:H'; 
       console.log(`[Guides] Fetching range: ${range}`);
-      const response = await fetch(
-        `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-          cache: 'no-store'
-        }
-      );
+      
+      const response = await auth.request({
+        url: `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}`,
+        method: 'GET'
+      });
 
       console.log(`[Guides] Response: ${response.status}`);
-      if (!response.ok) {
+      if (response.status !== 200) {
           console.error(`[Guides] Google Sheets API Error: ${response.status} ${response.statusText}`);
           return [];
       }
 
-      const data = await response.json();
+      const data: any = response.data;
       console.log(`[Guides] Fetched ${data.values?.length || 0} rows`);
       return processRows(data.values, fullRange);
     } catch (error) {

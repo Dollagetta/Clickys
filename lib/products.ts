@@ -63,29 +63,18 @@ async function _fetchProductsFromSheet() {
 
       console.log(`[Products] Fetching sheet: ${sheetId}`);
       
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout for sheet fetch
-
-      const response = await fetch(
-        `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/A:I`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-          signal: controller.signal,
-          cache: 'no-store'
-        }
-      );
-      clearTimeout(timeoutId);
-
+      const response = await auth.request({
+        url: `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/A:I`,
+        method: 'GET'
+      });
+      
       console.log(`[Products] Response: ${response.status}`);
-      if (!response.ok) {
+      if (response.status !== 200) {
           console.error(`[Products] Google Sheets API Error: ${response.status} ${response.statusText}`);
           return [];
       }
 
-      const data = await response.json();
+      const data: any = response.data;
       const rows = data.values || [];
       console.log(`[Products] Fetched ${rows.length} rows`);
     

@@ -567,7 +567,7 @@ export default function PinterestGrid({ initialItems }) {
       </div>
       
       {/* Masonry Grid Container */}
-      <div className="columns-2 sm:columns-3 lg:columns-4 xl:columns-5 gap-3 md:gap-4 w-full bg-[#bb1d1d]">
+      <div className="columns-2 sm:columns-3 lg:columns-4 xl:columns-5 gap-3 md:gap-4 w-full">
         {paginatedItems.map((item) => (
           <div key={item.id} className={`break-inside-avoid relative mb-3 md:mb-4 group rounded-xl md:rounded-2xl ${playingVideoId === item.id ? 'z-50 overflow-visible' : 'overflow-hidden'} bg-white shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col cursor-pointer`} onClick={() => setSelectedItem(item)}>
             
