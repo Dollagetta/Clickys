@@ -4,6 +4,7 @@ import { PrismicNextImage, PrismicNextLink } from '@prismicio/next';
 import { PrismicRichText, PrismicText } from '@prismicio/react';
 import { useSearchParams } from 'next/navigation';
 import { Bookmark, ExternalLink, Share2, X, Play, Pause, Eye, ChevronLeft } from 'lucide-react';
+import AIShopperInsight from '../../components/AIShopperInsight';
 
 /**
  * @typedef {import("@prismicio/client").Content.PinterestGridSlice} PinterestGridSlice
@@ -344,8 +345,48 @@ const PinterestGrid = ({ slice }) => {
                 <h2 className="text-xl md:text-3xl font-extrabold text-gray-900 mb-3 md:mb-4 leading-tight tracking-tight">
                   {selectedItem.product_title}
                 </h2>
+
+                <AIShopperInsight 
+                  productTitle={selectedItem.product_title}
+                  description={selectedItem.description}
+                  category={selectedItem.category || "Products"}
+                />
+
                 <div className="text-gray-600 text-sm md:text-base leading-relaxed space-y-4">
                   <PrismicRichText field={selectedItem.description} />
+                </div>
+
+                {/* Related Products in Modal */}
+                <div className="mt-12 pt-8 border-t border-gray-100">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">You Might Also Like</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    {allItems
+                      .filter(item => item.product_title !== selectedItem.product_title)
+                      .sort(() => 0.5 - Math.random())
+                      .slice(0, 2)
+                      .map((relatedItem, idx) => (
+                        <div 
+                          key={idx} 
+                          className="group/related cursor-pointer"
+                          onClick={() => {
+                            setSelectedItem(relatedItem);
+                            if (videoRef.current) videoRef.current.scrollTo(0,0);
+                          }}
+                        >
+                          <div className="aspect-square relative rounded-xl overflow-hidden bg-gray-50 border border-gray-100 mb-2 group-hover/related:border-orange-200 transition-colors">
+                            <PrismicNextImage 
+                              field={relatedItem.product_image} 
+                              fill 
+                              className="object-contain p-2 group-hover/related:scale-110 transition-transform duration-500" 
+                            />
+                          </div>
+                          <p className="text-[11px] font-bold text-gray-900 line-clamp-1 group-hover/related:text-orange-600 transition-colors">
+                            {relatedItem.product_title}
+                          </p>
+                        </div>
+                      ))
+                    }
+                  </div>
                 </div>
               </div>
 
