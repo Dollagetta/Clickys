@@ -17,6 +17,8 @@ export default function GiftFinder() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [suggestion, setSuggestion] = useState('');
+  const [isSuggesting, setIsSuggesting] = useState(false);
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -29,8 +31,11 @@ export default function GiftFinder() {
   const occasions = ["Birthday", "Anniversary", "Valentine's Day", "Mother's Day", "Father's Day", "Women's Day", "Wedding", "Housewarming", "Christmas", "Diwali", "Raksha Bandhan", "Other"];
   const budgets = ["Under ₹500", "₹500 - ₹2000", "₹2000 - ₹5000", "₹5000+"];
 
+  const displayOccasion = occasion === 'Other' && customOccasion ? customOccasion : occasion;
+
   const handleSearch = async () => {
     setIsSearching(true);
+    setSuggestion('');
     
     try {
       // We do a broad search to get a pool of products, 
@@ -92,7 +97,29 @@ export default function GiftFinder() {
       let topResults = scoredResults.slice(0, 20);
       topResults = topResults.sort(() => 0.5 - Math.random());
 
-      setSearchResults(topResults.slice(0, 5));
+      const finalResults = topResults.slice(0, 5);
+      setSearchResults(finalResults);
+
+      // Fetch Expert Suggestion
+      setIsSuggesting(true);
+      fetch('/api/expert-suggestion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'gift',
+          prompt: `I am looking for a gift for ${recipient} for ${displayOccasion} under ${budget}. I found these options: ${finalResults.map(r => r.title).join(', ')}. What do you think?`
+        })
+      })
+      .then(r => r.json())
+      .then(d => {
+        setSuggestion(d.suggestion);
+        setIsSuggesting(false);
+      })
+      .catch(e => {
+        console.error(e);
+        setIsSuggesting(false);
+      });
+
     } catch (err) {
       console.error("Search failed", err);
     } finally {
@@ -127,10 +154,9 @@ export default function GiftFinder() {
     setCustomOccasion('');
     setBudget('');
     setContactMethod('');
+    setSuggestion('');
     setStep(1);
   };
-
-  const displayOccasion = occasion === 'Other' && customOccasion ? customOccasion : occasion;
 
   const content = (
     <div 
@@ -293,6 +319,22 @@ export default function GiftFinder() {
                     {recipient} • {displayOccasion} • {budget}
                   </div>
                 </div>
+
+                {/* Expert Suggestion */}
+                {(isSuggesting || suggestion) && isExpanded && (
+                  <div className="mb-4 bg-blue-50 border border-blue-100 p-4 rounded-xl">
+                    <h4 className="text-xs font-bold text-blue-800 mb-2 flex items-center uppercase tracking-wider">
+                      Shopping Expert
+                    </h4>
+                    {isSuggesting ? (
+                      <div className="flex items-center text-blue-600 text-sm">
+                        <FiLoader className="animate-spin mr-2" /> Thinking of a suggestion...
+                      </div>
+                    ) : (
+                      <p className="text-sm text-blue-900 leading-relaxed">{suggestion}</p>
+                    )}
+                  </div>
+                )}
                 
                 <div className={`flex-grow overflow-y-auto min-h-0 mb-3 pr-1 hide-scrollbar max-h-[400px] p-1 ${isExpanded ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-max' : 'space-y-2'}`}>
                   {searchResults.length > 0 ? (

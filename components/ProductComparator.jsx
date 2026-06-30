@@ -14,6 +14,9 @@ export default function ProductComparator() {
   const [compareItems, setCompareItems] = useState([null, null, null]);
   const [activeSlot, setActiveSlot] = useState(0);
 
+  const [suggestion, setSuggestion] = useState('');
+  const [isSuggesting, setIsSuggesting] = useState(false);
+
   const [isExpanded, setIsExpanded] = useState(false);
   const [mounted, setMounted] = useState(false);
   
@@ -78,6 +81,7 @@ export default function ProductComparator() {
     setStep(1);
     setQuery('');
     setProducts([]);
+    setSuggestion('');
   };
 
   const removeSlot = (index) => {
@@ -187,7 +191,28 @@ export default function ProductComparator() {
               </div>
               
               {compareItems.filter(i => i !== null).length >= 2 && (
-                <button onClick={() => setStep(2)} className="mt-auto pt-4 bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 rounded-xl transition-all shadow-md hover:shadow-lg text-sm w-full block text-center">
+                <button onClick={() => {
+                  setStep(2);
+                  const itemsToCompare = compareItems.filter(i => i !== null);
+                  setIsSuggesting(true);
+                  fetch('/api/expert-suggestion', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      type: 'compare',
+                      prompt: `I am comparing the following products: ${itemsToCompare.map(i => i.title).join(', ')}. What are your thoughts on which one I should buy?`
+                    })
+                  })
+                  .then(r => r.json())
+                  .then(d => {
+                    setSuggestion(d.suggestion);
+                    setIsSuggesting(false);
+                  })
+                  .catch(e => {
+                    console.error(e);
+                    setIsSuggesting(false);
+                  });
+                }} className="mt-auto pt-4 bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 rounded-xl transition-all shadow-md hover:shadow-lg text-sm w-full block text-center">
                   Compare Selected
                 </button>
               )}
@@ -204,6 +229,21 @@ export default function ProductComparator() {
                   Clear All
                 </button>
               </div>
+
+              {(isSuggesting || suggestion) && isExpanded && (
+                <div className="mb-6 bg-blue-50 border border-blue-100 p-4 rounded-xl">
+                  <h4 className="text-xs font-bold text-blue-800 mb-2 flex items-center uppercase tracking-wider">
+                    Shopping Expert
+                  </h4>
+                  {isSuggesting ? (
+                    <div className="flex items-center text-blue-600 text-sm">
+                      <FiLoader className="animate-spin mr-2" /> Analyzing options...
+                    </div>
+                  ) : (
+                    <p className="text-sm text-blue-900 leading-relaxed">{suggestion}</p>
+                  )}
+                </div>
+              )}
               
               <div className="flex-grow w-full overflow-x-auto hide-scrollbar border border-gray-200 rounded-2xl shadow-sm bg-white relative">
                 <table className="w-full text-left border-collapse min-w-[600px] md:min-w-full table-fixed">

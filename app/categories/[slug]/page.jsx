@@ -11,6 +11,28 @@ import styles from '../../../styles/Home.module.css';
 
 export const revalidate = 86400;
 
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
+  const categoryName = slug
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+    
+  return {
+    title: `Best ${categoryName} Deals & Reviews | Clickys`,
+    description: `Discover top-rated ${categoryName} products, exclusive deals, and expert buying guides to make smarter shopping decisions.`,
+    alternates: {
+      canonical: `https://www.clickys.in/categories/${slug}`
+    },
+    openGraph: {
+      title: `Best ${categoryName} Deals & Reviews | Clickys`,
+      description: `Discover top-rated ${categoryName} products, exclusive deals, and expert buying guides to make smarter shopping decisions.`,
+      url: `https://www.clickys.in/categories/${slug}`,
+      siteName: "Clickys.in"
+    }
+  };
+}
+
 export default async function CategoryPage({ params }) {
   const { slug } = await params;
   

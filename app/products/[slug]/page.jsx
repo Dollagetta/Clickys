@@ -25,6 +25,30 @@ async function getProductData(slug) {
   const localProduct = products.find(product => product.slug === slug);
   if (localProduct) return localProduct;
 
+  // 1.5 Check Google Sheet
+  try {
+    const rawSheet = await fetchProductsFromSheet().catch(() => []);
+    const slugify = (text) => text ? text.toString().toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w-]+/g, '').replace(/--+/g, '-') : '';
+    const sheetProduct = rawSheet.find(p => slugify(p.title) === slug || p.slug === slug);
+    if (sheetProduct) {
+      return {
+        id: `sheet-${sheetProduct.title}`,
+        name: sheetProduct.title,
+        slug: slug,
+        price: sheetProduct.price ? (sheetProduct.price.startsWith('₹') ? sheetProduct.price : `₹${sheetProduct.price}`) : '',
+        category: sheetProduct.category || "Deals",
+        imageUrl: sheetProduct.image || "https://placehold.co/600x600/E5E7EB/475569?text=No+Image",
+        shortDescription: sheetProduct.description || sheetProduct.title,
+        amazonLink: sheetProduct.link || "#",
+        rating: 4.2,
+        reviewCount: 30,
+        isDeal: true
+      };
+    }
+  } catch (error) {
+    console.error("Sheet product fetch error", error);
+  }
+
   // 2. Fallback to Prismic if not found locally
   try {
     const client = createClient();
@@ -131,6 +155,9 @@ export async function generateMetadata({ params }) {
   return {
     title: title,
     description: description,
+    alternates: {
+      canonical: `https://www.clickys.in/products/${slug}`
+    },
     openGraph: {
       title: title,
       description: description,

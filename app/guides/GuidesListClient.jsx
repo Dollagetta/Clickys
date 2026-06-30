@@ -112,7 +112,7 @@ export default function GuidesListClient({ initialGuides, initialTotalPages, all
   }
 
   return (
-    <div>
+    <div style={{ backgroundColor: "#782828" }}>
       {/* Search and Filter */}
       <div className="mb-10 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row items-center gap-4">
         <div className="relative w-full flex-grow">

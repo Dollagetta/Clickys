@@ -1,8 +1,11 @@
 import GiftFinder from '../../components/GiftFinder';
 
 export const metadata = {
-  title: 'Gift Finder | Clickys',
-  description: 'Find the perfect gift for your loved ones with our interactive Smart Gift Finder.',
+  title: 'Smart Gift Finder | Clickys',
+  description: 'Find the perfect gift for your loved ones with our interactive Smart Gift Finder. Get personalized gift ideas instantly.',
+  alternates: {
+    canonical: 'https://www.clickys.in/gifts'
+  }
 };
 
 export default function GiftsPage() {

@@ -1,6 +1,8 @@
 import { fetchGuidesFromSheet } from '../../lib/guides';
 import GuidesListClient from './GuidesListClient';
 
+export const revalidate = 86400;
+
 export const metadata = {
   title: 'Shopping Guides',
   description: 'Explore our comprehensive product guides and buying recommendations to help you make the best purchase decisions.',

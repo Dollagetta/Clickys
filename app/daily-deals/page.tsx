@@ -4,7 +4,14 @@ import DailyDealsClient from './DailyDealsClient';
 import { FiSearch } from 'react-icons/fi';
 
 export const revalidate = 86400; // Cache for 24 hours to maximize speed and minimize API cost
-export const dynamic = 'force-dynamic';
+
+export const metadata = {
+  title: 'Daily Deals & Discounts | Clickys',
+  description: 'Find the best daily deals, discounts, and offers on electronics, gadgets, fashion, and home essentials. Hand-picked savings updated regularly.',
+  alternates: {
+    canonical: 'https://www.clickys.in/daily-deals'
+  }
+};
 
 export default async function DealsPage() {
   let products = [];

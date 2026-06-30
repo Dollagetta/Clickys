@@ -2,9 +2,12 @@ import { getGuideBySlug } from '../../../lib/guides';
 import { notFound } from 'next/navigation';
 import { PrismicRichText } from '@prismicio/react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 import { fetchProductsFromSheet } from '../../../lib/products';
 import ProductCard from '../../../components/ProductCard';
+
+export const revalidate = 86400;
 
 function ContentRenderer({ field }) {
   if (!field) return null;
@@ -18,7 +21,25 @@ export async function generateMetadata({ params }) {
   const { slug } = await params;
   const guide = await getGuideBySlug(slug);
   if (!guide) return { title: 'Guide Not Found' };
-  return { title: guide.title };
+  
+  const title = `${guide.title} | Clickys Buying Guide`;
+  const description = guide.description || `Comprehensive buying guide for ${guide.title}. Compare features, pros, and cons.`;
+  
+  return { 
+    title,
+    description,
+    alternates: {
+      canonical: `https://www.clickys.in/guides/${slug}`
+    },
+    openGraph: {
+      title,
+      description,
+      url: `https://www.clickys.in/guides/${slug}`,
+      siteName: "Clickys.in",
+      images: guide.image ? [{ url: guide.image, width: 1200, height: 630, alt: title }] : [],
+      type: "article",
+    }
+  };
 }
 
 export default async function GuidePage({ params }) {
@@ -48,6 +69,18 @@ export default async function GuidePage({ params }) {
         <div className="prose">
           <ContentRenderer field={guide.description} />
         </div>
+        {guide.image && (
+          <div className="mt-8 relative h-80 w-full rounded-xl overflow-hidden bg-gray-50 border border-gray-100">
+            <Image
+              src={guide.image}
+              alt={guide.title}
+              fill
+              className="object-contain p-4 mix-blend-multiply"
+              referrerPolicy="no-referrer"
+              unoptimized
+            />
+          </div>
+        )}
       </div>
 
       {guide.features && (

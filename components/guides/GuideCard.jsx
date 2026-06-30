@@ -98,16 +98,26 @@ export default function GuideCard({ guide }) {
           {descriptionText}
         </p>
 
-        <Link
-          href={`/guides/${guide.slug}`}
-          className="inline-flex items-center justify-center w-full text-white font-bold py-3.5 px-6 rounded-2xl transition-all duration-300 transform active:scale-[0.98] shadow-md hover:shadow-lg"
-          style={{ backgroundColor: platformColor }}
-        >
-          View Guide
-          <svg className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-          </svg>
-        </Link>
+        <div className="flex gap-3">
+          <Link
+            href={`/guides/${guide.slug}`}
+            className="inline-flex items-center justify-center flex-1 text-gray-900 bg-gray-100 hover:bg-gray-200 font-bold py-3.5 px-4 rounded-2xl transition-all duration-300 transform active:scale-[0.98] shadow-sm"
+          >
+            View Guide
+          </Link>
+          <a
+            href={guide.link || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center flex-1 text-white font-bold py-3.5 px-4 rounded-2xl transition-all duration-300 transform active:scale-[0.98] shadow-md hover:shadow-lg"
+            style={{ backgroundColor: platformColor }}
+          >
+            Buy Now
+            <svg className="w-5 h-5 ml-1 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </a>
+        </div>
       </div>
     </div>
   );

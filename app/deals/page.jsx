@@ -40,10 +40,15 @@ import { Suspense } from 'react';
   }
 };*/
 
+export const revalidate = 86400;
+
 export const metadata = {
   title: 'Clickys – All Products | Amazon, Flipkart & More',
   description: 'Shop Amazon, Flipkart, Myntra, Meesho, Ajio & Blinkit deals. Explore trending products, compare offers, and save big with Clickys.',
   keywords: 'all products, Amazon deals, Flipkart offers, Myntra sale, Meesho products, Ajio discounts, Blinkit shopping, trending products, save big',
+  alternates: {
+    canonical: 'https://www.clickys.in/deals'
+  }
 };
 //const dealProducts = products.filter(product => product.isDeal);
 //const dealProducts = products;

@@ -4,9 +4,14 @@ import { fetchProductsFromSheet } from '../../lib/products';
 import WhatsNewGrid from './WhatsNewGrid';
 import LimitedTimeDeals from './LimitedTimeDeals';
 
+export const revalidate = 86400;
+
 export const metadata = {
-  title: "What's New | Clickys product discovery",
-  description: "Explore our latest affiliate guides, tech reviews, and amazing deals.",
+  title: "What's New & Trending | Clickys",
+  description: "Explore our latest affiliate guides, tech reviews, fresh arrivals, and amazing trending deals.",
+  alternates: {
+    canonical: "https://www.clickys.in/whats-new"
+  }
 };
 
 export default async function WhatsNewListingPage() {

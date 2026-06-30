@@ -7,6 +7,8 @@ import { SliceZone } from '@prismicio/react';
 import { components } from '../../slices';
 import { fetchProductsFromSheet } from '../../lib/products';
 
+export const revalidate = 86400;
+
 export const metadata = {
   title: 'Clickys – Amazon Products | Top Deals & Reviews',
   description: 'Discover Amazon bestsellers with Clickys. Explore electronics, fashion, health, kitchen essentials, laptops, Best AirPods, Best Smartphones, Alexa & more with trusted reviews and offers.',
