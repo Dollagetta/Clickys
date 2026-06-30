@@ -107,7 +107,7 @@ export default function GiftFinder() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'gift',
-          prompt: `I am looking for a gift for ${recipient} for ${displayOccasion} under ${budget}. I found these options: ${finalResults.map(r => r.title).join(', ')}. What do you think?`
+          prompt: `I am looking for a gift for ${recipient} for ${displayOccasion} under ${budget}. I found these options in our store: ${JSON.stringify(finalResults.map(r => ({title: r.title, link: r.link, price: r.price}))) }. Please recommend actual products from this list, using their exact links formatted as Markdown links. You may also recommend 1-2 external product ideas. Format your response clearly in Markdown.`
         })
       })
       .then(r => r.json())
@@ -165,7 +165,7 @@ export default function GiftFinder() {
         ? "fixed inset-0 z-[100] bg-zinc-900/40 backdrop-blur-sm overflow-y-auto p-4 md:p-10 flex flex-col w-full h-[100dvh]"
         : "bg-white border-2 border-gray-200 hover:border-orange-500 rounded-3xl shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden p-6 flex flex-col relative w-full h-full cursor-pointer"}
     >
-      <div className={isExpanded ? "max-w-4xl mx-auto w-full flex flex-col bg-white rounded-3xl shadow-2xl p-6 md:p-10 border-4 border-gray-900 relative min-h-[500px]" : "flex flex-col h-full"}>
+      <div className={isExpanded ? "max-w-6xl mx-auto w-full flex flex-col bg-white rounded-3xl shadow-2xl p-6 md:p-10 border-4 border-gray-900 relative min-h-[500px]" : "flex flex-col h-full"}>
         {isExpanded && (
           <button 
             type="button" 
@@ -322,7 +322,7 @@ export default function GiftFinder() {
 
                 {/* Expert Suggestion */}
                 {(isSuggesting || suggestion) && isExpanded && (
-                  <div className="mb-4 bg-blue-50 border border-blue-100 p-4 rounded-xl">
+                  <div className="mb-4 bg-blue-50 border border-blue-100 p-4 rounded-xl max-h-64 overflow-y-auto shrink-0">
                     <h4 className="text-xs font-bold text-blue-800 mb-2 flex items-center uppercase tracking-wider">
                       Shopping Expert
                     </h4>
@@ -331,7 +331,9 @@ export default function GiftFinder() {
                         <FiLoader className="animate-spin mr-2" /> Thinking of a suggestion...
                       </div>
                     ) : (
-                      <p className="text-sm text-blue-900 leading-relaxed">{suggestion}</p>
+                      <div className="text-sm text-blue-900 leading-relaxed prose prose-sm prose-blue max-w-none">
+                        {suggestion}
+                      </div>
                     )}
                   </div>
                 )}

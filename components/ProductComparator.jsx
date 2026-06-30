@@ -101,7 +101,7 @@ export default function ProductComparator() {
         ? "fixed inset-0 z-[100] bg-zinc-900/40 backdrop-blur-sm p-4 overflow-y-auto md:p-10 flex flex-col w-full h-[100dvh]"
         : "bg-white border-2 border-gray-200 hover:border-green-500 rounded-3xl shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden p-6 flex flex-col relative w-full h-full cursor-pointer"}
     >
-      <div className={isExpanded ? "max-w-3xl mx-auto w-full flex flex-col bg-white rounded-3xl shadow-2xl p-6 md:p-10 border-4 border-gray-900 relative min-h-[500px]" : "flex flex-col h-full"} >
+      <div className={isExpanded ? "max-w-5xl mx-auto w-full flex flex-col bg-white rounded-3xl shadow-2xl p-6 md:p-10 border-4 border-gray-900 relative min-h-[500px]" : "flex flex-col h-full"} >
         {isExpanded && (
           <button 
             type="button" 
@@ -200,7 +200,7 @@ export default function ProductComparator() {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                       type: 'compare',
-                      prompt: `I am comparing the following products: ${itemsToCompare.map(i => i.title).join(', ')}. What are your thoughts on which one I should buy?`
+                      prompt: `I am comparing the following products: ${JSON.stringify(itemsToCompare.map(i => ({title: i.title, link: i.link, price: i.price}))) }. Please provide a detailed comparison including pros, cons, key features, and possible alternatives if available (you can suggest 1-2 external product ideas). Recommend actual products using their exact links formatted as Markdown links. Format your response clearly in Markdown.`
                     })
                   })
                   .then(r => r.json())
@@ -231,7 +231,7 @@ export default function ProductComparator() {
               </div>
 
               {(isSuggesting || suggestion) && isExpanded && (
-                <div className="mb-6 bg-blue-50 border border-blue-100 p-4 rounded-xl">
+                <div className="mb-6 bg-blue-50 border border-blue-100 p-4 rounded-xl max-h-64 overflow-y-auto shrink-0">
                   <h4 className="text-xs font-bold text-blue-800 mb-2 flex items-center uppercase tracking-wider">
                     Shopping Expert
                   </h4>
@@ -240,7 +240,9 @@ export default function ProductComparator() {
                       <FiLoader className="animate-spin mr-2" /> Analyzing options...
                     </div>
                   ) : (
-                    <p className="text-sm text-blue-900 leading-relaxed">{suggestion}</p>
+                    <div className="text-sm text-blue-900 leading-relaxed prose prose-sm prose-blue max-w-none">
+                      {suggestion}
+                    </div>
                   )}
                 </div>
               )}
