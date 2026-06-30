@@ -1,0 +1,71 @@
+/* styles/PageStandard.module.css */
+.pageContainer {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+}
+
+.pageHeader {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 2rem 0;
+  border-bottom: 1px solid var(--light-gray);
+  background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-yellow) 100%);
+  color: var(--neutral-white);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+}
+.pageHeader h1.pageTitle { /* Make sure h1 is targeted if pageTitle can be other elements */
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+.pageHeader p.pageSubtitle {
+  font-size: 1.2rem;
+  color: rgba(255,255,255,0.9);
+}
+
+.contentSection {
+  padding: 2rem 0;
+}
+
+.contentSection h2 {
+  font-size: 1.8rem;
+  color: var(--neutral-black);
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid var(--primary-green);
+  padding-bottom: 0.5rem;
+  display: inline-block;
+}
+
+.contentSection p,
+.contentSection ul,
+.contentSection ol {
+  margin-bottom: 1rem;
+  line-height: 1.7;
+  font-size: 1rem;
+  color: var(--dark-gray);
+}
+
+.contentSection ul,
+.contentSection ol {
+  padding-left: 1.5rem;
+}
+
+.productGrid { /* Ensure this is globally available or duplicate */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+  gap: 4px !important;
+  padding: 4px !important;
+  margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+  .pageHeader h1.pageTitle {
+    font-size: 2rem;
+  }
+  .pageHeader p.pageSubtitle {
+    font-size: 1rem;
+  }
+}

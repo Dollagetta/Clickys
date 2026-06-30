@@ -108,7 +108,7 @@ export default function GiftFinder() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'gift',
-          prompt: `I am looking for a gift for ${recipient} for ${displayOccasion} under ${budget}. I found these options in our store: ${JSON.stringify(finalResults.map(r => ({title: r.title, link: '/products/' + r.id, price: r.price}))) }. Please recommend actual products from this list, using their exact links formatted as Markdown links. You may also recommend 1-2 external product ideas. Format your response clearly in Markdown. Do NOT use any emojis.`
+          prompt: `I am looking for a gift for ${recipient} for ${displayOccasion} under ${budget}. I found these options in our store: ${JSON.stringify(finalResults.map(r => ({title: r.title, link: r.internalLink, price: r.price}))) }. Please recommend actual products from this list, using their exact links formatted as Markdown links. You may also recommend 1-2 external product ideas. Format your response clearly in Markdown. Do NOT use any emojis.`
         })
       })
       .then(r => r.json())
@@ -321,44 +321,47 @@ export default function GiftFinder() {
                   </div>
                 </div>
 
-                {/* Expert Suggestion */}
-                {(isSuggesting || suggestion) && isExpanded && (
-                  <div className="mb-4 bg-blue-50 border border-blue-100 p-4 rounded-xl shrink-0 max-h-[30vh] overflow-y-auto">
-                    <h4 className="text-xs font-bold text-blue-800 mb-2 flex items-center uppercase tracking-wider">
-                      Shopping Expert
-                    </h4>
-                    {isSuggesting ? (
-                      <div className="flex items-center text-blue-600 text-sm">
-                        <FiLoader className="animate-spin mr-2" /> Thinking of a suggestion...
-                      </div>
+                <div className={`flex-grow flex min-h-0 ${isExpanded ? 'flex-col md:flex-row-reverse gap-6' : 'flex-col'}`}>
+                  {/* Expert Suggestion (Right side on desktop) */}
+                  {(isSuggesting || suggestion) && isExpanded && (
+                    <div className="md:w-1/3 bg-blue-50 border border-blue-100 p-6 rounded-2xl shrink-0 h-full overflow-y-auto flex flex-col mb-4 md:mb-0">
+                      <h4 className="text-xs font-bold text-blue-800 mb-4 flex items-center uppercase tracking-wider">
+                        Shopping Expert
+                      </h4>
+                      {isSuggesting ? (
+                        <div className="flex items-center text-blue-600 text-sm">
+                          <FiLoader className="animate-spin mr-2" /> Thinking of a suggestion...
+                        </div>
+                      ) : (
+                        <div className="text-sm text-blue-900 leading-relaxed prose prose-sm prose-blue max-w-none">
+                          <ReactMarkdown>{suggestion}</ReactMarkdown>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Products Grid (Left side on desktop) */}
+                  <div className={`${isExpanded && (isSuggesting || suggestion) ? 'md:w-2/3' : 'w-full'} flex-grow overflow-y-auto min-h-0 mb-3 pr-1 hide-scrollbar p-1 ${isExpanded ? 'grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-max' : 'space-y-2'}`}>
+                    {searchResults.length > 0 ? (
+                      searchResults.map(p => (
+                        <a key={p.id} href={p.internalLink || p.link || '#'} className={`flex ${isExpanded ? 'flex-col h-full' : 'items-center'} gap-3 p-3 bg-white border-2 border-gray-100 hover:border-orange-500 shadow-sm rounded-xl transition-all group`}>
+                          <div className={`${isExpanded ? 'w-full h-40' : 'w-12 h-12'} bg-white rounded-lg border border-gray-100 shrink-0 flex items-center justify-center overflow-hidden`}>
+                            {p.image ? <img src={p.image} className="max-w-full max-h-full object-contain" /> : <FiGift className="text-gray-300" />}
+                          </div>
+                          <div className={isExpanded ? 'flex flex-col flex-grow' : 'flex-grow min-w-0'}>
+                            <h4 className="font-bold text-sm text-gray-900 line-clamp-2 group-hover:text-orange-600 transition-colors">{p.title}</h4>
+                            {p.price && <p className="text-xs font-black text-gray-600 mt-1">{p.price}</p>}
+                            {isExpanded && <button className="mt-auto pt-3 bg-gray-900 group-hover:bg-orange-500 text-white w-full py-2 rounded-lg text-xs font-bold transition-colors">View Product</button>}
+                          </div>
+                        </a>
+                      ))
                     ) : (
-                      <div className="text-sm text-blue-900 leading-relaxed prose prose-sm prose-blue max-w-none">
-                        <ReactMarkdown>{suggestion}</ReactMarkdown>
+                      <div className="text-center py-8 col-span-full">
+                         <p className="text-sm font-bold text-gray-900 mb-1">No exact matches yet.</p>
+                         <p className="text-xs text-gray-500">We're adding new gifts daily!</p>
                       </div>
                     )}
                   </div>
-                )}
-                
-                <div className={`flex-grow overflow-y-auto min-h-0 mb-3 pr-1 hide-scrollbar p-1 ${isExpanded ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-max' : 'space-y-2'}`}>
-                  {searchResults.length > 0 ? (
-                    searchResults.map(p => (
-                      <a key={p.id} href={`/products/${p.id}`} className={`flex ${isExpanded ? 'flex-col' : 'items-center'} gap-3 p-3 bg-white border-2 border-gray-100 hover:border-orange-500 shadow-sm rounded-xl transition-all group`}>
-                        <div className={`${isExpanded ? 'w-full h-40' : 'w-12 h-12'} bg-white rounded-lg border border-gray-100 shrink-0 flex items-center justify-center overflow-hidden`}>
-                          {p.image ? <img src={p.image} className="max-w-full max-h-full object-contain" /> : <FiGift className="text-gray-300" />}
-                        </div>
-                        <div className={isExpanded ? 'flex flex-col' : 'flex-grow min-w-0'}>
-                          <h4 className="font-bold text-sm text-gray-900 line-clamp-2 group-hover:text-orange-600 transition-colors">{p.title}</h4>
-                          {p.price && <p className="text-xs font-black text-gray-600 mt-1">{p.price}</p>}
-                          {isExpanded && <button className="mt-3 bg-gray-900 group-hover:bg-orange-500 text-white w-full py-2 rounded-lg text-xs font-bold transition-colors">View Product</button>}
-                        </div>
-                      </a>
-                    ))
-                  ) : (
-                    <div className="text-center py-8 col-span-full">
-                       <p className="text-sm font-bold text-gray-900 mb-1">No exact matches yet.</p>
-                       <p className="text-xs text-gray-500">We're adding new gifts daily!</p>
-                    </div>
-                  )}
                 </div>
                 
                 <div className="mt-auto pt-4 shrink-0">

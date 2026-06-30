@@ -130,7 +130,7 @@ export default function ProductComparator() {
                   >
                     {compareItems[i] ? (
                       <>
-                        <div className="text-[10px] font-bold text-gray-900 line-clamp-2 text-center leading-tight">{compareItems[i].title}</div>
+                        <div className="text-[10px] font-bold text-gray-900 line-clamp-2 text-center leading-tight">{compareItems[i].name || compareItems[i].title}</div>
                         <button onClick={(e) => {e.stopPropagation(); removeSlot(i);}} className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-[3px] shadow-sm hover:!bg-red-600 transition-colors"><FiX size={10}/></button>
                       </>
                     ) : (
@@ -201,7 +201,7 @@ export default function ProductComparator() {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                       type: 'compare',
-                      prompt: `I am comparing the following products: ${JSON.stringify(itemsToCompare.map(i => ({title: i.title, link: '/products/' + i.id, price: i.price}))) }. Please provide a detailed comparison including pros, cons, key features, and possible alternatives if available (you can suggest 1-2 external product ideas). Recommend actual products using their exact links formatted as Markdown links. Format your response clearly in Markdown. Do NOT use any emojis.`
+                      prompt: `I am comparing the following products: ${JSON.stringify(itemsToCompare.map(i => ({title: i.name || i.title, link: i.internalLink ? i.internalLink : (i.slug ? ('/products/' + i.slug) : (i.amazonLink || i.link || ('/products/' + i.id))), price: i.price}))) }. Please provide a detailed comparison including pros, cons, key features, and possible alternatives if available (you can suggest 1-2 external product ideas). Recommend actual products using their exact links formatted as Markdown links. Format your response clearly in Markdown. Do NOT use any emojis.`
                     })
                   })
                   .then(r => r.json())
@@ -231,25 +231,26 @@ export default function ProductComparator() {
                 </button>
               </div>
 
-              {(isSuggesting || suggestion) && isExpanded && (
-                <div className="mb-6 bg-blue-50 border border-blue-100 p-4 rounded-xl shrink-0 max-h-[30vh] overflow-y-auto">
-                  <h4 className="text-xs font-bold text-blue-800 mb-2 flex items-center uppercase tracking-wider">
-                    Shopping Expert
-                  </h4>
-                  {isSuggesting ? (
-                    <div className="flex items-center text-blue-600 text-sm">
-                      <FiLoader className="animate-spin mr-2" /> Analyzing options...
-                    </div>
-                  ) : (
-                    <div className="text-sm text-blue-900 leading-relaxed prose prose-sm prose-blue max-w-none">
-                      <ReactMarkdown>{suggestion}</ReactMarkdown>
-                    </div>
-                  )}
-                </div>
-              )}
-              
-              <div className="flex-grow w-full overflow-x-auto hide-scrollbar border border-gray-200 rounded-2xl shadow-sm bg-white relative">
-                <table className="w-full text-left border-collapse min-w-[600px] md:min-w-full table-fixed">
+              <div className={`flex flex-col flex-grow w-full overflow-hidden min-h-0 ${isExpanded ? 'md:flex-row-reverse md:gap-6' : ''}`}>
+                {(isSuggesting || suggestion) && isExpanded && (
+                  <div className="md:w-1/3 bg-blue-50 border border-blue-100 p-6 rounded-2xl shrink-0 h-full overflow-y-auto flex flex-col mb-6 md:mb-0">
+                    <h4 className="text-xs font-bold text-blue-800 mb-4 flex items-center uppercase tracking-wider">
+                      Shopping Expert
+                    </h4>
+                    {isSuggesting ? (
+                      <div className="flex items-center text-blue-600 text-sm">
+                        <FiLoader className="animate-spin mr-2" /> Analyzing options...
+                      </div>
+                    ) : (
+                      <div className="text-sm text-blue-900 leading-relaxed prose prose-sm prose-blue max-w-none">
+                        <ReactMarkdown>{suggestion}</ReactMarkdown>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                <div className={`${isExpanded && (isSuggesting || suggestion) ? 'md:w-2/3' : 'w-full'} flex-grow overflow-x-auto overflow-y-auto hide-scrollbar border border-gray-200 rounded-2xl shadow-sm bg-white relative`}>
+                  <table className="w-full text-left border-collapse min-w-[600px] md:min-w-full table-fixed">
                   <tbody>
                     {/* Images & Title */}
                     <tr>
@@ -257,9 +258,9 @@ export default function ProductComparator() {
                       {compareItems.filter(i => i !== null).map((prod, idx) => (
                         <td key={idx} className="p-4 border-b border-r border-gray-200 align-top">
                           <div className="h-32 md:h-40 w-full bg-white rounded-xl mb-4 flex items-center justify-center p-2 relative group">
-                             {prod.image ? <img src={prod.image} className="max-h-full max-w-full object-contain mix-blend-multiply transition-transform group-hover:scale-105" /> : <p className="text-xs text-gray-400 font-bold">No Image</p>}
+                             {prod.image || prod.imageUrl ? <img src={prod.image || prod.imageUrl} className="max-h-full max-w-full object-contain mix-blend-multiply transition-transform group-hover:scale-105" /> : <p className="text-xs text-gray-400 font-bold">No Image</p>}
                           </div>
-                          <h4 className="font-bold text-sm text-gray-900 leading-snug line-clamp-3 hover:text-green-600 transition-colors" title={prod.title}>{prod.title}</h4>
+                          <h4 className="font-bold text-sm text-gray-900 leading-snug line-clamp-3 hover:text-green-600 transition-colors" title={prod.name || prod.title}>{prod.name || prod.title}</h4>
                         </td>
                       ))}
                     </tr>
@@ -292,7 +293,7 @@ export default function ProductComparator() {
                       <th className="p-4 border-gray-200 bg-gray-50 font-bold text-gray-600 border-r align-middle text-center sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Action</th>
                       {compareItems.filter(i => i !== null).map((prod, idx) => (
                         <td key={idx} className="p-4 border-r border-gray-200">
-                           <a href={prod.link || "#"} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-full py-3 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-700 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                           <a href={prod.amazonLink || prod.link || (prod.slug ? `/products/${prod.slug}` : "#")} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-full py-3 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-700 hover:shadow-md hover:-translate-y-0.5 transition-all">
                              View Offer <FiChevronRight className="ml-1" />
                            </a>
                         </td>
@@ -301,6 +302,7 @@ export default function ProductComparator() {
                   </tbody>
                 </table>
               </div>
+            </div>
             </div>
           )}
         </div>

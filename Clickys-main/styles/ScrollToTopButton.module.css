@@ -1,0 +1,24 @@
+/* styles/ScrollToTopButton.module.css */
+.scrollToTop {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: var(--primary-green);
+  color: var(--neutral-white);
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  z-index: 999;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.scrollToTop:hover {
+  /* Hover handled by Framer Motion, but keep for no-JS or overrides */
+}

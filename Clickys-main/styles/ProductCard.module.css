@@ -1,0 +1,314 @@
+/* styles/ProductCard.module.css */
+.card {
+  background-color: var(--neutral-white);
+  border-radius: var(--rounded-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 100% !important;
+  margin: 0;
+  border: 1px solid var(--affcolor);
+  transition: border-color var(--transition-fast);
+}
+.card:hover {
+  border-color: var(--affcolor);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.dealCard {
+  /* No special border overrides */
+}
+.dealCard:hover {
+  /* No special border overrides */
+}
+
+.cardLinkWrapper { /* Applied to Link component */
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.imageWrapper {
+  position: relative;
+  overflow: hidden;
+  height: 180px;
+  background-color: var(--light-gray);
+}
+.partnerImageWrapper {
+  height: 350px;
+}
+.productImage { /* For next/image */
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.4s ease-out;
+}
+.card:hover .productImage {
+  /* transform handled by imageVariants in Framer Motion */
+}
+
+.dealTag, .promoTag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--rounded-md);
+  font-size: 0.75rem;
+  font-weight: bold;
+  z-index: 1;
+  color: var(--neutral-white);
+  box-shadow: var(--shadow-sm);
+}
+.dealTag { background-color: var(--neutral-white); color: var(--affcolor); border: 1px solid var(--affcolor); }
+.promoTag { background-color: var(--affcolor); color: var(--neutral-white); border: 1px solid var(--affcolor); }
+
+.featuredBadge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background-color: #1dc629; /* Fresh Green */
+  color: white;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.55rem;
+  font-weight: 850;
+  text-transform: uppercase;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  letter-spacing: 0.02em;
+}
+
+.statusRow {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 4px;
+}
+
+.statusBadge {
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 1px 4px;
+  border-radius: 2px;
+  width: max-content;
+}
+
+.inStock {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.outOfStock {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.promoText {
+  font-size: 9px;
+  font-weight: 600;
+  color: #f97316;
+  font-style: italic;
+}
+
+.quickActions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  z-index: 10;
+}
+
+.discountBadge {
+  background-color: #f97316; /* Orange */
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  padding: 2px 8px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.bankOfferBadge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #e91e63; /* Pink from image */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  z-index: 12;
+}
+
+.shiftedActions {
+  top: 45px !important;
+}
+
+.platformBadge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: white;
+  color: var(--affcolor);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border: 1px solid var(--affcolor);
+}
+
+.trashAction {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #fff1f2; /* Light pink background */
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e11d48; /* Red trash icon */
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.priceTagBadge {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: #ff5722; /* Vivid Orange */
+  color: white;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 900;
+  z-index: 5;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.actionButton {
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 1px solid #e5e7eb;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  color: #4b5563;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+}
+
+.actionButton:hover {
+  background-color: white;
+  transform: scale(1.1);
+}
+
+.wishlistActive {
+  color: #ef4444;
+  background-color: #fee2e2;
+  border-color: #fecaca;
+}
+
+.cardContent {
+  padding: 4px 8px 8px 8px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+.productCategory {
+  font-size: 9px;
+  color: var(--dark-gray);
+  margin-bottom: 0;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.productName {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--neutral-black);
+  margin-bottom: 0.1rem;
+  line-height: 1.1;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.2em;
+}
+.ratingContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  margin-bottom: 0.1rem;
+  font-size: 0.7rem;
+}
+.starFilled { color: var(--color-rating); }
+.starEmpty { color: var(--medium-gray); }
+.reviewCount {
+  font-size: 0.6rem;
+  color: var(--dark-gray);
+  margin-left: 0.2rem;
+}
+.priceActionRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.priceContainer {
+  display: flex;
+  align-items: baseline;
+  gap: 0.2rem;
+}
+.currentPrice {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--affcolor);
+}
+.oldPrice {
+  text-decoration: line-through;
+  color: var(--dark-gray);
+  font-size: 0.6rem;
+}
+.amazonButton {
+  font-size: 10px;
+  padding: 0.25rem 0.4rem;
+  display: flex; /* For icon alignment */
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--rounded-md);
+  background-color: var(--affcolor);
+  color: white;
+  flex: 1;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cardSkeleton {
+  width: 100%; height: 230px; background-color: var(--light-gray); border-radius: var(--rounded-lg);
+  display: flex; align-items: center; justify-content: center; color: var(--dark-gray);
+}

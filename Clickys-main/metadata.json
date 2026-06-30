@@ -1,0 +1,6 @@
+{
+  "name": "Clickys",
+  "description": "Clickys is a modern multi-platform affiliate marketplace designed to help users discover, compare, and shop the best products from leading online stores like Amazon, Flipkart, Myntra, AJIO, and more all in one place.Built with a fast and responsive Next.js architecture, Clickys delivers a smooth shopping experience with smart product discovery, affiliate-based category browsing, product comparisons, trending deals, and SEO-optimized buying guides. The platform integrates dynamically with Prismic CMS, allowing scalable content management and future affiliate expansion without rebuilding the system.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,205 @@
+/* styles/Footer.module.css */
+.footer {
+  background-color: var(--neutral-black);
+  color: var(--medium-gray); /* Lighter gray for better contrast on black */
+  padding: 4rem 0 2rem; /* More padding for a substantial footer */
+  border-top: 5px solid var(--primary-green);
+  font-size: 0.9rem;
+}
+
+/* .footerContainer is using the global .container class */
+
+.footerTop {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2rem;
+    padding-bottom: 3rem;
+    margin-bottom: 3rem;
+    border-bottom: 1px solid var(--dark-gray);
+}
+
+.footerBrand {
+    flex: 1;
+    min-width: 280px;
+    max-width: 450px;
+}
+
+.footerLogo {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--neutral-white);
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  text-decoration: none; /* Ensure Link doesn't get default underline */
+}
+.footerLogo:hover {
+  color: var(--primary-yellow);
+  text-decoration: none;
+}
+.footerLogo .logoAccent { /* Ensure specificity if needed */
+  color: var(--primary-green);
+}
+
+.footerTagline {
+    font-size: 1rem;
+    color: var(--neutral-white);
+    margin-bottom: 1rem;
+}
+
+.disclosure {
+  font-style: italic;
+  font-size: 0.8rem;
+  color: #a0a0a0; /* Lighter gray for disclosure */
+  line-height: 1.5;
+  margin-top: 1rem;
+}
+
+/* Styles for the new Featured Content Snippet */
+.footerFeaturedContent {
+    flex: 1;
+    min-width: 280px;
+    max-width: 400px;
+    /* background-color: rgba(255, 255, 255, 0.03); /* Subtle background */
+    /* padding: 1.5rem; */
+    /* border-radius: var(--rounded-lg); */
+}
+.featuredContentTitle {
+    font-size: 1.3rem;
+    color: var(--primary-yellow);
+    margin-bottom: 1.2rem; /* Increased margin */
+    font-weight: 600;
+}
+.featuredItem {
+    display: flex;
+    align-items: flex-start; /* Align icon with multi-line text */
+    gap: 0.8rem;
+    margin-bottom: 1.2rem; /* Space between featured items */
+}
+.featuredItem:last-child {
+    margin-bottom: 0;
+}
+.featuredIcon {
+    font-size: 1.5rem; /* Size of the icon */
+    color: var(--primary-green); /* Icon color */
+    margin-top: 0.15em; /* Align icon nicely with text */
+    flex-shrink: 0;
+}
+.featuredLink {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--neutral-white);
+    text-decoration: none;
+    display: block; /* Make link take full width for easier click */
+    margin-bottom: 0.2rem; /* Space between link and description */
+    transition: color var(--transition-fast);
+}
+.featuredLink:hover {
+    color: var(--primary-yellow);
+    text-decoration: underline;
+}
+.featuredDescription {
+    font-size: 0.8rem;
+    color: var(--medium-gray);
+    line-height: 1.5;
+}
+
+
+.footerMain {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 2rem;
+    padding-bottom: 3rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--dark-gray);
+}
+
+.footerLinksColumn h4.footerLinksTitle { /* Ensure h4 is targeted */
+  color: var(--primary-yellow);
+  font-size: 1.1rem; /* Slightly larger title for link columns */
+  font-weight: 600;
+  margin-bottom: 1.2rem; /* More space below title */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.footerLinksColumn ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footerLinksColumn li {
+  margin-bottom: 0.8rem; /* More space between links */
+}
+
+.footerLinksColumn a {
+  color: var(--medium-gray);
+  transition: color var(--transition-fast), padding-left var(--transition-fast);
+  text-decoration: none; /* Ensure Link doesn't get default underline */
+}
+
+.footerLinksColumn a:hover {
+  color: var(--primary-green);
+  padding-left: 5px;
+  text-decoration: none;
+}
+
+.footerBottom {
+  display: flex;
+  flex-wrap: wrap; /* Allow wrapping on small screens */
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem; /* Space between copyright and social icons */
+}
+
+.copyright {
+  font-size: 0.85rem;
+  color: #a0a0a0;
+  margin: 0; /* Remove default p margin */
+}
+
+.socialIcons {
+  display: flex;
+  gap: 1rem; /* Space between icons */
+}
+
+.socialIcons a { /* This styles motion.a */
+  color: var(--medium-gray);
+  font-size: 1.5rem; /* Larger social icons */
+  transition: color var(--transition-fast) !important; /* Ensure color transition overrides motion if needed */
+  text-decoration: none;
+}
+
+.socialIcons a:hover {
+  color: var(--primary-yellow); /* Yellow hover for social icons */
+  /* transform handled by framer-motion */
+}
+
+@media (max-width: 768px) {
+    .footerTop {
+        flex-direction: column;
+        text-align: center;
+    }
+    .footerBrand, .footerFeaturedContent {
+        max-width: 100%;
+        align-items: center; /* Center content within these blocks on mobile */
+    }
+    .featuredItem {
+        justify-content: center; /* Center icon and text block within featured item */
+        text-align: left; /* Keep text left-aligned within its own block */
+    }
+     .featuredItem > div { /* Ensure text block within featuredItem doesn't over-expand */
+        max-width: 300px;
+    }
+    .footerMain {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1.5rem;
+    }
+    .footerBottom {
+        flex-direction: column;
+    }
+    .copyright {
+        margin-bottom: 1rem;
+    }
+}
