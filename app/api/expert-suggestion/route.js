@@ -1,14 +1,20 @@
 import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-  httpOptions: {
-    headers: {
-      'User-Agent': 'aistudio-build',
-    }
+let ai;
+function getAIClient() {
+  if (!ai) {
+    ai = new GoogleGenAI({
+      apiKey: process.env.GEMINI_API_KEY || 'dummy-key-to-prevent-crash',
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build',
+        }
+      }
+    });
   }
-});
+  return ai;
+}
 
 export async function POST(req) {
   try {
@@ -18,7 +24,13 @@ export async function POST(req) {
       ? "You are a friendly, knowledgeable shopping expert. Help the user compare these products and make a suggestion. Be conversational, concise, and helpful. Do NOT use words like 'AI', 'assistant', 'bot', or 'AI shop'."
       : "You are a friendly, knowledgeable personal shopper. Give the user a quick, warm suggestion for their gift search. Be conversational, concise, and helpful. Do NOT use words like 'AI', 'assistant', 'bot', or 'AI shop'.";
 
-    const response = await ai.models.generateContent({
+    const aiClient = getAIClient();
+    if (!process.env.GEMINI_API_KEY) {
+       console.warn('GEMINI_API_KEY is missing, returning default suggestion.');
+       return NextResponse.json({ suggestion: "I'm having a little trouble thinking of a suggestion right now, but the options above look great!" }, { status: 200 });
+    }
+
+    const response = await aiClient.models.generateContent({
       model: "gemini-3.5-flash",
       contents: prompt,
       config: {

@@ -29,11 +29,13 @@ async function _fetchProductsFromSheet() {
   }
 
   if (!clientEmail || !privateKey) {
-    throw new Error('Missing Google Auth environment variables (GOOGLE_CLIENT_EMAIL/GOOGLE_PRIVATE_KEY or FIREBASE_SERVICE_ACCOUNT_KEY).');
+    console.warn('[Products] Missing Google Auth environment variables (GOOGLE_CLIENT_EMAIL/GOOGLE_PRIVATE_KEY or FIREBASE_SERVICE_ACCOUNT_KEY). Returning empty products list.');
+    return [];
   }
 
   if (!sheetId) {
-    throw new Error('Missing PRODUCT_SHEET_ID environment variable. Please configure it in your settings.');
+    console.warn('[Products] Missing PRODUCT_SHEET_ID environment variable. Returning empty products list.');
+    return [];
   }
 
   // Global timeout for the entire operation to prevent "eternal loading"
