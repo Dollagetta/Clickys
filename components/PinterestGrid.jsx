@@ -556,7 +556,7 @@ export default function PinterestGrid({ initialItems }) {
   // For now, let's just render the filtered list.
 
   return (
-    <section className="py-16 mx-4 md:mx-auto max-w-7xl" id="inspiration-grid">
+    <section className="py-16 w-full px-4 sm:px-6 lg:px-8" id="inspiration-grid">
       <div className="mb-12 text-center">
         <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
           {searchQuery ? `Search Results for "${searchQuery}"` : 'Trending Inspiration'}

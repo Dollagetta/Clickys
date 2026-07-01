@@ -29,7 +29,7 @@ export default async function GuidesPage() {
   const allPlatforms = [...new Set(allGuides.map(g => g.platform).filter(Boolean))];
 
   return (
-   <div className="container mx-auto px-4 py-8">
+   <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
       <div className="max-w-3xl mx-auto text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight">
           Clickys <span className="text-green-600">Guides</span>

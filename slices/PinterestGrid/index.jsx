@@ -79,7 +79,7 @@ const PinterestGrid = ({ slice }) => {
   };
 
   return (
-    <section className="max-w-6xl mx-auto px-4 py-16">
+    <section className="w-full px-4 sm:px-6 lg:px-8 py-16">
       {heading && !searchQuery && (
         <div className="mb-12 text-center">
            <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
@@ -101,7 +101,7 @@ const PinterestGrid = ({ slice }) => {
       )}
 
       {/* Horizontal Layout Container */}
-      <div className="columns-2 sm:columns-2 lg:columns-3 xl:columns-4 gap-3 md:gap-6 w-full max-w-7xl mx-auto">
+      <div className="columns-2 sm:columns-2 lg:columns-3 xl:columns-4 gap-3 md:gap-6 w-full mx-auto">
         {paginatedItems.map((item, index) => {
           const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1560343776-97e7d202ff0e?q=80&w=1080';
           const aspectRatioClass = getAspectRatioClass(item.aspect_ratio);

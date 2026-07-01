@@ -166,7 +166,7 @@ export default function GiftFinder() {
         ? "fixed inset-0 z-[100] bg-zinc-900/40 backdrop-blur-sm overflow-y-auto p-4 md:p-10 flex flex-col w-full h-[100dvh]"
         : "bg-white border-2 border-gray-200 hover:border-orange-500 rounded-3xl shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden p-6 flex flex-col relative w-full h-full cursor-pointer"}
     >
-      <div className={isExpanded ? "max-w-[90vw] md:max-w-7xl mx-auto w-full flex flex-col bg-white rounded-3xl shadow-2xl p-6 md:p-10 border-4 border-gray-900 relative h-[90vh]" : "flex flex-col h-full"}>
+      <div className={isExpanded ? "w-full mx-auto flex flex-col bg-white rounded-3xl shadow-2xl p-6 md:p-10 border-4 border-gray-900 relative h-full" : "flex flex-col h-full"}>
         {isExpanded && (
           <button 
             type="button" 

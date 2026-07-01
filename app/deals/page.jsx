@@ -78,12 +78,12 @@ const page = async () => {
   }
 
   return (
-   <div className="container py-12">
+   <div className="w-full px-4 sm:px-6 lg:px-8 py-12">
       <Suspense fallback={<div>Loading deals...</div>}>
         <DealsPage products={ products }/>
       </Suspense>
       {allSlices.length > 0 && (
-        <section className="w-full max-w-7xl mx-auto px-4 py-16 mt-8 border-t border-gray-100">
+        <section className="w-full mx-auto py-16 mt-8 border-t border-gray-100">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight mb-4">
               Latest Highlights
