@@ -3,6 +3,7 @@ import { createClient } from "../../prismicio";
 import { fetchProductsFromSheet } from '../../lib/products';
 import WhatsNewGrid from './WhatsNewGrid';
 import LimitedTimeDeals from './LimitedTimeDeals';
+import FloatingProducts from '../../components/FloatingProducts';
 
 export const revalidate = 86400;
 
@@ -63,7 +64,7 @@ export default async function WhatsNewListingPage() {
 
   return (
     <>
-      <div className="bg-[#f8f9fa] min-h-screen pb-24 pt-12">
+      <div className="bg-[#f8f9fa] min-h-screen pb-24 pt-12 relative z-10">
         <div className="container mx-auto px-4 md:px-8 max-w-7xl">
           <header className="mb-20 text-center max-w-3xl mx-auto">
             <h1 className="text-5xl md:text-7xl font-black text-gray-900 mb-6 tracking-tight">
@@ -82,6 +83,7 @@ export default async function WhatsNewListingPage() {
             <LimitedTimeDeals productsByPlatform={productsByPlatform} allProducts={allProducts} />
           </Suspense>
         </div>
+        <FloatingProducts />
       </div>
     </>
   );

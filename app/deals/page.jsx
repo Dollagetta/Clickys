@@ -4,6 +4,7 @@ import { products } from '../../components/flipkartProducts'
 import { createClient } from '../../prismicio';
 import PaginatedGuides from './PaginatedGuides';
 import { Suspense } from 'react';
+import FloatingProducts from '../../components/FloatingProducts';
 
 // Metadata for the Deals page
 
@@ -77,7 +78,7 @@ const page = async () => {
   }
 
   return (
-    <>
+    <div className="relative z-10">
       <Suspense fallback={<div>Loading deals...</div>}>
         <DealsPage products={ products }/>
       </Suspense>
@@ -96,7 +97,8 @@ const page = async () => {
           </Suspense>
         </section>
       )}
-    </>
+      <FloatingProducts />
+    </div>
   )
 }
 

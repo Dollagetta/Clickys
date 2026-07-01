@@ -1,4 +1,5 @@
 import GiftFinder from '../../components/GiftFinder';
+import FloatingProducts from '../../components/FloatingProducts';
 
 export const metadata = {
   title: 'Smart Gift Finder | Clickys',
@@ -10,7 +11,7 @@ export const metadata = {
 
 export default function GiftsPage() {
   return (
-    <div className="container mx-auto px-4 py-20 min-h-screen">
+    <div className="container mx-auto px-4 py-20 min-h-screen relative z-10">
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">Smart Gift Finder</h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">Answer three quick questions and we'll find the perfect, thoughtful gift recommendations instantly.</p>
@@ -18,6 +19,7 @@ export default function GiftsPage() {
       <div className="max-w-4xl mx-auto">
         <GiftFinder />
       </div>
+      <FloatingProducts category="Gifts" />
     </div>
   );
 }

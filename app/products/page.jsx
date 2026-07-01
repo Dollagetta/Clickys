@@ -6,6 +6,7 @@ import { createClient } from '../../prismicio';
 import { SliceZone } from '@prismicio/react';
 import { components } from '../../slices';
 import { fetchProductsFromSheet } from '../../lib/products';
+import FloatingProducts from '../../components/FloatingProducts';
 
 export const revalidate = 86400;
 
@@ -79,10 +80,11 @@ const page = async () => {
     };
 
   return (
-    <div className="container py-12">
+    <div className="container py-12 relative z-10">
       <Suspense fallback={<ProductGridSkeleton count={8} />}>
         <ProductsPage products={standardizedSheetProducts} productsByPlatform={productsByPlatform} />
       </Suspense>
+      <FloatingProducts />
     </div>
   )
 }
