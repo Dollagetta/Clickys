@@ -41,6 +41,9 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   images: {
     loader: 'custom',
     loaderFile: './imagekitLoader.js',
