@@ -207,7 +207,7 @@ export default {
       if (slug) {
         paths.push({
           loc: `${routePrefix}/${slug}`,
-          lastmod: doc.last_publication_date || new Date().toISOString(),
+          lastmod: doc.last_publication_date ? new Date(doc.last_publication_date).toISOString() : new Date().toISOString(),
           changefreq: doc.type === 'product' ? 'daily' : 'monthly',
           priority: doc.type === 'product' ? 0.9 : 0.8,
         });

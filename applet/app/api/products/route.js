@@ -1,0 +1,1 @@
+import { NextResponse } from 'next/server'; import { fetchProductsFromSheet } from '../../../lib/products'; export async function GET() { const products = await fetchProductsFromSheet(); return NextResponse.json(products); }

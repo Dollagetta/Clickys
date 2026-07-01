@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://clickys.in
+
+# Sitemaps
+Sitemap: https://clickys.in/sitemap.xml

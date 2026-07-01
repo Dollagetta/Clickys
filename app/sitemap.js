@@ -33,28 +33,28 @@ export default async function sitemap() {
 
     const productPaths = products.map(p => ({
       url: `${baseUrl}/products/${p.uid}`,
-      lastModified: p.last_publication_date,
+      lastModified: p.last_publication_date ? new Date(p.last_publication_date).toISOString() : new Date().toISOString(),
       changeFrequency: 'weekly',
       priority: 0.8,
     }));
 
     const wnPaths = whatsnews.map(p => ({
       url: `${baseUrl}/whats-new/${p.uid}`,
-      lastModified: p.last_publication_date,
+      lastModified: p.last_publication_date ? new Date(p.last_publication_date).toISOString() : new Date().toISOString(),
       changeFrequency: 'weekly',
       priority: 0.8,
     }));
 
     const sgPaths = sliceguides.map(p => ({
       url: `${baseUrl}/guides/${p.uid}`,
-      lastModified: p.last_publication_date,
+      lastModified: p.last_publication_date ? new Date(p.last_publication_date).toISOString() : new Date().toISOString(),
       changeFrequency: 'weekly',
       priority: 0.8,
     }));
 
     const pPaths = partners.map(p => ({
       url: `${baseUrl}/partners/${p.uid}`,
-      lastModified: p.last_publication_date,
+      lastModified: p.last_publication_date ? new Date(p.last_publication_date).toISOString() : new Date().toISOString(),
       changeFrequency: 'monthly',
       priority: 0.6,
     }));

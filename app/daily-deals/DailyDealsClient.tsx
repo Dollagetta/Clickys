@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
-import ProductCard from '@/components/ProductCard';
+import ProductCard from '../../components/ProductCard';
 import { FiSearch, FiFilter, FiChevronLeft, FiChevronRight, FiAlertCircle, FiRefreshCw } from 'react-icons/fi';
 
 export default function DailyDealsClient({ initialProducts = [] }: { initialProducts?: any[] }) {

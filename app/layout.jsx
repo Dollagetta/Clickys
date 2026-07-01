@@ -1,14 +1,11 @@
 import { Inter } from 'next/font/google';
 import './globals.css';
-// Placeholders for components we will create next
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ReadingProgressBar from '../components/ReadingProgressBar';
 import ScrollToTopButton from '../components/ScrollToTopButton';
 import AppProviders from '../components/AppProviders'; // For client-side logic like AnimatePresence & AOS
 import Script from "next/script";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({
   subsets: ['latin'],
@@ -21,14 +18,11 @@ const siteUrl = "https://www.clickys.in"; // Replace with your actual domain
 
 export const metadata = {
   metadataBase: new URL(siteUrl),
-  // Basic metadata
   title: {
     default: "Clickys - Discover Top Amazon Picks & Deals",
     template: `%s | ${siteName}`
   },
   description: "Your ultimate guide to the best products, exclusive deals, and honest reviews for Amazon shopping. We do the research, so you can shop with confidence.",
-  
-  // Standard metadata
   keywords: "Amazon affiliate, product reviews, best deals, buying guides, tech gadgets, home appliances, electronics, smart home, affiliate marketing, product recommendations",
   applicationName: siteName,
   authors: [{ name: "Clickys Team", url: `${siteUrl}/about` }],
@@ -39,8 +33,6 @@ export const metadata = {
   alternates: {
     canonical: siteUrl,
   },
-  
-  // Open Graph metadata
   openGraph: {
     type: "website",
     siteName,
@@ -57,8 +49,6 @@ export const metadata = {
       }
     ],
   },
-  
-  // Twitter metadata
   twitter: {
     card: "summary_large_image",
     title: "Clickys - Top Amazon Picks, Deals, and Reviews",
@@ -66,13 +56,8 @@ export const metadata = {
     images: [`${siteUrl}/favicon.svg`],
     creator: "@clickys25",
   },
-  
-  // Verification for search consoles
   verification: {
-    // google: "your-google-verification-code",
   },
-  
-  // Robots
   robots: {
     index: true,
     follow: true,
@@ -117,7 +102,6 @@ export default function RootLayout({ children }) {
             })
           }}
         />
-        {/* Analytics script */}
       </head>
       <body suppressHydrationWarning>
         <Script id="cuelinks" strategy="afterInteractive">
@@ -144,8 +128,6 @@ export default function RootLayout({ children }) {
           <Footer key="footer" />
           <ScrollToTopButton />
         </AppProviders>
-        <Analytics />
-        <SpeedInsights />
       </body>
     </html>
   );

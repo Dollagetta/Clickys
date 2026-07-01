@@ -1,0 +1,84 @@
+{
+  "id": "comparison_section",
+  "type": "SharedSlice",
+  "name": "ComparisonSection",
+  "description": "ComparisonSection",
+  "variations": [
+    {
+      "id": "default",
+      "name": "Default",
+      "docURL": "...",
+      "version": "s39ke",
+      "description": "Default",
+      "primary": {
+        "title": {
+          "type": "Title",
+          "config": {
+            "label": "Title",
+            "placeholder": ""
+          }
+        },
+        "description": {
+          "type": "RichText",
+          "config": {
+            "label": "Description",
+            "placeholder": ""
+          }
+        }
+      },
+      "items": {
+        "product_name": {
+          "type": "Text",
+          "config": {
+            "label": "Product Name",
+            "placeholder": ""
+          }
+        },
+        "product_image": {
+          "type": "Image",
+          "config": {
+            "label": "Product Image",
+            "constraint": {},
+            "thumbnails": []
+          }
+        },
+        "pros": {
+          "type": "RichText",
+          "config": {
+            "label": "Pros",
+            "placeholder": ""
+          }
+        },
+        "cons": {
+          "type": "RichText",
+          "config": {
+            "label": "Cons",
+            "placeholder": ""
+          }
+        },
+        "price": {
+          "type": "Text",
+          "config": {
+            "label": "Price",
+            "placeholder": ""
+          }
+        },
+        "rating": {
+            "type": "Select",
+            "config": {
+              "label": "Rating (out of 5)",
+              "placeholder": "Select a rating",
+              "options": ["1", "2", "3", "4", "5"]
+            }
+          },
+        "buy_link": {
+          "type": "Link",
+          "config": {
+            "label": "Buy Link",
+            "placeholder": ""
+          }
+        }
+      }
+    }
+  ]
+}

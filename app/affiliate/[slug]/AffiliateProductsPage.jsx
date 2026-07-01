@@ -38,7 +38,7 @@ export default function AffiliateProductsPage({ affiliate, products = [] }) {
     if (allCategories.length > 0 && selectedCategories.length === 0) {
       setSelectedCategories(allCategories);
     }
-  }, [allCategories]);
+  }, [allCategories, selectedCategories.length]);
 
   // Filtered Products
   const filteredProducts = useMemo(() => {
@@ -112,7 +112,7 @@ export default function AffiliateProductsPage({ affiliate, products = [] }) {
     }
 
     return result;
-  }, [products, searchTerm, selectedCategories, sortOption]);
+  }, [products, searchTerm, selectedCategories, sortOption, minDiscount, priceRange.max, priceRange.min]);
 
   useEffect(() => {
     setCurrentPage(1);

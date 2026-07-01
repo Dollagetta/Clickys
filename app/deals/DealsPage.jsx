@@ -429,7 +429,7 @@ function DealsPageContent({ initialProducts = [] }) {
       <div className={styles.dealsPageContainer}>
         {/* Page Header */}
         <header className={styles.pageHeader} data-aos="fade-in" data-aos-duration="600">
-          <div className="container" style={{ position: 'relative' }}>
+          <div className="w-full" style={{ position: 'relative' }}>
             <FiTag className={styles.headerIcon} />
             <h1 className={styles.pageTitle}>Find Your Next Great Deal</h1>
             <p className={styles.pageSubtitle}>
@@ -441,7 +441,7 @@ function DealsPageContent({ initialProducts = [] }) {
 
         {/* --- Search, Filter, and Sort Controls --- */}
         <section className={styles.controlsSection} data-aos="fade-up">
-          <div className="container">
+          <div className="w-full">
             <form className={styles.controlsBar} onSubmit={handleSearchSubmit}>
               <div className={styles.searchBox}>
                   <input 
@@ -623,7 +623,7 @@ function DealsPageContent({ initialProducts = [] }) {
 
         {/* Deals Grid Section */}
         <section className={styles.dealsGridSection}>
-          <div className="container">
+          <div className="w-full">
             {isLoading ? (
               <div className={styles.loadingState}>
                 <FiLoader className={styles.spinningIcon} />

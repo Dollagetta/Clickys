@@ -27,7 +27,7 @@ export default function ProductsPage({ products: initialProductsList = [], produ
   
   // Randomizing the search term for placeholder
   const keywords = ["Air Fryer", "Smart Watch", "Sneakers", "Face Serum", "Gaming Mouse", "Water Bottles", "Laptop Stand"];
-  const placeholderSearch = useMemo(() => keywords[Math.floor(Math.random() * keywords.length)], []);
+  const placeholderSearch = useMemo(() => keywords[Math.floor(Math.random() * keywords.length)], [keywords]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // If no initial query, we want to fetch EVERYTHING, not a random keyword.
   const [searchTerm, setSearchTerm] = useState(initialQuery || 'All');
@@ -150,7 +150,7 @@ export default function ProductsPage({ products: initialProductsList = [], produ
       
       return matchesCategory && matchesPrice && matchesDiscount;
     });
-  }, [allProducts, initialProductsList, selectedCategories, priceRange, minDiscount, selectedPlatforms]);
+  }, [allProducts, initialProductsList, selectedCategories, priceRange, minDiscount, selectedPlatforms, searchTerm]);
 
   // Reset page to 1 whenever filters change the product list
   useEffect(() => {
@@ -199,14 +199,14 @@ export default function ProductsPage({ products: initialProductsList = [], produ
     <>
       <div className={styles.productsPageContainer}>
         <header id="products-header" className={styles.pageHeader} style={{ backgroundColor: '#c09758', backgroundImage: 'none' }}>
-          <div className="container" style={{ position: 'relative' }}>
+          <div className="w-full" style={{ position: 'relative' }}>
             <FiBox className={styles.headerIcon} />
             <h1 id="products-title" className={styles.pageTitle}>Explore All Products</h1>
             <p className={styles.pageSubtitle} style={{ color: '#ffffff', fontWeight: 'bold' }}>Discover our ultimate collection of handpicked tech, home, and lifestyle essentials.</p>
           </div>
         </header>
 
-        <div className="container">
+        <div className="w-full">
           <form id="search-controls" className={styles.controlsBar} onSubmit={handleSearchSubmit}>
             <div className={styles.searchAndFilter}>
                 {/* --- UPDATED: Integrated Search Bar --- */}
@@ -336,7 +336,7 @@ export default function ProductsPage({ products: initialProductsList = [], produ
         )}
 
         <section id="products-listing" className={styles.productsGridSection}>
-          <div className="container">
+          <div className="w-full">
             {isLoading ? (
               <div className={styles.loadingState}>
                 <FiLoader className={styles.loaderIcon} />
@@ -412,7 +412,7 @@ export default function ProductsPage({ products: initialProductsList = [], produ
         </section>
             </div> {/* End Main Content Area */}
           </div> {/* End flex flex-col md:flex-row gap-6 */}
-        </div> {/* End container */}
+        </div> {/* End w-full */}
       </div> {/* End productsPageContainer */}
     </>
   );

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { fetchProductsFromSheet } from '@/lib/products';
+import { fetchProductsFromSheet } from '../../../lib/products';
 
 export async function GET(request: Request) {
   try {

@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "title": "Amazon Mega Deals",
+    "image": "https://m.media-amazon.com/images/G/31/img22/cepc/med/may22/D45798145_IN_PC-Electronics-Mega-Electronics-days_1500x300.jpg",
+    "alt": "Amazon Mega Deals Banner",
+    "buttonLink": "/amazon",
+    "category": "amazon",
+    "active": true
+  },
+  {
+    "id": 2,
+    "title": "Latest Electronics",
+    "image": "https://lh3.googleusercontent.com/e6Fh08Gftmpm8LdTZ9991aaNYIDorSWGtEXLLCpXDw9PCkX1kJtZHE3J3TFHZAdWUc8fLvoneZVOmmWZV1fEb8iMWknqBSUJBl02ROo=w360-rw",
+    "alt": "Electronics Affiliate Banner",
+    "buttonLink": "/electronics",
+    "category": "electronics",
+    "active": true
+  },
+  {
+    "id": 3,
+    "title": "Fashion Collection",
+    "image": "https://neonyt.messefrankfurt.com/content/dam/messefrankfurt-redaktion/neonyt/2025/nyt-paris-header.webp.2560.jpg",
+    "alt": "Fashion Deals Banner",
+    "buttonLink": "/fashion",
+    "category": "fashion",
+    "active": true
+  },
+  {
+    "id": 4,
+    "title": "Kitchen Essentials",
+    "image": "https://bergnerhome.in/cdn/shop/articles/Header-Banner-1.png?v=1718542473&width=1400",
+    "alt": "Kitchen Products Banner",
+    "buttonLink": "/kitchen",
+    "category": "kitchen",
+    "active": true
+  }
+]

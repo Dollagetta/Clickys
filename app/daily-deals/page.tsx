@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { fetchProductsFromSheet } from '@/lib/products';
+import { fetchProductsFromSheet } from '../../lib/products';
 import DailyDealsClient from './DailyDealsClient';
 import { FiSearch } from 'react-icons/fi';
 
