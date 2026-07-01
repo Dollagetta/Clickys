@@ -98,7 +98,7 @@ export async function POST(req) {
           const descriptionText = descriptionExtracted ? `\n\n${descriptionExtracted.substring(0, 150)}...` : '';
           
           imageUrl = guideSlice?.primary?.image?.url || doc.data?.image?.url;
-          link = `https://www.clickys.in/guide/${doc.uid}`;
+          link = `https://www.clickys.in/guides/${doc.uid}`;
           message = `${title}${descriptionText}\n\nFind the product here: ${link}`;
           
         } else {

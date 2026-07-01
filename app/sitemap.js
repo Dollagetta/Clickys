@@ -46,7 +46,7 @@ export default async function sitemap() {
     }));
 
     const sgPaths = sliceguides.map(p => ({
-      url: `${baseUrl}/guide/${p.uid}`,
+      url: `${baseUrl}/guides/${p.uid}`,
       lastModified: p.last_publication_date,
       changeFrequency: 'weekly',
       priority: 0.8,

@@ -71,7 +71,7 @@ const Guide = ({ slice }) => {
         )}
 
         {slice.primary.description && (
-          <div className="text-gray-500 text-xs sm:text-sm leading-snug mb-3 sm:mb-6 prose prose-slate">
+          <div className="text-gray-500 text-xs sm:text-sm leading-snug mb-3 sm:mb-6 line-clamp-2 prose prose-slate">
             <PrismicRichText field={slice.primary.description} />
           </div>
         )}
@@ -83,7 +83,7 @@ const Guide = ({ slice }) => {
 
           <div className="flex space-x-2 items-center">
             <Link
-              href={slice.docUid ? `/guide/${slice.docUid}` : '#'}
+              href={slice.docUid ? `/guides/${slice.docUid}` : '#'}
               className="inline-flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-bold text-gray-700 transition-all duration-300 bg-gray-100 rounded-full hover:bg-gray-200 hover:shadow-md"
             >
               Read

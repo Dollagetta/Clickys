@@ -21,8 +21,8 @@ const routes = [
   { type: "category", path: "/categories/:uid" },
   { type: "partner", path: "/partners/:uid" },
   { type: "marketingbanner", path: "/marketing/:uid" },
-  { type: "sliceguide1", path: "/guide/:uid" },
-  { type: "guide", path: "/guide/:uid" },
+  { type: "sliceguide1", path: "/guides/:uid" },
+  { type: "guide", path: "/guides/:uid" },
   { type: "affiliate", path: "/affiliates/:uid" }
 ];
 

@@ -15,8 +15,8 @@ const PromotionBanner = ({ slice }) => {
     
     // rel=0: show related videos from same channel
     // modestbranding=1: hide YouTube logo in the control bar
-    // controls=0: disable player controls to make it clean
-    const params = "?rel=0&modestbranding=1&autohide=1&showinfo=0&controls=0&iv_load_policy=3";
+    // controls=1: enable player controls
+    const params = "?rel=0&modestbranding=1&autohide=1&showinfo=0&controls=1&iv_load_policy=3";
 
     if (data?.html) {
       const flexibleHtml = data.html
@@ -29,6 +29,10 @@ const PromotionBanner = ({ slice }) => {
 
     let url = typeof data === 'string' ? data : (data?.url || data?.embed_url || null);
     if (!url) return null;
+    
+    if (data?.link_type === 'Media' || url.match(/\.(mp4|webm|ogg|mov)(\?.*)?$/i) || url.includes('prismic-io.s3.amazonaws.com')) {
+      return { isVideoTag: true, url };
+    }
     
     try {
       const u = new URL(url);
@@ -98,61 +102,60 @@ const PromotionBanner = ({ slice }) => {
             viewport={{ once: true }}
             className="w-full flex flex-col items-center justify-center gap-4"
           >
-            {link?.url ? (
-              <PrismicNextLink field={link} className="w-full block">
-                {renderVisuals()}
-              </PrismicNextLink>
-            ) : renderVisuals()}
+            {(image?.url || slice.data.image1?.url || slice.data.Image1?.url) && (
+              <div className="flex w-full flex-row gap-4 items-center justify-center">
+                {image?.url && (
+                  <div className="flex-1 min-w-0">
+                    <PrismicNextImage 
+                      field={image} 
+                      className={styles.bannerImage} 
+                    />
+                  </div>
+                )}
+                {(slice.data.image1?.url || slice.data.Image1?.url) && (
+                  <div className="flex-1 min-w-0">
+                    <PrismicNextImage 
+                      field={slice.data.image1?.url ? slice.data.image1 : slice.data.Image1} 
+                      className={styles.bannerImage} 
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {embedHtml && embedHtml.isVideoTag ? (
+              <div className="relative w-full max-w-2xl mx-auto aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/20 group hover:shadow-cyan-500/20 transition-all duration-500">
+                <video 
+                  src={embedHtml.url}
+                  autoPlay
+                  loop
+                  controls
+                  playsInline
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.05]"
+                />
+              </div>
+            ) : embedHtml && (
+              <div className="relative w-full max-w-2xl mx-auto aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/20 group hover:shadow-cyan-500/20 transition-all duration-500">
+                {/* 
+                  Using scale-[1.35] ensures the 16:9 iframe matches the container's 16:9 ratio 
+                  without letterboxing, while pushing the title and logo safely out of bounds.
+                */}
+                <div 
+                  className="w-full h-full scale-[1.35] pointer-events-auto origin-center transition-transform duration-700 group-hover:scale-[1.40]"
+                  dangerouslySetInnerHTML={{
+                    __html: embedHtml.__html.replace('controls=0', 'controls=1').replace('mute=1', 'mute=0')
+                  }}
+                />
+                
+                {/* Modern aesthetic overlays and Interaction Shields removed to allow video interaction */}
+                <div className="absolute inset-0 pointer-events-none rounded-2xl ring-1 ring-inset ring-white/10" />
+              </div>
+            )}
           </motion.div>
         </div>
       </motion.section>
     </div>
   );
-
-  function renderVisuals() {
-    return (
-      <>
-        {(image?.url || slice.data.image1?.url || slice.data.Image1?.url) && (
-          <div className="flex w-full flex-row gap-4 items-center justify-center">
-            {image?.url && (
-              <div className="flex-1 min-w-0">
-                <PrismicNextImage 
-                  field={image} 
-                  className={styles.bannerImage} 
-                />
-              </div>
-            )}
-            {(slice.data.image1?.url || slice.data.Image1?.url) && (
-              <div className="flex-1 min-w-0">
-                <PrismicNextImage 
-                  field={slice.data.image1?.url ? slice.data.image1 : slice.data.Image1} 
-                  className={styles.bannerImage} 
-                />
-              </div>
-            )}
-          </div>
-        )}
-        
-        {embedHtml && (
-          <div className="relative w-full max-w-2xl mx-auto aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/20 group hover:shadow-cyan-500/20 transition-all duration-500">
-            {/* 
-              Using scale-[1.35] ensures the 16:9 iframe matches the container's 16:9 ratio 
-              without letterboxing, while pushing the title and logo safely out of bounds.
-            */}
-            <div 
-              className="w-full h-full scale-[1.35] pointer-events-auto origin-center transition-transform duration-700 group-hover:scale-[1.40]"
-              dangerouslySetInnerHTML={embedHtml}
-            />
-            
-            {/* Modern aesthetic overlays and Interaction Shields */}
-            <div className="absolute inset-0 pointer-events-none rounded-2xl ring-1 ring-inset ring-white/10" />
-            <div className="absolute top-0 left-0 w-full h-[20%] bg-gradient-to-b from-black/60 to-transparent z-10 pointer-events-auto" />
-            <div className="absolute bottom-0 left-0 w-full h-[20%] z-10 bg-transparent pointer-events-auto" />
-          </div>
-        )}
-      </>
-    );
-  }
 };
 
 export default PromotionBanner;
