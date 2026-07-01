@@ -127,7 +127,7 @@ const PromotionBanner = ({ slice }) => {
               <div className="relative w-full max-w-2xl mx-auto aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/20 group hover:shadow-cyan-500/20 transition-all duration-500">
                 <video 
                   src={embedHtml.url}
-                  autoPlay
+                  
                   loop
                   controls
                   playsInline
