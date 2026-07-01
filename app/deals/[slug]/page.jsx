@@ -9,12 +9,7 @@ import { FiArrowLeft, FiTag } from 'react-icons/fi';
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const client = createClient();
-  let page;
-  try {
-    page = await client.getByUID("sliceguide1", slug);
-  } catch (e) {
-    page = await client.getByID(slug).catch(() => notFound());
-  }
+  const page = await client.getByUID("sliceguide1", slug).catch(() => notFound());
 
   const title = `${page.data.meta_title || page.data.title || "Exclusive Deal"} | Clickys`;
   const description = page.data.meta_description || "Check out this amazing deal on Clickys! Limited time offer.";
@@ -44,12 +39,7 @@ export async function generateMetadata({ params }) {
 export default async function DealDetailPage({ params }) {
   const { slug } = await params;
   const client = createClient();
-  let page;
-  try {
-    page = await client.getByUID("sliceguide1", slug);
-  } catch (e) {
-    page = await client.getByID(slug).catch(() => notFound());
-  }
+  const page = await client.getByUID("sliceguide1", slug).catch(() => notFound());
 
   return (
     <div className="bg-white min-h-screen">

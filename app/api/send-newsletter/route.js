@@ -83,19 +83,24 @@ export async function POST(req) {
     customHeader = customHeader || 'Find this trending deal on clickys';
     
     // Dynamically determine the URL based on the document type
-    let productUrl = 'https://clickys.in/products';
-    const docIdentifier = latestDoc.uid || latestDoc.id;
-    if (latestDoc.type.includes('whatsnew') || latestDoc.type.includes('whats-new')) {
-      productUrl = `https://clickys.in/whats-new/${docIdentifier}`;
-    } else if (latestDoc.type.includes('guide') || latestDoc.type.includes('sliceguide1')) {
-      productUrl = `https://clickys.in/guide/${docIdentifier}`;
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://clickys.in';
+    let productUrl = `${siteUrl}/products`;
+    
+    if (latestDoc.uid) {
+      if (latestDoc.type.includes('whatsnew') || latestDoc.type.includes('whats-new')) {
+        productUrl = `${siteUrl}/whats-new/${latestDoc.uid}`;
+      } else if (latestDoc.type.includes('guide') || latestDoc.type.includes('sliceguide1')) {
+        productUrl = `${siteUrl}/guide/${latestDoc.uid}`;
+      } else if (latestDoc.type.includes('partner')) {
+        productUrl = siteUrl;
+      } else if (latestDoc.type.includes('product')) {
+        productUrl = `${siteUrl}/products/${latestDoc.uid}`;
+      }
     } else if (latestDoc.type.includes('partner')) {
-      productUrl = `https://clickys.in`;
-    } else if (latestDoc.type.includes('product')) {
-      productUrl = `https://clickys.in/products/${docIdentifier}`;
+      productUrl = siteUrl;
     }
-
-    console.log("Analyzing document type:", latestDoc.type);
+    
+    console.log("Analyzing document type:", latestDoc.type, "Final URL:", productUrl);
 
     // Extract image
     let productImage = latestDoc.data?.image?.url || latestDoc.data?.cover_image?.url || latestDoc.data?.the_big_burner?.url || latestDoc.data?.featured_image?.url || latestDoc.data?.meta_image?.url || latestDoc.data?.partner_image?.url || latestDoc.data?.logo?.url || latestDoc.data?.brand_image?.url || '';

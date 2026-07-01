@@ -71,7 +71,7 @@ const Guide = ({ slice }) => {
         )}
 
         {slice.primary.description && (
-          <div className="text-gray-500 text-xs sm:text-sm leading-snug mb-3 sm:mb-6 line-clamp-2 prose prose-slate">
+          <div className="text-gray-500 text-xs sm:text-sm leading-snug mb-3 sm:mb-6 prose prose-slate">
             <PrismicRichText field={slice.primary.description} />
           </div>
         )}

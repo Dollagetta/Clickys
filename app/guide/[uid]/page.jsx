@@ -8,11 +8,11 @@ import { PrismicNextImage, PrismicNextLink } from "@prismicio/next";
 export async function generateMetadata({ params }) {
   const { uid } = await params;
   const client = createClient();
-  let guide;
-  try {
-    guide = await client.getByUID("sliceguide1", uid);
-  } catch (e) {
-    guide = await client.getByID(uid).catch(() => null);
+  
+  // Try fetching by 'guide' first, then fallback to 'sliceguide1'
+  let guide = await client.getByUID("guide", uid).catch(() => null);
+  if (!guide) {
+    guide = await client.getByUID("sliceguide1", uid).catch(() => null);
   }
 
   if (!guide) {
@@ -59,11 +59,11 @@ export async function generateMetadata({ params }) {
 export default async function GuidePage({ params }) {
   const { uid } = await params;
   const client = createClient();
-  let guide;
-  try {
-    guide = await client.getByUID("sliceguide1", uid);
-  } catch (e) {
-    guide = await client.getByID(uid).catch(() => null);
+  
+  // Try fetching by 'guide' first, then fallback to 'sliceguide1'
+  let guide = await client.getByUID("guide", uid).catch(() => null);
+  if (!guide) {
+    guide = await client.getByUID("sliceguide1", uid).catch(() => null);
   }
 
   if (!guide) {

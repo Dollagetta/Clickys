@@ -10,12 +10,7 @@ import { ExternalLink, ChevronLeft } from "lucide-react";
 export default async function Page({ params }) {
   const { uid } = await params;
   const client = createClient();
-  let page;
-  try {
-    page = await client.getByUID("pinterestgrid", uid);
-  } catch (e) {
-    page = await client.getByID(uid).catch(() => notFound());
-  }
+  const page = await client.getByUID("pinterestgrid", uid).catch(() => notFound());
 
   const data = page.data || {};
   

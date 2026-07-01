@@ -94,7 +94,7 @@ export default function GuideCard({ guide }) {
           {guide.price && (guide.price.toString().includes('₹') ? guide.price : `₹${guide.price}`)}
         </div>
 
-        <p className="text-gray-500 text-sm line-clamp-3 mb-6 flex-grow leading-relaxed">
+        <p className="text-gray-500 text-sm mb-6 flex-grow leading-relaxed">
           {descriptionText}
         </p>
 

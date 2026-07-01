@@ -10,12 +10,7 @@ import NewLaunchesSection from "../../../components/NewLaunchesSection";
 export async function generateMetadata({ params }) {
   const { uid } = await params;
   const client = createClient();
-  let page;
-  try {
-    page = await client.getByUID("whatsnew", uid);
-  } catch (e) {
-    page = await client.getByID(uid).catch(() => notFound());
-  }
+  const page = await client.getByUID("whatsnew", uid).catch(() => notFound());
 
   const title = `${page.data.meta_title || page.data.title || "What's New"} | Clickys`;
   const description = page.data.meta_description || "Discover what's new on Clickys! Check out the latest products and offers.";
@@ -66,12 +61,7 @@ export async function generateMetadata({ params }) {
 export default async function WhatsNewPage({ params }) {
   const { uid } = await params;
   const client = createClient();
-  let page;
-  try {
-    page = await client.getByUID("whatsnew", uid);
-  } catch (e) {
-    page = await client.getByID(uid).catch(() => notFound());
-  }
+  const page = await client.getByUID("whatsnew", uid).catch(() => notFound());
 
   // Extract product images from any Shopping Grid slices to pass to the Burner
   const shoppingGridImages = page.data.slices

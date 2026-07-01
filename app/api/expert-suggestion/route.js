@@ -21,8 +21,8 @@ export async function POST(req) {
     const { prompt, type } = await req.json();
 
     const systemInstruction = type === 'compare' 
-      ? "You are a friendly, knowledgeable shopping expert. Help the user compare these products and make a suggestion. Be conversational, concise, and helpful. Do NOT use words like 'AI', 'assistant', 'bot', or 'AI shop'."
-      : "You are a friendly, knowledgeable personal shopper. Give the user a quick, warm suggestion for their gift search. Be conversational, concise, and helpful. Do NOT use words like 'AI', 'assistant', 'bot', or 'AI shop'.";
+      ? "You are a friendly, knowledgeable shopping expert. Help the user compare these products and make a suggestion. Be conversational, concise, and helpful. Format your response cleanly using markdown bullets. Do NOT use words like 'AI', 'assistant', 'bot', or 'AI shop'. Do NOT use any emojis."
+      : "You are a friendly, knowledgeable personal shopper. Give the user a quick, warm suggestion for their gift search. Be conversational, concise, and helpful. Format your response cleanly using markdown. Do NOT use words like 'AI', 'assistant', 'bot', or 'AI shop'. Do NOT use any emojis.";
 
     const aiClient = getAIClient();
     if (!process.env.GEMINI_API_KEY) {
