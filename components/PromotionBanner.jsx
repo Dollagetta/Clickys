@@ -30,6 +30,10 @@ const PromotionBanner = ({ slice }) => {
     let url = typeof data === 'string' ? data : (data?.url || data?.embed_url || null);
     if (!url) return null;
     
+    if (data?.link_type === 'Media' || url.match(/\.(mp4|webm|ogg|mov)(\?.*)?$/i) || url.includes('prismic-io.s3.amazonaws.com')) {
+      return { isVideoTag: true, url };
+    }
+    
     try {
       const u = new URL(url);
       let embedUrl = url;
@@ -119,7 +123,18 @@ const PromotionBanner = ({ slice }) => {
               </div>
             )}
             
-            {embedHtml && (
+            {embedHtml && embedHtml.isVideoTag ? (
+              <div className="relative w-full max-w-2xl mx-auto aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/20 group hover:shadow-cyan-500/20 transition-all duration-500">
+                <video 
+                  src={embedHtml.url}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.05]"
+                />
+              </div>
+            ) : embedHtml && (
               <div className="relative w-full max-w-2xl mx-auto aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/20 group hover:shadow-cyan-500/20 transition-all duration-500">
                 {/* 
                   Using scale-[1.35] ensures the 16:9 iframe matches the container's 16:9 ratio 
