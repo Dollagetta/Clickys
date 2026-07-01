@@ -84,14 +84,15 @@ export async function POST(req) {
     
     // Dynamically determine the URL based on the document type
     let productUrl = 'https://clickys.in/products';
+    const docIdentifier = latestDoc.uid || latestDoc.id;
     if (latestDoc.type.includes('whatsnew') || latestDoc.type.includes('whats-new')) {
-      productUrl = `https://clickys.in/whats-new/${latestDoc.uid}`;
+      productUrl = `https://clickys.in/whats-new/${docIdentifier}`;
     } else if (latestDoc.type.includes('guide') || latestDoc.type.includes('sliceguide1')) {
-      productUrl = `https://clickys.in/guide/${latestDoc.uid}`;
+      productUrl = `https://clickys.in/guide/${docIdentifier}`;
     } else if (latestDoc.type.includes('partner')) {
       productUrl = `https://clickys.in`;
     } else if (latestDoc.type.includes('product')) {
-      productUrl = `https://clickys.in/products/${latestDoc.uid}`;
+      productUrl = `https://clickys.in/products/${docIdentifier}`;
     }
 
     console.log("Analyzing document type:", latestDoc.type);

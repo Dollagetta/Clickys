@@ -39,7 +39,6 @@ export const searchAllProducts = (query) => {
      title: p.name || p.title || 'Unknown Product',
      price: p.price || p.oldPrice || null,
      image: p.imageUrl || p.image || null,
-     link: p.amazonLink || p.flipkartLink || p.link || `/products/${p.slug || ''}`,
-     internalLink: p.slug ? `/products/${p.slug}` : (p.link || '#')
+     link: p.amazonLink || p.flipkartLink || p.link || `/products/${p.slug || ''}`
   }));
 }

@@ -52,7 +52,12 @@ async function getProductData(slug) {
   // 2. Fallback to Prismic if not found locally
   try {
     const client = createClient();
-    const doc = await client.getByUID("product", slug);
+    let doc;
+    try {
+      doc = await client.getByUID("product", slug);
+    } catch (e) {
+      doc = await client.getByID(slug).catch(() => null);
+    }
     
     if (doc) {
       // Helper to extract text from Prismic rich text or string

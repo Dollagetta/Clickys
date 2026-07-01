@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { FiSearch, FiLoader, FiCheckCircle, FiChevronRight, FiArrowLeft, FiX, FiPlus } from 'react-icons/fi';
-import ReactMarkdown from 'react-markdown';
 import { searchAllProducts } from '../components/searchUtils';
 
 export default function ProductComparator() {
@@ -102,7 +101,7 @@ export default function ProductComparator() {
         ? "fixed inset-0 z-[100] bg-zinc-900/40 backdrop-blur-sm p-4 overflow-y-auto md:p-10 flex flex-col w-full h-[100dvh]"
         : "bg-white border-2 border-gray-200 hover:border-green-500 rounded-3xl shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden p-6 flex flex-col relative w-full h-full cursor-pointer"}
     >
-      <div className={isExpanded ? "max-w-[90vw] md:max-w-7xl mx-auto w-full flex flex-col bg-white rounded-3xl shadow-2xl p-6 md:p-10 border-4 border-gray-900 relative h-[90vh]" : "flex flex-col h-full"} >
+      <div className={isExpanded ? "max-w-3xl mx-auto w-full flex flex-col bg-white rounded-3xl shadow-2xl p-6 md:p-10 border-4 border-gray-900 relative min-h-[500px]" : "flex flex-col h-full"} >
         {isExpanded && (
           <button 
             type="button" 
@@ -130,7 +129,7 @@ export default function ProductComparator() {
                   >
                     {compareItems[i] ? (
                       <>
-                        <div className="text-[10px] font-bold text-gray-900 line-clamp-2 text-center leading-tight">{compareItems[i].name || compareItems[i].title}</div>
+                        <div className="text-[10px] font-bold text-gray-900 line-clamp-2 text-center leading-tight">{compareItems[i].title}</div>
                         <button onClick={(e) => {e.stopPropagation(); removeSlot(i);}} className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-[3px] shadow-sm hover:!bg-red-600 transition-colors"><FiX size={10}/></button>
                       </>
                     ) : (
@@ -201,7 +200,7 @@ export default function ProductComparator() {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                       type: 'compare',
-                      prompt: `I am comparing the following products: ${JSON.stringify(itemsToCompare.map(i => ({title: i.name || i.title, link: i.internalLink ? i.internalLink : (i.slug ? ('/products/' + i.slug) : (i.amazonLink || i.link || ('/products/' + i.id))), price: i.price}))) }. Please provide a detailed comparison including pros, cons, key features, and possible alternatives if available (you can suggest 1-2 external product ideas). Recommend actual products using their exact links formatted as Markdown links. Format your response clearly in Markdown. Do NOT use any emojis.`
+                      prompt: `I am comparing the following products: ${itemsToCompare.map(i => i.title).join(', ')}. What are your thoughts on which one I should buy?`
                     })
                   })
                   .then(r => r.json())
@@ -231,26 +230,23 @@ export default function ProductComparator() {
                 </button>
               </div>
 
-              <div className={`flex flex-col flex-grow w-full overflow-hidden min-h-0 ${isExpanded ? 'md:flex-row-reverse md:gap-6' : ''}`}>
-                {(isSuggesting || suggestion) && isExpanded && (
-                  <div className="md:w-1/3 bg-blue-50 border border-blue-100 p-6 rounded-2xl shrink-0 h-full overflow-y-auto flex flex-col mb-6 md:mb-0">
-                    <h4 className="text-xs font-bold text-blue-800 mb-4 flex items-center uppercase tracking-wider">
-                      Shopping Expert
-                    </h4>
-                    {isSuggesting ? (
-                      <div className="flex items-center text-blue-600 text-sm">
-                        <FiLoader className="animate-spin mr-2" /> Analyzing options...
-                      </div>
-                    ) : (
-                      <div className="text-sm text-blue-900 leading-relaxed prose prose-sm prose-blue max-w-none">
-                        <ReactMarkdown>{suggestion}</ReactMarkdown>
-                      </div>
-                    )}
-                  </div>
-                )}
-                
-                <div className={`${isExpanded && (isSuggesting || suggestion) ? 'md:w-2/3' : 'w-full'} flex-grow overflow-x-auto overflow-y-auto hide-scrollbar border border-gray-200 rounded-2xl shadow-sm bg-white relative`}>
-                  <table className="w-full text-left border-collapse min-w-[600px] md:min-w-full table-fixed">
+              {(isSuggesting || suggestion) && isExpanded && (
+                <div className="mb-6 bg-blue-50 border border-blue-100 p-4 rounded-xl">
+                  <h4 className="text-xs font-bold text-blue-800 mb-2 flex items-center uppercase tracking-wider">
+                    Shopping Expert
+                  </h4>
+                  {isSuggesting ? (
+                    <div className="flex items-center text-blue-600 text-sm">
+                      <FiLoader className="animate-spin mr-2" /> Analyzing options...
+                    </div>
+                  ) : (
+                    <p className="text-sm text-blue-900 leading-relaxed">{suggestion}</p>
+                  )}
+                </div>
+              )}
+              
+              <div className="flex-grow w-full overflow-x-auto hide-scrollbar border border-gray-200 rounded-2xl shadow-sm bg-white relative">
+                <table className="w-full text-left border-collapse min-w-[600px] md:min-w-full table-fixed">
                   <tbody>
                     {/* Images & Title */}
                     <tr>
@@ -258,9 +254,9 @@ export default function ProductComparator() {
                       {compareItems.filter(i => i !== null).map((prod, idx) => (
                         <td key={idx} className="p-4 border-b border-r border-gray-200 align-top">
                           <div className="h-32 md:h-40 w-full bg-white rounded-xl mb-4 flex items-center justify-center p-2 relative group">
-                             {prod.image || prod.imageUrl ? <img src={prod.image || prod.imageUrl} className="max-h-full max-w-full object-contain mix-blend-multiply transition-transform group-hover:scale-105" /> : <p className="text-xs text-gray-400 font-bold">No Image</p>}
+                             {prod.image ? <img src={prod.image} className="max-h-full max-w-full object-contain mix-blend-multiply transition-transform group-hover:scale-105" /> : <p className="text-xs text-gray-400 font-bold">No Image</p>}
                           </div>
-                          <h4 className="font-bold text-sm text-gray-900 leading-snug line-clamp-3 hover:text-green-600 transition-colors" title={prod.name || prod.title}>{prod.name || prod.title}</h4>
+                          <h4 className="font-bold text-sm text-gray-900 leading-snug line-clamp-3 hover:text-green-600 transition-colors" title={prod.title}>{prod.title}</h4>
                         </td>
                       ))}
                     </tr>
@@ -293,7 +289,7 @@ export default function ProductComparator() {
                       <th className="p-4 border-gray-200 bg-gray-50 font-bold text-gray-600 border-r align-middle text-center sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Action</th>
                       {compareItems.filter(i => i !== null).map((prod, idx) => (
                         <td key={idx} className="p-4 border-r border-gray-200">
-                           <a href={prod.amazonLink || prod.link || (prod.slug ? `/products/${prod.slug}` : "#")} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-full py-3 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-700 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                           <a href={prod.link || "#"} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-full py-3 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-700 hover:shadow-md hover:-translate-y-0.5 transition-all">
                              View Offer <FiChevronRight className="ml-1" />
                            </a>
                         </td>
@@ -302,7 +298,6 @@ export default function ProductComparator() {
                   </tbody>
                 </table>
               </div>
-            </div>
             </div>
           )}
         </div>
