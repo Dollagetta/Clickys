@@ -2,7 +2,7 @@ import { GoogleAuth } from 'google-auth-library';
 import { unstable_cache } from 'next/cache';
 import { createClient } from '../prismicio';
 
-function slugify(text) {
+function slugify(text: string | null | undefined) {
   if (!text) return '';
   return text
     .toString()
@@ -19,7 +19,7 @@ async function _fetchGuidesFromPrismic() {
   try {
     const client = createClient();
     console.log('[Guides] Fetching from Prismic...');
-    const [guides, products, sliceGuides] = await Promise.all([
+    const [guides, products] = await Promise.all([
       client.getAllByType('guide', {
         orderings: {
           field: 'document.first_publication_date',
@@ -31,18 +31,12 @@ async function _fetchGuidesFromPrismic() {
           field: 'document.first_publication_date',
           direction: 'desc',
         },
-      }).catch(() => []),
-      client.getAllByType('sliceguide1', {
-        orderings: {
-          field: 'document.first_publication_date',
-          direction: 'desc',
-        },
       }).catch(() => [])
     ]);
 
-    console.log(`[Guides] Prismic counts - Guides: ${guides.length}, Products: ${products.length}, SliceGuides: ${sliceGuides.length}`);
+    console.log(`[Guides] Prismic counts - Guides: ${guides.length}, Products: ${products.length}`);
 
-    const prismicGuides = [...guides, ...products, ...sliceGuides].map((doc) => {
+    const prismicGuides = [...guides, ...products].map((doc) => {
       // For sliceguide1, we might need to extract data from slices
       const firstGuideSlice = doc.data.slices?.find(s => s.slice_type === 'guide');
       

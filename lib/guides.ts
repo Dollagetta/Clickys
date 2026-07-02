@@ -2,7 +2,7 @@ import { GoogleAuth } from 'google-auth-library';
 import { unstable_cache } from 'next/cache';
 import { createClient } from '../prismicio';
 
-function slugify(text) {
+function slugify(text: string | null | undefined) {
   if (!text) return '';
   return text
     .toString()
@@ -19,7 +19,7 @@ async function _fetchGuidesFromPrismic() {
   try {
     const client = createClient();
     console.log('[Guides] Fetching from Prismic...');
-    const [guides, products, sliceGuides] = await Promise.all([
+    const [guides, products] = await Promise.all([
       client.getAllByType('guide', {
         orderings: {
           field: 'document.first_publication_date',
@@ -31,20 +31,14 @@ async function _fetchGuidesFromPrismic() {
           field: 'document.first_publication_date',
           direction: 'desc',
         },
-      }).catch(() => []),
-      client.getAllByType('sliceguide1', {
-        orderings: {
-          field: 'document.first_publication_date',
-          direction: 'desc',
-        },
       }).catch(() => [])
     ]);
 
-    console.log(`[Guides] Prismic counts - Guides: ${guides.length}, Products: ${products.length}, SliceGuides: ${sliceGuides.length}`);
+    console.log(`[Guides] Prismic counts - Guides: ${guides.length}, Products: ${products.length}`);
 
-    const prismicGuides = [...guides, ...products, ...sliceGuides].map((doc) => {
+    const prismicGuides = [...guides, ...products].map((doc: any) => {
       // For sliceguide1, we might need to extract data from slices
-      const firstGuideSlice = doc.data.slices?.find(s => s.slice_type === 'guide');
+      const firstGuideSlice = doc.data.slices?.find((s: any) => s.slice_type === 'guide');
       
       return {
         isPrismic: true,
@@ -74,8 +68,8 @@ async function _fetchGuidesFromPrismic() {
   }
 }
 
-function sliceGuidePrice(doc) {
-  const guideSlice = doc.data.slices?.find(s => s.slice_type === 'guide');
+function sliceGuidePrice(doc: any) {
+  const guideSlice = doc.data.slices?.find((s: any) => s.slice_type === 'guide');
   return guideSlice?.primary?.price || '';
 }
 
@@ -135,7 +129,7 @@ async function _fetchGuidesFromSheet(fullRange = true) {
     }
   })();
 
-  let timeoutId;
+  let timeoutId: NodeJS.Timeout;
   const timeoutPromise = new Promise((resolve) => {
     timeoutId = setTimeout(() => {
       console.warn('[Guides] Fetch operation timed out after 12s');
@@ -160,7 +154,7 @@ let _guidesCacheMinimalTime = 0;
 export const fetchGuidesFromSheet = async (fullRange = true) => {
   if (fullRange) {
     if (_guidesCacheFull && (Date.now() - _guidesCacheFullTime < 3600000)) return _guidesCacheFull;
-    const [sheetGuides, prismicGuides] = await Promise.all([
+    const [sheetGuides, prismicGuides]: [any, any] = await Promise.all([
       _fetchGuidesFromSheet(true),
       _fetchGuidesFromPrismic()
     ]);
@@ -170,7 +164,7 @@ export const fetchGuidesFromSheet = async (fullRange = true) => {
     return guides;
   } else {
     if (_guidesCacheMinimal && (Date.now() - _guidesCacheMinimalTime < 3600000)) return _guidesCacheMinimal;
-    const [sheetGuides, prismicGuides] = await Promise.all([
+    const [sheetGuides, prismicGuides]: [any, any] = await Promise.all([
       _fetchGuidesFromSheet(false),
       _fetchGuidesFromPrismic()
     ]);
@@ -223,7 +217,7 @@ function processRows(rows: any[], fullRange: boolean) {
     });
 }
 
-export async function getGuideBySlug(slug) {
+export async function getGuideBySlug(slug: any) {
   const guides = await fetchGuidesFromSheet(true);
   return guides.find((g: any) => g.slug === slug);
 }

@@ -18,7 +18,8 @@ export async function POST(req: Request) {
     }
 
     // Always revalidate the general prismic tag cache
-    revalidateTag("prismic");
+    // In next@16, revalidateTag expects a second argument for CacheLifeConfig
+    revalidateTag("prismic", "default");
 
     // Also specifically revalidate specific pages if documents are present
     if (body.documents && body.documents.length > 0) {

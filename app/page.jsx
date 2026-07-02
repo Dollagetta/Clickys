@@ -247,7 +247,7 @@ export default async function HomePage() {
         <HomeSearchResults />
       </Suspense>
       
-      <div className="container mx-auto mt-6 px-4 flex flex-col lg:flex-row gap-6 relative z-10">
+      <div className="w-full px-2 lg:px-4 flex flex-col lg:flex-row gap-6 relative z-10">
         <HomeSidebar />
 
         <div className="flex-1 w-full min-w-0">
@@ -276,15 +276,17 @@ export default async function HomePage() {
           <Suspense fallback={null}>
             <SearchPinterestGrid initialItems={Array.isArray(homePageData) ? homePageData : []} />
           </Suspense>
-
-          <FeaturedFrames 
-            pinterestItems={Array.isArray(homePageData) ? homePageData : []}
-            localProducts={products}
-            sheetProducts={sheetProducts}
-          />
-          
-          <NewLaunchesSection />
         </div>
+      </div>
+
+      <div className="w-full">
+        <FeaturedFrames 
+          pinterestItems={Array.isArray(homePageData) ? homePageData : []}
+          localProducts={products}
+          sheetProducts={sheetProducts}
+        />
+        
+        <NewLaunchesSection />
       </div>
 
       {/* Modern Interactive Tools Section */}

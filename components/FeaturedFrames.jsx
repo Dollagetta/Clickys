@@ -108,15 +108,15 @@ export default function FeaturedFrames({ pinterestItems = [], localProducts = []
   if (frames.length === 0) return null;
 
   return (
-    <section className="py-10 px-4">
-      <div className="max-w-7xl mx-auto rounded-3xl" style={{ backgroundColor: '#c06431' }}>
-        <div className="p-6 md:p-8">
+    <section className="py-10 w-full px-4 sm:px-6 lg:px-8">
+      <div className="w-full mx-auto rounded-3xl" style={{ backgroundColor: '#c06431' }}>
+        <div className="p-6 md:p-8 lg:p-10">
           <div className="flex items-center gap-2 mb-8 border-b border-white/20 pb-4">
             <div className="w-2 h-8 bg-white rounded-full"></div>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-white uppercase tracking-tighter">Featured Finds</h2>
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-white uppercase tracking-tighter">Featured Finds</h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-6">
           {frames.map((frameItems, frameIdx) => {
              const color = frameColors[frameIdx % frameColors.length];
              const isLight = color === 'ffffff';

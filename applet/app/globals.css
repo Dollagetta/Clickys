@@ -158,3 +158,26 @@ footer:nth-of-type(1) > div:nth-of-type(1) { background-color: #0c0c0b; }
 .rich-text-content a:hover { color: var(--secondary-green); }
 .rich-text-content blockquote { border-left: 4px solid var(--primary-green); padding-left: 1rem; color: var(--dark-gray); font-style: italic; margin-bottom: 1rem; }
 
+nav:nth-of-type(1) {
+  background-color: #70451b;
+}
+
+nav:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > a:nth-of-type(1) {
+  color: #ffffff;
+}
+
+nav:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > a:nth-of-type(1) {
+  color: #ffffff;
+}
+
+nav:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(3) > a:nth-of-type(1) {
+  color: #ffffff;
+}
+
+nav:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(4) > a:nth-of-type(1) {
+  color: #ffffff;
+}
+
+nav:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(5) > a:nth-of-type(1) {
+  color: #ffffff;
+}

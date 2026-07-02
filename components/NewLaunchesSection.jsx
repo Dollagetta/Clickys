@@ -401,7 +401,7 @@ export default function NewLaunchesSection() {
         .nl-scroll::-webkit-scrollbar { display: none; }
         .nl-scroll { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
-      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '20px 24px', backgroundColor: '#ffffff', borderWidth: '8px', borderStyle: 'solid', borderColor: '#f28b24', borderRadius: '50px' }}>
+      <div style={{ width: '100%', margin: '0 auto', padding: '20px 24px', backgroundColor: '#ffffff', borderWidth: '8px', borderStyle: 'solid', borderColor: '#f28b24', borderRadius: '50px' }}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -424,12 +424,12 @@ export default function NewLaunchesSection() {
 
         {/* Product Grid */}
         <div
-          className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 pb-1 pt-2 w-full"
+          className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 gap-3 md:gap-4 pb-1 pt-2 w-full"
           style={{ backgroundColor: '#a62c2c' }}
         >
           {loading
-            ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
-            : launches.slice(0, 4).map(item => <LaunchCard key={item.id} item={item} />)
+            ? Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
+            : launches.slice(0, 6).map(item => <LaunchCard key={item.id} item={item} />)
           }
         </div>
       </div>
