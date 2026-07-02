@@ -39,3 +39,8 @@ nav:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(8) 
 nav:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(9) > a:nth-of-type(1) {
   color: #ffffff;
 }
+
+main:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > section#products-listing:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) {
+  background-color: #ffffff;
+}
+

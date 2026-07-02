@@ -1,7 +1,7 @@
 /* styles/Footer.module.css */
 .footer {
-  background-color: var(--neutral-black);
-  color: var(--medium-gray); /* Lighter gray for better contrast on black */
+  background-color: #0a192f;
+  color: #ffffff; /* Lighter gray for better contrast on black */
   padding: 4rem 0 2rem; /* More padding for a substantial footer */
   border-top: 5px solid var(--primary-green);
   font-size: 0.9rem;
@@ -38,7 +38,7 @@
   text-decoration: none;
 }
 .footerLogo .logoAccent { /* Ensure specificity if needed */
-  color: var(--primary-green);
+  color: #ffffff;
 }
 
 .footerTagline {
@@ -50,7 +50,7 @@
 .disclosure {
   font-style: italic;
   font-size: 0.8rem;
-  color: #a0a0a0; /* Lighter gray for disclosure */
+  color: #ffffff; /* Lighter gray for disclosure */
   line-height: 1.5;
   margin-top: 1rem;
 }
@@ -66,7 +66,7 @@
 }
 .featuredContentTitle {
     font-size: 1.3rem;
-    color: var(--primary-yellow);
+    color: #ffffff;
     margin-bottom: 1.2rem; /* Increased margin */
     font-weight: 600;
 }
@@ -100,7 +100,7 @@
 }
 .featuredDescription {
     font-size: 0.8rem;
-    color: var(--medium-gray);
+    color: #ffffff;
     line-height: 1.5;
 }
 
@@ -115,7 +115,7 @@
 }
 
 .footerLinksColumn h4.footerLinksTitle { /* Ensure h4 is targeted */
-  color: var(--primary-yellow);
+  color: #ffffff;
   font-size: 1.1rem; /* Slightly larger title for link columns */
   font-weight: 600;
   margin-bottom: 1.2rem; /* More space below title */
@@ -134,7 +134,7 @@
 }
 
 .footerLinksColumn a {
-  color: var(--medium-gray);
+  color: #ffffff;
   transition: color var(--transition-fast), padding-left var(--transition-fast);
   text-decoration: none; /* Ensure Link doesn't get default underline */
 }
@@ -155,7 +155,7 @@
 
 .copyright {
   font-size: 0.85rem;
-  color: #a0a0a0;
+  color: #ffffff;
   margin: 0; /* Remove default p margin */
 }
 
@@ -165,7 +165,7 @@
 }
 
 .socialIcons a { /* This styles motion.a */
-  color: var(--medium-gray);
+  color: #ffffff;
   font-size: 1.5rem; /* Larger social icons */
   transition: color var(--transition-fast) !important; /* Ensure color transition overrides motion if needed */
   text-decoration: none;

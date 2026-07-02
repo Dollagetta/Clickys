@@ -133,7 +133,7 @@
   display: none; /* Hidden on desktop */
   background: none;
   border: none;
-  color: var(--neutral-white);
+  color: var(--neutral-black);
   cursor: pointer;
   padding: 0.5rem;
   z-index: 1005; /* Above mobile menu content */
@@ -162,7 +162,7 @@
 .mobileMenu li a {
   display: block;
   padding: 0.8rem 1.5rem;
-  color: var(--neutral-white);
+  color: var(--neutral-black);
   font-size: 1.05rem;
   font-weight: 500;
   width: 100%;

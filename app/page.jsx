@@ -263,11 +263,11 @@ export default async function HomePage() {
               
               <div className="container mx-auto px-4 flex flex-col items-center pointer-events-auto mt-auto">
                 <div className={styles.heroActions} data-aos="fade-up" data-aos-delay="200" style={{ marginBottom: '1rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-                  <CallToAction text="Explore All Products" link="/products" type="secondary" className={styles.heroCtaButton} icon={<FiZap />} iconPosition="left" premium />
-                  <CallToAction text="Browse Partner Products" link="/products" type="primary" className={`${styles.heroCtaButton} ${styles.heroCtaOutline}`} icon={<FiShoppingCart />} iconPosition="left" style={{ backgroundColor: '#cc851f', borderColor: '#ffb300', color: '#ffffff', fontWeight: 'bold', backdropFilter: 'blur(8px)' }} premium />
+                  <CallToAction text="Compare Products" link="/compare" type="secondary" className={styles.heroCtaButton} icon={<FiZap />} iconPosition="left" style={{ backgroundColor: '#064e3b', color: '#ffffff', borderColor: '#064e3b', padding: '14px 28px', fontSize: '1.1rem' }} premium />
+                  <CallToAction text="Track Price" link="/tracker" type="primary" className={`${styles.heroCtaButton} ${styles.heroCtaOutline}`} icon={<FiShoppingCart />} iconPosition="left" style={{ backgroundColor: '#cc851f', borderColor: '#ffb300', color: '#ffffff', fontWeight: 'bold', backdropFilter: 'blur(8px)', padding: '14px 28px', fontSize: '1.1rem'}} premium />
                 </div>
                 <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', textAlign: 'center', textShadow: '0 2px 4px rgba(0,0,0,0.8)', fontWeight: '500', background: 'rgba(0,0,0,0.3)', padding: '4px 12px', borderRadius: '100px', backdropFilter: 'blur(4px)' }} data-aos-delay="400">
-                  Affiliate links help support our mission of bringing you the best tech & home essentials.
+                  We might earn commissions from qualifying purchases.
                 </p>
               </div>
             </div>
@@ -356,7 +356,7 @@ export default async function HomePage() {
       </section>
 
       {/* Deals of the Day Section */}
-      <section className={`${styles.section} ${styles.dealsSection}`} style={{ backgroundColor: '#f97316', border: 'none', height: 'auto', minHeight: 'fit-content', borderRadius: '40px', margin: '2rem 0.5rem', padding: '3rem 1rem' }}>
+      <section className={`${styles.section} ${styles.dealsSection}`} style={{ backgroundColor: '#ffffff', border: 'none', height: 'auto', minHeight: 'fit-content', borderRadius: '40px', margin: '2rem 0.5rem', padding: '3rem 1rem' }}>
         <div className="container mx-auto max-w-7xl px-2 sm:px-4">
           <h2 className={styles.sectionTitle} data-aos="fade-up" style={{ color: '#fff', fontSize: '1.75rem' }}>
             <FiGift className={styles.titleIcon} /> Top Deals
