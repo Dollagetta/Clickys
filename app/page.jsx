@@ -23,7 +23,7 @@ import ProductComparator from '../components/ProductComparator';
 import GiftFinder from '../components/GiftFinder';
 import { components } from "../slices";
 import styles from '../styles/Home.module.css';
-import { FiZap, FiShoppingCart, FiTrendingUp, FiGift, FiShield, FiThumbsUp, FiArrowRight, FiMessageSquare, FiAward, FiCheckCircle, FiClock } from 'react-icons/fi';
+import { FiZap, FiShoppingCart, FiTrendingUp, FiGift, FiShield, FiThumbsUp, FiArrowRight, FiMessageSquare, FiAward, FiCheckCircle, FiClock, FiSmartphone } from 'react-icons/fi';
 import Image from 'next/image'; // For Buying Guides section images
 import Link from 'next/link'; // For guide card links
 import { products } from '../components/products.js';
@@ -92,6 +92,9 @@ const placeholderCategories = [
   { id: 'cat8', name: 'Pet Supplies', slug: 'pet-supplies', icon: 'FiHeart', color: '#06b6d4' },
   { id: 'cat9', name: 'Automotive', slug: 'automotive', icon: 'FiTruck', color: '#f97316' },
   { id: 'cat10', name: 'Office', slug: 'office', icon: 'FiPaperclip', color: '#6366f1' },
+  { id: 'cat11', name: 'Gifts', slug: 'gifts', icon: 'FiGift', color: '#ec4899' },
+  { id: 'cat12', name: 'Mobiles', slug: 'mobiles', icon: 'FiSmartphone', color: '#3b82f6' },
+  { id: 'cat13', name: 'Laptops', slug: 'laptops', icon: 'FiMonitor', color: '#6366f1' },
 ];
 
 export default async function HomePage() {
@@ -223,7 +226,7 @@ export default async function HomePage() {
 
     let categories = [...placeholderCategories];
     if (categoriesResResult.status === 'fulfilled' && categoriesResResult.value.length > 0) {
-      categories = categoriesResResult.value.map(doc => ({
+      const prismicCats = categoriesResResult.value.map(doc => ({
         id: doc.id,
         slug: doc.uid || doc.data.title?.toLowerCase().replace(/\s+/g, '-'),
         name: doc.data.title || 'Category',
@@ -231,6 +234,8 @@ export default async function HomePage() {
         icon: doc.data.icon || 'FiStar',
         color: doc.data.color || '#3dd370'
       }));
+      const prismicNames = new Set(prismicCats.map(c => c.name.toLowerCase()));
+      categories = [...prismicCats, ...categories.filter(c => !prismicNames.has(c.name.toLowerCase()))];
     }
 
 

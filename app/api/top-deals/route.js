@@ -39,7 +39,7 @@ export async function GET(request) {
        };
     });
 
-    const categories = ['Fashion', 'Electronics', 'Beauty', 'Health'];
+    const categories = ['Fashion', 'Electronics', 'Beauty', 'Health', 'Gifts', 'Mobiles', 'Laptops'];
     const platforms = ['Amazon', 'Flipkart', 'Myntra', 'Ajio'];
 
     const dealsByCategory = {};

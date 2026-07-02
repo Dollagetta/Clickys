@@ -11,7 +11,7 @@ export default function HomeSidebar() {
   const toggleSection = (s) => setOpenSections(prev => ({...prev, [s]: !prev[s]}));
 
   const [categorySearchTerm, setCategorySearchTerm] = useState('');
-  const allCategories = ['Electronics', 'Fashion', 'Kitchen', 'Health', 'Home', 'Games', 'Beauty', 'Pet Supplies', 'Automotive', 'Office'];
+  const allCategories = ['Electronics', 'Fashion', 'Kitchen', 'Health', 'Home', 'Games', 'Beauty', 'Pet Supplies', 'Automotive', 'Office', 'Gifts', 'Mobiles', 'Laptops'];
   const allPlatforms = ['Amazon', 'Flipkart', 'Meesho', 'Ajio', 'TataCliQ', 'JioMart', 'Firstcry', 'Zara', 'Shopsy'];
   
   const [minDiscount, setMinDiscount] = useState(0);

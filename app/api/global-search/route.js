@@ -25,14 +25,14 @@ export async function GET(request) {
     let prismicPromise;
     if (isBroad) {
       prismicPromise = client.get({
-        filters: [prismic.filter.at('document.type', 'product')],
+        filters: [prismic.filter.any('document.type', ['product', 'pinterestgrid', 'guide'])],
         pageSize: 40,
         orderings: [{ field: 'document.first_publication_date', direction: 'desc' }]
       });
     } else {
       prismicPromise = client.get({
         filters: [
-          prismic.filter.at('document.type', 'product'),
+          prismic.filter.any('document.type', ['product', 'pinterestgrid', 'guide']),
           prismic.filter.fulltext('document', queryParam)
         ],
         pageSize: 40
