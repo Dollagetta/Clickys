@@ -95,6 +95,7 @@ const placeholderCategories = [
   { id: 'cat11', name: 'Gifts', slug: 'gifts', icon: 'FiGift', color: '#ec4899' },
   { id: 'cat12', name: 'Mobiles', slug: 'mobiles', icon: 'FiSmartphone', color: '#3b82f6' },
   { id: 'cat13', name: 'Laptops', slug: 'laptops', icon: 'FiMonitor', color: '#6366f1' },
+  { id: 'cat14', name: 'Food', slug: 'food', icon: 'FiCoffee', color: '#f59e0b' }
 ];
 
 export default async function HomePage() {
