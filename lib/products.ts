@@ -1,5 +1,7 @@
 import { GoogleAuth } from 'google-auth-library';
 import { unstable_cache } from 'next/cache';
+import { createClient } from '../prismicio';
+import * as prismic from '@prismicio/client';
 
 async function _fetchProductsFromSheet() {
   let clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
@@ -105,6 +107,81 @@ async function _fetchProductsFromSheet() {
   return fetchPromise;
 }
 
+async function _fetchProductsFromPrismic() {
+  try {
+    const client = createClient();
+    const response = await client.get({
+      filters: [prismic.filter.at('document.type', 'product')],
+      pageSize: 100,
+      orderings: [{ field: 'document.first_publication_date', direction: 'desc' }]
+    });
+
+    return (response.results || []).map((p: any) => {
+      let title = p.data?.title || p.data?.name || p.data?.product_name || 'Item';
+      if (Array.isArray(title)) {
+        title = title[0]?.text || 'Item';
+      }
+      
+      let image = p.data?.image?.url || p.data?.meta_image?.url || p.data?.image1?.url || '';
+      if (!image && p.data?.image) image = p.data.image; // Handle case where image might be a string or object
+
+      let link = p.data?.link?.url || p.data?.amazon_link?.url || `/products/${p.uid || p.id}`;
+      
+      let platform = p.data?.platform || p.data?.platform_name || 'Amazon';
+      if (typeof platform === 'object' && platform?.id) {
+         // It might be a relationship field, we'll try to guess from UID or just use Amazon
+         platform = 'Amazon'; 
+      }
+
+      const url = String(link || '').toLowerCase();
+      if (url.includes('flipkart') || url.includes('fktr.in')) platform = 'Flipkart';
+      else if (url.includes('myntra')) platform = 'Myntra';
+      else if (url.includes('ajio')) platform = 'Ajio';
+      else if (url.includes('amazon') || url.includes('amzn')) platform = 'Amazon';
+      else if (url.includes('meesho')) platform = 'Meesho';
+
+      const price = p.data?.price || '';
+      const discount = p.data?.discount || '';
+      
+      // Calculate old price if discount is available
+      let oldPrice = p.data?.old_price || null;
+      let savings = null;
+      
+      if (!oldPrice && discount && price) {
+        const parsedPrice = parseFloat(String(price).replace(/[^0-9.]/g, "")) || 0;
+        const parsedDiscount = parseFloat(String(discount).replace(/[^0-9.]/g, "")) || 0;
+        if (parsedDiscount > 0) {
+            oldPrice = parsedPrice + parsedDiscount;
+            savings = `Save ₹${parsedDiscount}`;
+        }
+      }
+
+      return {
+        id: p.id,
+        title: title,
+        name: title, // Support both name and title
+        price: price,
+        oldPrice: oldPrice ? (String(oldPrice).startsWith('₹') ? oldPrice : `₹${oldPrice}`) : null,
+        savings: savings,
+        link: link,
+        amazonLink: link, // Support both amazonLink and link
+        image: image,
+        imageUrl: image, // Support both imageUrl and image
+        category: p.data?.category || 'Uncategorized',
+        discount: discount,
+        platform: platform,
+        description: p.data?.description || '',
+        rating: p.data?.rating || 4.5,
+        reviewCount: p.data?.review_count || 100,
+        featured: p.data?.featured === true
+      };
+    });
+  } catch (error) {
+    console.error('[Products] Prismic fetch error:', error);
+    return [];
+  }
+}
+
 let _productsCache: any[] | null = null;
 let _productsCacheTime = 0;
 
@@ -144,5 +221,24 @@ export async function fetchProductsFromSheet(categoryQuery: string | null = null
       return products;
     }
     return [];
+  }
+}
+
+export async function fetchAllProducts(categoryQuery: string | null = null) {
+  try {
+    const [sheetProducts, prismicProducts] = await Promise.all([
+      fetchProductsFromSheet(),
+      _fetchProductsFromPrismic()
+    ]);
+    
+    let products = [...sheetProducts, ...prismicProducts];
+    
+    if (categoryQuery) {
+      products = products.filter((p: any) => p.category && p.category.toLowerCase() === categoryQuery.toLowerCase());
+    }
+    return products;
+  } catch (error) {
+    console.error('[Products] Error fetching all products:', error);
+    return fetchProductsFromSheet(categoryQuery);
   }
 }

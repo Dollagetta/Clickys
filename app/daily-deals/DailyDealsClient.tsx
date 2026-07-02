@@ -105,8 +105,8 @@ export default function DailyDealsClient({ initialProducts = [] }: { initialProd
         product.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.platform?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         false;
-      const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
-      const matchesPlatform = selectedPlatform === 'All' || product.platform === selectedPlatform;
+      const matchesCategory = selectedCategory === 'All' || product.category?.toLowerCase() === selectedCategory.toLowerCase();
+      const matchesPlatform = selectedPlatform === 'All' || product.platform?.toLowerCase() === selectedPlatform.toLowerCase();
       return matchesSearch && matchesCategory && matchesPlatform;
     });
   }, [products, searchTerm, selectedCategory, selectedPlatform]);

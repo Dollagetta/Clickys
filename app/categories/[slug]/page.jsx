@@ -2,8 +2,9 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import { FiArrowLeft } from 'react-icons/fi';
 import ProductCard from '../../../components/ProductCard';
-import { products } from '../../../components/products.js';
+import { products as staticProducts } from '../../../components/products.js';
 import { allGuides } from '../../../components/guides.js';
+import { fetchAllProducts } from '../../../lib/products';
 import { createClient } from "../../../prismicio";
 import { asText } from "@prismicio/client";
 import { PrismicNextImage } from "@prismicio/next";
@@ -44,11 +45,11 @@ export default async function CategoryPage({ params }) {
 
   const client = createClient();
 
-  const [guidesResponseResult, prismicProductsResResult] = await Promise.allSettled([
+  const [guidesResponseResult, productsResult] = await Promise.allSettled([
     client.getAllByType("whatsnew", {
       orderings: { field: 'my.whatsnew.date', direction: 'desc' },
     }),
-    client.getAllByType('product')
+    fetchAllProducts()
   ]);
 
   // Prismic Guides (whatsnew)
@@ -73,23 +74,14 @@ export default async function CategoryPage({ params }) {
     });
   }
 
-  // Prismic Products
-  let prismicProducts = [];
-  if (prismicProductsResResult.status === 'fulfilled') {
-    prismicProducts = prismicProductsResResult.value.map(p => ({
-      id: p.id,
-      name: p.data.title,
-      category: p.data.category || 'General',
-      price: p.data.price,
-      imageUrl: p.data.image,
-      amazonLink: p.data.link?.url,
-      platform: p.data.platform || 'Amazon',
-      rating: 0,
-    }));
+  // All Products (Sheet + Prismic)
+  let allProducts = [];
+  if (productsResult.status === 'fulfilled') {
+    allProducts = productsResult.value;
   }
 
   // Also include the local fallback products and guides
-  const allProductsCombined = [...products, ...prismicProducts];
+  const allProductsCombined = [...staticProducts, ...allProducts];
   const allGuidesCombined = [...allGuides, ...guidesData];
 
   // Filter based on the requested category

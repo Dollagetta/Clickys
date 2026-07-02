@@ -3,9 +3,9 @@ import { notFound } from "next/navigation";
 import AffiliateProductsPage from "./AffiliateProductsPage";
 import { products as localProducts } from "../../../components/products.js";
 import { products as flipkartProducts } from "../../../components/flipkartProducts.js";
-import { fetchProductsFromSheet } from "../../../lib/products";
+import { fetchAllProducts } from "../../../lib/products";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 // ==============================
 // SEO METADATA
@@ -77,89 +77,50 @@ export default async function AffiliatePage({ params }) {
 
   const affiliateName = affiliate?.data?.site_name?.toLowerCase() || "";
   const affiliateSlug = affiliate?.uid?.toLowerCase() || "";
-  const affiliateId = affiliate?.id;
 
   // =====================================
-  // FETCH PRISMIC PRODUCTS
+  // FETCH ALL PRODUCTS (Sheet + Prismic + local)
   // =====================================
-  const prismicDocs = await client.getAllByType("product");
-
-  // =====================================
-  // FILTER & MAP PRISMIC PRODUCTS
-  // =====================================
-  const mappedPrismic = prismicDocs
-    .filter((doc) => {
-      // Match relationship field
-      if (doc?.data?.platform && doc.data.platform.id === affiliateId) return true;
-
-      // Match tags
-      if (doc?.tags?.some(tag => 
-        tag?.toLowerCase() === affiliateName || 
-        tag?.toLowerCase() === affiliateSlug
-      )) return true;
-
-      // Match category
-      if (doc?.data?.category && (
-        doc.data.category.toLowerCase() === affiliateName ||
-        doc.data.category.toLowerCase() === affiliateSlug
-      )) return true;
-
-      // Match platform name directly
-      if (doc?.data?.platform_name && doc.data.platform_name.toLowerCase() === affiliateName) return true;
-
-      return false;
-    })
-    .map((doc) => {
-      const price = doc?.data?.price?.toString() || "0";
-      const discount = doc?.data?.discount?.toString() || "";
+  const allProducts = await fetchAllProducts().catch(() => []);
+  
+  const mappedProducts = allProducts
+    .filter((p) => {
+      const platform = (p.platform || "").toLowerCase();
+      const link = (p.link || p.amazonLink || "").toLowerCase();
+      const cat = (p.category || "").toLowerCase();
       
-      const parsedPrice = parseFloat(price.replace(/[^0-9.]/g, "")) || 0;
-      const parsedDiscount = parseFloat(discount.replace(/[^0-9.]/g, "")) || 0;
-      const oldPrice = parsedPrice + parsedDiscount;
-
-      const formatPrice = (p) => {
-        if (!p || String(p).trim() === '') return '';
-        let strClean = String(p).trim();
-        if (strClean.includes('₹')) return strClean;
-        if (/^[0-9]/.test(strClean)) return `₹${strClean}`;
-        return strClean;
-      };
-      const formattedPrice = formatPrice(price);
-
-      const imageUrl = doc?.data?.image || "https://placehold.co/600x600/E5E7EB/475569?text=No+Image";
-
-      let description = doc?.data?.description;
-
-      return {
-        id: doc.id,
-        name: doc?.data?.title || doc?.data?.product_name || "Product",
-        price: formattedPrice,
-        oldPrice: parsedDiscount > 0 && parsedPrice > 0 ? `₹${oldPrice}` : null,
-        savings: discount && parsedDiscount > 0 ? `Save ${discount.includes('%') || discount.includes('₹') ? discount : `₹${discount}`}` : null,
-        category: doc?.data?.category || affiliate?.data?.site_name || "Products",
-        platform: affiliate?.data?.site_name || "Affiliate",
-        imageUrl,
-        description,
-        amazonLink: doc?.data?.link?.url || "#",
-        rating: 4.5,
-        reviewCount: 120,
-        discount,
-        featuredFind: doc?.data?.featured_find === true,
-        promotionalStatus: doc?.data?.promotional_status || "",
-        availabilityStatus: doc?.data?.availability_status || "",
-      };
-    });
+      return platform === affiliateName || 
+             platform === affiliateSlug ||
+             link.includes(affiliateSlug) ||
+             link.includes(affiliateName) ||
+             (affiliateSlug === 'amazon' && (link.includes('amazon') || link.includes('amzn'))) ||
+             (affiliateSlug === 'flipkart' && (link.includes('flipkart') || link.includes('fktr.in'))) ||
+             (affiliateSlug === 'myntra' && link.includes('myntra')) ||
+             (affiliateSlug === 'meesho' && link.includes('meesho')) ||
+             (affiliateSlug === 'ajio' && link.includes('ajio'));
+    })
+    .map((p, idx) => ({
+      id: p.id || `prod-${idx}`,
+      name: p.title || p.name,
+      price: String(p.price).startsWith('₹') ? p.price : `₹${p.price}`,
+      oldPrice: p.oldPrice,
+      savings: p.savings,
+      category: p.category || "Deals",
+      platform: affiliate?.data?.site_name || "Affiliate",
+      imageUrl: p.image || p.imageUrl,
+      description: p.description || p.title || p.name,
+      amazonLink: p.link || p.amazonLink || "#",
+      rating: p.rating || 4.2,
+      reviewCount: p.reviewCount || 30,
+      discount: p.discount,
+    }));
 
   // =====================================
-  // FILTER & MAP LOCAL PRODUCTS (Daily Deals)
+  // FILTER & MAP LOCAL PRODUCTS (Legacy fallback)
   // =====================================
   const mappedLocal = [...localProducts, ...flipkartProducts]
     .filter((p) => {
       const link = (p.amazonLink || "").toLowerCase();
-      const name = (p.name || "").toLowerCase();
-      const cat = (p.category || "").toLowerCase();
-      
-      // Check if link matches affiliate
       const isMatch = 
         link.includes(affiliateSlug) || 
         link.includes(affiliateName) ||
@@ -187,42 +148,7 @@ export default async function AffiliatePage({ params }) {
       discount: p.oldPrice > 0 ? Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100) : 0,
     }));
 
-  // =====================================
-  // FETCH SHEET PRODUCTS (Daily Deals)
-  // =====================================
-  let mappedSheet = [];
-  try {
-    const rawSheet = await fetchProductsFromSheet().catch(() => []);
-    mappedSheet = rawSheet
-      .filter((p) => {
-        const platform = (p.platform || "").toLowerCase();
-        const link = (p.link || "").toLowerCase();
-        
-        return platform === affiliateName || 
-               platform === affiliateSlug ||
-               link.includes(affiliateSlug) ||
-               link.includes(affiliateName);
-      })
-      .map((p, idx) => ({
-        id: `sheet-${idx}-${p.title}`,
-        name: p.title,
-        price: p.price.startsWith('₹') ? p.price : `₹${p.price}`,
-        oldPrice: null, // Sheet data structure doesn't have oldPrice usually
-        savings: null,
-        category: p.category || "Deals",
-        platform: affiliate?.data?.site_name || "Affiliate",
-        imageUrl: p.image,
-        description: p.description || p.title,
-        amazonLink: p.link || "#",
-        rating: 4.2,
-        reviewCount: 30,
-        discount: p.discount,
-      }));
-  } catch (e) {
-    console.error("Affiliate sheet merge error:", e);
-  }
-
-  const combinedProducts = [...mappedPrismic, ...mappedLocal, ...mappedSheet];
+  const combinedProducts = [...mappedProducts, ...mappedLocal];
 
   // =====================================
   // PASS DATA TO CLIENT PAGE

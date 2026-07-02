@@ -110,9 +110,10 @@ export async function POST(req) {
     if (productImage && (productImage.includes('prismic.io') || productImage.includes('imgix.net'))) {
        try {
          const urlObj = new URL(productImage);
-         urlObj.searchParams.set('w', '1600'); // Higher HD quality
-         urlObj.searchParams.set('auto', 'format'); // Better optimization, removed compress for higher fidelity
-         urlObj.searchParams.set('q', '100'); // Maximum quality
+         urlObj.searchParams.set('w', '1200'); // Optimized for 600px width with Retina support (2x)
+         urlObj.searchParams.set('auto', 'format'); // Better optimization
+         urlObj.searchParams.set('q', '95'); // High quality (100 can be counter-productive)
+         urlObj.searchParams.set('fit', 'max'); // Maintain aspect ratio
          productImage = urlObj.toString();
        } catch (e) {
          // Ignore

@@ -1,9 +1,9 @@
 import React, { Suspense } from 'react';
-import { fetchProductsFromSheet } from '../../lib/products';
+import { fetchAllProducts } from '../../lib/products';
 import DailyDealsClient from './DailyDealsClient';
 import { FiSearch } from 'react-icons/fi';
 
-export const revalidate = 86400; // Cache for 24 hours to maximize speed and minimize API cost
+export const revalidate = 3600; // Cache for 1 hour
 
 export const metadata = {
   title: 'Daily Deals & Discounts | Clickys',
@@ -19,7 +19,7 @@ export default async function DealsPage() {
   let message = "";
 
   try {
-    products = await fetchProductsFromSheet();
+    products = await fetchAllProducts();
   } catch (err: any) {
     error = true;
     message = err.message;
